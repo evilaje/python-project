@@ -1,0 +1,7 @@
+# los mierdones de ejecucion de python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+env/
