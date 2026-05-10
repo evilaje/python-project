@@ -1,4 +1,4 @@
-# los mierdones de ejecucion de python
+# ignorar mierdones de ejecucion de python
 __pycache__/
 *.pyc
 *.pyo
