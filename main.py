@@ -1,7 +1,7 @@
 import customtkinter as tk
-from clases import equipo, partido, torneo
-from clases.app import *
-from clases.btnHandler import *
+from models import equipo, partido, torneo
+from ui.app import *
+from ui.views.btnHandler import *
 
 # ventana principal
 root = App()

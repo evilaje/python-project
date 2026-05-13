@@ -3,6 +3,7 @@ import customtkinter as tk
 #comando del btn1
 def open_torneo_config(root):
     window = tk.CTkToplevel(root)
+    window.after(10, window.lift) #levanta por encima de la ventana princpal, asi se muestra arribaS
     window.title("Configuración del Torneo")
     window.geometry("600x400")
 

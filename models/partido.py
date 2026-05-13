@@ -27,7 +27,7 @@ class Partido:
                 if str(self.idEquipo1) in line or str(self.idEquipo2) in line:
                     print("Uno de los equipos ya tiene un partido programado en ese espacio y tiempo")
                     return
-                
-        
+
+
         with open(filename, 'a') as file:
             file.write(f"{self.fecha},{self.hora},{self.lugar},{self.idEquipo1},{self.idEquipo2},{self.golesT1},{self.golesT2},{self.penalesT1},{self.penalesT2}\n")
