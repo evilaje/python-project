@@ -1,5 +1,7 @@
 import customtkinter as tk
-from models import equipo, partido, torneo
+from models.equipo import *
+from models.torneo import *
+from models.partido import *
 from ui.app import *
 from ui.views.btnHandler import *
 
@@ -17,19 +19,26 @@ parent.pack(pady=20, padx=60, fill="both", expand=True)
 # lambda: es basicamente para que la funcion no se ejecute cuando corres la app
 # normalmente en command pasas el nombre de la funcion sin los parentesis pero si necesitas
 # mandarle un parametro tenes que ponerle el lambda para que espere el trigger de tocar el boton
-btn1 = tk.CTkButton(parent, text="Configuración del Torneo", width=200, height=50, command=lambda: open_torneo_config(root))
-btn1.pack(pady=10)
+btn1 = tk.CTkButton(parent, text="Configuración del Torneo", height=50, command=lambda: open_torneo_config(root))
+btn1.pack(pady=10, padx=10, fill="x")
 
-btn2 = tk.CTkButton(parent, text="Registro de Resultados", width=200, height=50)
-btn2.pack(pady=10)
 
-btn3 = tk.CTkButton(parent, text="Emisión de Informes", width=200, height=50)
-btn3.pack(pady=10)
+# segun el pdf este boton se tiene que habilitar cuando ya esten cargados todos los datos (?)
+btn2 = tk.CTkButton(parent, text="Registro de Resultados", height=50)
+btn2.pack(pady=10, padx=10, fill="x")
+
+btn3 = tk.CTkButton(parent, text="Emisión de Informes", height=50)
+btn3.pack(pady=10, padx=10, fill="x")
 
 # el destroy es una funcion nativa del tkinter, para cerrar
-btn4 = tk.CTkButton(parent, text="Salir", width=200, height=50, command=root.destroy)
-btn4.pack(pady=10)
+btn4 = tk.CTkButton(parent, text="Salir", height=50, command=root.destroy)
+btn4.pack(pady=10, padx=10, fill="x")
 # hasta aca llegan los botones
+
+
+# para probar bs
+#btn5 = tk.CTkButton(parent, text="Debug", height=50, command=lambda: test.savePartido())
+#btn5.pack(pady=10, padx=10, fill="x")
 
 
 # bs que inicia la app

@@ -7,7 +7,7 @@ class Torneo:
 		# self.saveTorneo()
 
 
-	def saveTorneo(self, filename="files/torneos.txt"):
+	def saveTorneo(self, filename="data/torneos.txt"):
 		with open(filename, 'a+') as file:
 
 			# mirar si ya existe el nombre que se metio en el archivo
@@ -28,7 +28,7 @@ class Torneo:
 
 
 #utils
-def selectTorneo(nombre, filename="files/torneos.txt"):
+def selectTorneo(nombre, filename="data/torneos.txt"):
 	with open(filename, 'r') as file:
 		for line in file:
 			if line.startswith(f"{nombre},"):
