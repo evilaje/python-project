@@ -106,5 +106,41 @@
         "golesT2": 0,
         "penalesT1": 0,
         "penalesT2": 0
+    },
+    {
+        "id": 10,
+        "fecha": "14/05/2026",
+        "hora": "12:00",
+        "lugar": "La nueva Olla",
+        "idEquipo1": 1,
+        "idEquipo2": 1,
+        "golesT1": 0,
+        "golesT2": 0,
+        "penalesT1": 0,
+        "penalesT2": 0
+    },
+    {
+        "id": 11,
+        "fecha": "14/05/2026",
+        "hora": "12:00",
+        "lugar": "La nueva Olla",
+        "idEquipo1": 1,
+        "idEquipo2": 1,
+        "golesT1": 0,
+        "golesT2": 0,
+        "penalesT1": 0,
+        "penalesT2": 0
+    },
+    {
+        "id": 12,
+        "fecha": "14/05/2026",
+        "hora": "12:00",
+        "lugar": "La nueva Olla",
+        "idEquipo1": 1,
+        "idEquipo2": 1,
+        "golesT1": 0,
+        "golesT2": 0,
+        "penalesT1": 0,
+        "penalesT2": 0
     }
 ]

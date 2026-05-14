@@ -1,11 +1,101 @@
 [
     {
+        "id": "E1",
+        "pais": "Pais de pruba",
+        "abreviatura": "PRUEB",
+        "prefijo": "+67",
+        "confederacion": "TTT",
+        "grupo": "A",
+        "puntos": 0
+    },
+    {
         "id": "P1",
         "pais": "Paraguay",
         "abreviatura": "PY",
         "prefijo": "+595",
         "confederacion": "FIFA",
         "grupo": "A",
+        "puntos": 0
+    },
+    {
+        "id": "P2",
+        "pais": "Argentina",
+        "abreviatura": "ARG",
+        "prefijo": "+54",
+        "confederacion": "CONMEBOL",
+        "grupo": "A",
+        "puntos": 0
+    },
+    {
+        "id": "P3",
+        "pais": "Brasil",
+        "abreviatura": "BRA",
+        "prefijo": "+55",
+        "confederacion": "CONMEBOL",
+        "grupo": "B",
+        "puntos": 0
+    },
+    {
+        "id": "P4",
+        "pais": "Uruguay",
+        "abreviatura": "URY",
+        "prefijo": "+598",
+        "confederacion": "CONMEBOL",
+        "grupo": "B",
+        "puntos": 0
+    },
+    {
+        "id": "P5",
+        "pais": "Espa\u00f1a",
+        "abreviatura": "ESP",
+        "prefijo": "+34",
+        "confederacion": "UEFA",
+        "grupo": "C",
+        "puntos": 0
+    },
+    {
+        "id": "P6",
+        "pais": "Francia",
+        "abreviatura": "FRA",
+        "prefijo": "+33",
+        "confederacion": "UEFA",
+        "grupo": "C",
+        "puntos": 0
+    },
+    {
+        "id": "P7",
+        "pais": "Alemania",
+        "abreviatura": "GER",
+        "prefijo": "+49",
+        "confederacion": "UEFA",
+        "grupo": "D",
+        "puntos": 0
+    },
+    {
+        "id": "P8",
+        "pais": "Italia",
+        "abreviatura": "ITA",
+        "prefijo": "+39",
+        "confederacion": "UEFA",
+        "grupo": "D",
+        "puntos": 0
+    },
+    {
+        "id": "P10",
+        "pais": "Senegal",
+        "abreviatura": "SEN",
+        "prefijo": "+221",
+        "confederacion": "CAF",
+        "grupo": "E",
+        "puntos": 0
+    },
+    {
+        "id": "P9",
+        "pais": "Nigeria",
+        "abreviatura": "NGA",
+        "prefijo": "+234",
+        "confederacion": "CAF",
+        "grupo": "E",
         "puntos": 0
     }
 ]

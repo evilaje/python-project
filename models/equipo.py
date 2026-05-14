@@ -41,6 +41,7 @@ class Equipo:
                 return
 
         equipos.append(self.toDict())
+        equipos.sort(key=lambda eq: (eq["grupo"], eq["id"]))
 
         with open(filename, "w") as file:
             json.dump(equipos, file, indent=4)
