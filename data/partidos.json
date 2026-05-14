@@ -1,0 +1,86 @@
+[
+    {
+        "id": 1,
+        "fecha": "14/05/2026",
+        "hora": "12:00",
+        "lugar": "La nueva Olla",
+        "idEquipo1": 0,
+        "idEquipo2": 0,
+        "golesT1": 0,
+        "golesT2": 0,
+        "penalesT1": 0,
+        "penalesT2": 0
+    },
+    {
+        "id": 2,
+        "fecha": "14/05/2026",
+        "hora": "12:00",
+        "lugar": "La nueva Olla",
+        "idEquipo1": 1,
+        "idEquipo2": 1,
+        "golesT1": 0,
+        "golesT2": 0,
+        "penalesT1": 0,
+        "penalesT2": 0
+    },
+    {
+        "id": 3,
+        "fecha": "14/05/2026",
+        "hora": "12:00",
+        "lugar": "La nueva Olla",
+        "idEquipo1": 1,
+        "idEquipo2": 1,
+        "golesT1": 0,
+        "golesT2": 0,
+        "penalesT1": 0,
+        "penalesT2": 0
+    },
+    {
+        "id": 4,
+        "fecha": "14/05/2026",
+        "hora": "12:00",
+        "lugar": "La nueva Olla",
+        "idEquipo1": 1,
+        "idEquipo2": 1,
+        "golesT1": 0,
+        "golesT2": 0,
+        "penalesT1": 0,
+        "penalesT2": 0
+    },
+    {
+        "id": 5,
+        "fecha": "14/05/2026",
+        "hora": "12:00",
+        "lugar": "La nueva Olla",
+        "idEquipo1": 1,
+        "idEquipo2": 1,
+        "golesT1": 0,
+        "golesT2": 0,
+        "penalesT1": 0,
+        "penalesT2": 0
+    },
+    {
+        "id": 6,
+        "fecha": "14/05/2026",
+        "hora": "12:00",
+        "lugar": "La nueva Olla",
+        "idEquipo1": 1,
+        "idEquipo2": 1,
+        "golesT1": 0,
+        "golesT2": 0,
+        "penalesT1": 0,
+        "penalesT2": 0
+    },
+    {
+        "id": 7,
+        "fecha": "14/05/2026",
+        "hora": "12:00",
+        "lugar": "La nueva Olla",
+        "idEquipo1": 1,
+        "idEquipo2": 1,
+        "golesT1": 0,
+        "golesT2": 0,
+        "penalesT1": 0,
+        "penalesT2": 0
+    }
+]

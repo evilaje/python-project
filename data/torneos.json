@@ -1,0 +1,9 @@
+[
+    {
+        "id": 1,
+        "nombre": "Copa America",
+        "inicio": "10/05/2026",
+        "fin": "14/05/2026",
+        "estaActivo": false
+    }
+]

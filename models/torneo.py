@@ -1,24 +1,49 @@
+from utils.files_utils import *
+
+PATH = get_path("data", "torneos.json")
+
 class Torneo:
-	def __init__ (self, nombre: str, inicio:str, fin:str):
+	def __init__ (self, nombre: str, inicio:str, fin:str, estaActivo:bool=None):
+		self.id = self.obtenerId()
 		self.nombre = nombre
 		self.inicio = inicio #DD/MM/AAAA
 		self.fin = fin #DD/MM/AAAA
+		self.estaActivo = False if estaActivo is None else True #sujeto a cambio
 
-		# self.saveTorneo()
+	def toDict(self):
+		return {
+			"id" : self.id,
+			"nombre" : self.nombre,
+			"inicio" : self.inicio,
+			"fin" : self.fin,
+			"estaActivo" : self.estaActivo
+		}
 
+	def saveTorneo(self, filename=None):
+		if (filename is None):
+			filename = PATH
 
-	def saveTorneo(self, filename="files/torneos.txt"):
-		with open(filename, 'a+') as file:
+		torneos = []
+		if (file_exists(filename)):
+			with open(filename, "r") as file:
+				torneos = json.load(file)
 
-			# mirar si ya existe el nombre que se metio en el archivo
-			for line in file:
-				if line.startswith(f"{self.nombre},"):
-					print(f"Torneo {self.nombre} ya existe. El torneo no se va a guardar.")
-					return
+		# mirar si ya existe el nombre que se metio en el archivo, es que el id es autoincremental xd
+		#a lo mejor hay que echarle un ojo a esta valiacion
+		for t in torneos:
+			if (self.nombre == t["nombre"]):
+				print("ya existe el torneo, no se guardara.")
+				return
 
-			file.write(f"{self.nombre},{self.inicio},{self.fin}\n")
+		torneos.append(self.toDict())
 
+		with open(filename, "w") as file:
+			json.dump(torneos, file, indent=4)
+
+	#tdv no hice nada con esto xd, solo evitar 	q se modifique si el torneo ya emppezo
 	def editTorneo(self, inicio:str, fin:str):
+		if (not self.estaActivo):
+			pass
 		#tengo pensado que no se pueden cambiar los nombres de los torneos, solo las fechas
 		self.inicio = inicio
 		self.fin = fin
@@ -27,12 +52,34 @@ class Torneo:
 		pass
 
 
-#utils
-def selectTorneo(nombre, filename="files/torneos.txt"):
-	with open(filename, 'r') as file:
-		for line in file:
-			if line.startswith(f"{nombre},"):
-				return line.strip().split(",")
+	def obtenerId(self, filename=None):
+		if filename is None:
+			filename = PATH
 
-		print(f"Torneo {nombre} no encontrado.")
+		if not file_exists(filename):
+			return 1
+
+		with open(filename, "r") as file:
+			torneos = json.load(file)
+			return len(torneos) + 1 if len(torneos) != 0 else 1
+
+	def getAllTorneos(filename:str = None):
+		if (filename is None):
+			filename = PATH
+		arr = []
+		if (file_exists(filename)):
+			with open(filename, "r") as file:
+				arr = json.load(file)
+				return arr if len(arr) > 0 else None
+		return None
+
+	def getTorneo(id, filename:str = None):
+		if (filename is None):
+			filename = PATH
+		arr = []
+		if (file_exists(filename)):
+			with open(filename, "r") as file:
+				arr = json.load(file)
+		for obj in arr:
+			if (id == obj["id"]): return obj
 		return None

@@ -1,3 +1,7 @@
+from utils.files_utils import *
+
+
+PATH = get_path("data", "equipos.json")
 class Equipo:
     def __init__(self, id, pais, abv, prefix, conf, grupo):
         self.id = id
@@ -8,18 +12,55 @@ class Equipo:
         self.grupo = grupo
 
         # self.saveEquipo()
+    def toDict(self):
+        return {
+            "id" : self.id,
+            "pais" : self.pais,
+            "abreviatura" : self.abreviatura,
+            "prefijo" : self.prefijo,
+            "confederacion" : self.confederacion,
+            "grupo" : self.grupo
+        }
 
 
     # bs para guardar la data en un archivo
     # podemos usar el identificador para encontrar el lugar
-    def saveEquipo(self, filename="../files/equipos.txt"):
-        with open(filename, 'a') as file:
+    def saveEquipo(self, filename=None):
+        if (filename is None):
+            filename = PATH
 
-            # mirar si ya existe el id que se metio en er archivo
-            # ese print hay que cambiar por una ventana de error o algo despues
-            for line in file:
-                if line.startswith(f"{self.id},"):
-                    print(f"ID {self.id} ya existe. El equipo no se va a guardar.")
-                    return
+        equipos = []
+        if file_exists(filename):
+            with open(filename, "r") as file:
+                equipos = json.load(file)
 
-            file.write(f"{self.id},{self.pais},{self.abreviatura},{self.prefijo},{self.confederacion},{self.grupo}\n")
+        for eq in equipos:
+            if (self.id == eq["id"]):
+                print("el equipo ya existe, no se va a guardar")
+                return
+
+        equipos.append(self.toDict())
+
+        with open(filename, "w") as file:
+            json.dump(equipos, file, indent=4)
+
+    def getAllEquipos(filename:str = None):
+        if (filename is None):
+            filename = PATH
+        arr = []
+        if (file_exists(filename)):
+            with open(filename, "r") as file:
+                arr = json.load(file)
+                return arr if len(arr) > 0 else None
+        return None
+
+    def getTorneo(id, filename:str = None):
+        if (filename is None):
+            filename = PATH
+        arr = []
+        if (file_exists(filename)):
+            with open(filename, "r") as file:
+                arr = json.load(file)
+        for obj in arr:
+            if (id == obj["id"]): return obj
+        return None

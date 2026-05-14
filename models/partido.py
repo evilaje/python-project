@@ -1,8 +1,11 @@
 # esto se puede ampliar para guardar el minuto del gol y eso
 # o que jugador metio pero idk
+from utils.files_utils import *
 
+PATH = get_path("data", "partidos.json")
 class Partido:
     def __init__(self, date, hora, lugar, idT1, idT2):
+        self.id = self.obtenerId()
         self.fecha = date
         self.hora = hora
         self.lugar = lugar
@@ -13,21 +16,66 @@ class Partido:
         self.penalesT1 = 0
         self.penalesT2 = 0
 
-    # muchas verificaciones
-    # no puede haber un partido con la misma fecha, hora, lugar
-    # hay qiue ver que un equipo no juegue dos partidos al mismo tiempo
-    def savePartido(self, filename="../files/partidos.txt"):
-        for line in open(filename, 'r'):
+    def toDict(self):
+         return {
+              "id" : self.id,
+              "fecha" : self.fecha,
+              "hora" : self.hora,
+              "lugar" : self.lugar,
+              "idEquipo1" : self.idEquipo1,
+              "idEquipo2" : self.idEquipo2,
+              "golesT1" : self.golesT1,
+              "golesT2" : self.golesT2,
+              "penalesT1" : self.penalesT1,
+              "penalesT2" : self.penalesT2
+         }
 
-            # revisar
-            if self.fecha in line and self.hora in line and self.lugar in line:
-                print("Ya hay un partido programado en ese espacio y tiempo")
-                return
-            elif self.fecha in line and self.hora in line:
-                if str(self.idEquipo1) in line or str(self.idEquipo2) in line:
-                    print("Uno de los equipos ya tiene un partido programado en ese espacio y tiempo")
-                    return
+    #las verificaciones deben ir por santos cojones en el servicio, aca se hace un quilombo
+    def savePartido(self, filename=None):
+        if filename is None:
+            filename = PATH
+
+        #obtener todo para volver a cargar despues, asi evitamos separar logicas de creacion de archivos (igual es re macanada pero x)
+        partidos = []
+
+        if file_exists(filename):
+            with open(filename, "r") as file:
+                partidos = json.load(file)
+
+        partidos.append(self.toDict())
+
+        with open(filename, "w") as file:
+            json.dump(partidos, file, indent=4)
 
 
-        with open(filename, 'a') as file:
-            file.write(f"{self.fecha},{self.hora},{self.lugar},{self.idEquipo1},{self.idEquipo2},{self.golesT1},{self.golesT2},{self.penalesT1},{self.penalesT2}\n")
+    def obtenerId(self, filename=None):
+        if (filename is None):
+            filename = PATH
+
+        if not file_exists(filename): #por si el archivo todavia no se creo
+            return 1
+
+        with open(filename, "r") as file:
+            partidos = json.load(file) #json load carga el contenido del archivo a la variable, en este caso como vector
+            return len(partidos) + 1 if len(partidos) != 0 else 1
+
+    def getAllPartidos(filename:str = None):
+        if (filename is None):
+            filename = PATH
+        arr = []
+        if (file_exists(filename)):
+            with open(filename, "r") as file:
+                arr = json.load(file)
+                return arr if len(arr) > 0 else None
+        return None
+
+    def getPartido(id, filename:str = None):
+        if (filename is None):
+            filename = PATH
+        arr = []
+        if (file_exists(filename)):
+            with open(filename, "r") as file:
+                arr = json.load(file)
+        for obj in arr:
+            if (id == obj["id"]): return obj
+        return None

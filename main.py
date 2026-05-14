@@ -1,8 +1,26 @@
 import customtkinter as tk
-from models import equipo, partido, torneo
+
 from ui.app import *
 from ui.views.btnHandler import *
 
+from models.partido import *
+from models.equipo import *
+from models.torneo import *
+
+print("test")
+t1 = Torneo("Copa America", "10/05/2026", "14/05/2026")
+t1.saveTorneo()
+p1 = Partido("14/05/2026", "12:00", "La nueva Olla", 1, 1)
+p1.savePartido()
+eq1 = Equipo("P1", "Paraguay", "PY", "+595", "FIFA", "A")
+eq1.saveEquipo()
+
+equipos = Equipo.getAllEquipos()
+torneos = Torneo.getAllTorneos()
+partidos = Partido.getAllPartidos()
+print(equipos)
+print(torneos)
+print(partidos)
 # ventana principal
 root = App()
 
