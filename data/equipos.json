@@ -1,18 +1,11 @@
 [
     {
-        "id": "A1",
-        "pais": "Bolivia",
-        "abreviatura": "Bol",
-        "prefijo": "+591",
-        "confederacion": "No se que es confederacion xd",
-        "grupo": "B"
-    },
-    {
         "id": "P1",
         "pais": "Paraguay",
         "abreviatura": "PY",
         "prefijo": "+595",
         "confederacion": "FIFA",
-        "grupo": "A"
+        "grupo": "A",
+        "puntos": 0
     }
 ]

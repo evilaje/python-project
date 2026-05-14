@@ -3,13 +3,14 @@ from utils.files_utils import *
 
 PATH = get_path("data", "equipos.json")
 class Equipo:
-    def __init__(self, id, pais, abv, prefix, conf, grupo):
+    def __init__(self, id, pais, abv, prefix, conf, grupo, puntos = 0):
         self.id = id
         self.pais = pais
         self.abreviatura = abv
         self.prefijo = prefix
         self.confederacion = conf
         self.grupo = grupo
+        self.puntos = puntos
 
         # self.saveEquipo()
     def toDict(self):
@@ -19,24 +20,24 @@ class Equipo:
             "abreviatura" : self.abreviatura,
             "prefijo" : self.prefijo,
             "confederacion" : self.confederacion,
-            "grupo" : self.grupo
+            "grupo" : self.grupo,
+            "puntos" : self.puntos
         }
 
 
     # bs para guardar la data en un archivo
     # podemos usar el identificador para encontrar el lugar
-    def saveEquipo(self, filename=None):
+    def saveEquipo(self, filename:str = None):
         if (filename is None):
             filename = PATH
-
         equipos = []
         if file_exists(filename):
             with open(filename, "r") as file:
                 equipos = json.load(file)
 
         for eq in equipos:
-            if (self.id == eq["id"]):
-                print("el equipo ya existe, no se va a guardar")
+            if (eq["id"] == self.id):
+                print("No se guardara el equipo")
                 return
 
         equipos.append(self.toDict())
