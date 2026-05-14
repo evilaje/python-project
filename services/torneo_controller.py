@@ -5,5 +5,5 @@ def cargarTorneo(nombre:str, inicio:str, fin:str):
 	torneo:Torneo = Torneo(nombre, inicio, fin)
 	torneo.saveTorneo()
 
-def buscarTorneo(nombre:str):
-	return selectTorneo(nombre)
+def buscarTorneo(id:int):
+	return getTorneo(id, PATH)

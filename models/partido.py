@@ -30,6 +30,13 @@ class Partido:
               "penalesT2" : self.penalesT2
          }
 
+    """
+        agregar validaciones
+        -> 1 equipo no puede jugar 2 partidos el mismo dia
+        -> el partido tiene que estar en rango del torneo
+        -> no pueden haber 2 partidos en el mismo lugar a la misma hora
+        -> equipo 1 y equipo 2 no pueden ser el mismo (igual esto se puede validar en la UI)
+    """
     #las verificaciones deben ir por santos cojones en el servicio, aca se hace un quilombo
     def savePartido(self, filename=None):
         if filename is None:
@@ -47,7 +54,33 @@ class Partido:
         with open(filename, "w") as file:
             json.dump(partidos, file, indent=4)
 
+        # aumentar los puntos de los equipos segun el resultado
+        with open(get_path("data", "equipos.json"), "w") as file:
+            equipos = json.load(file)
+            for eq in equipos:
+                if self.golesT1 > self.golesT2:
+                    if eq["id"] == self.idEquipo1:
+                        eq["puntos"] += 3
+                    if eq["id"] == self.idEquipo2:
+                        eq["puntos"] += 0
+                elif self.golesT2 > self.golesT1:
+                    if eq["id"] == self.idEquipo2:
+                        eq["puntos"] += 3
+                    if eq["id"] == self.idEquipo1:
+                        eq["puntos"] += 0
+                
+                # che cuando pio hay penales yo no se
+                # dudoso de esta parte del code
+                else:
+                    if eq["id"] == self.idEquipo1:
+                        eq["puntos"] += 1
+                    if eq["id"] == self.idEquipo2:
+                        eq["puntos"] += 1
 
+            json.dump(equipos, file, indent=4)
+
+
+    # esto es para el autoincrement
     def obtenerId(self, filename=None):
         if (filename is None):
             filename = PATH
@@ -59,6 +92,7 @@ class Partido:
             partidos = json.load(file) #json load carga el contenido del archivo a la variable, en este caso como vector
             return len(partidos) + 1 if len(partidos) != 0 else 1
 
+    # al abrir la app se cargar todo en un arreglo
     def getAllPartidos(filename:str = None):
         if (filename is None):
             filename = PATH
@@ -69,13 +103,13 @@ class Partido:
                 return arr if len(arr) > 0 else None
         return None
 
-    def getPartido(id, filename:str = None):
-        if (filename is None):
-            filename = PATH
-        arr = []
-        if (file_exists(filename)):
-            with open(filename, "r") as file:
-                arr = json.load(file)
-        for obj in arr:
-            if (id == obj["id"]): return obj
-        return None
+def getPartido(id, filename:str = None):
+    if (filename is None):
+        filename = PATH
+    arr = []
+    if (file_exists(filename)):
+        with open(filename, "r") as file:
+            arr = json.load(file)
+    for obj in arr:
+        if (id == obj["id"]): return obj
+    return None
