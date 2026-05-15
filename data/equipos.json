@@ -1,15 +1,6 @@
 [
     {
-        "id": "E1",
-        "pais": "Pais de pruba",
-        "abreviatura": "PRUEB",
-        "prefijo": "+67",
-        "confederacion": "TTT",
-        "grupo": "A",
-        "puntos": 0
-    },
-    {
-        "id": "P1",
+        "id": "A1",
         "pais": "Paraguay",
         "abreviatura": "PY",
         "prefijo": "+595",
@@ -18,84 +9,174 @@
         "puntos": 0
     },
     {
-        "id": "P2",
-        "pais": "Argentina",
-        "abreviatura": "ARG",
-        "prefijo": "+54",
-        "confederacion": "CONMEBOL",
+        "id": "A2",
+        "pais": "Colombia",
+        "abreviatura": "CO",
+        "prefijo": "+57",
+        "confederacion": "FIFA",
         "grupo": "A",
         "puntos": 0
     },
     {
-        "id": "P3",
+        "id": "A3",
+        "pais": "Ecuador",
+        "abreviatura": "EC",
+        "prefijo": "+593",
+        "confederacion": "FIFA",
+        "grupo": "A",
+        "puntos": 0
+    },
+    {
+        "id": "A4",
+        "pais": "Paraguay",
+        "abreviatura": "PY",
+        "prefijo": "+595",
+        "confederacion": "FIFA",
+        "grupo": "A",
+        "puntos": 0
+    },
+    {
+        "id": "A5",
+        "pais": "Colombia",
+        "abreviatura": "CO",
+        "prefijo": "+57",
+        "confederacion": "FIFA",
+        "grupo": "A",
+        "puntos": 0
+    },
+    {
+        "id": "A6",
+        "pais": "Ecuador",
+        "abreviatura": "EC",
+        "prefijo": "+593",
+        "confederacion": "FIFA",
+        "grupo": "A",
+        "puntos": 0
+    },
+    {
+        "id": "B1",
+        "pais": "Argentina",
+        "abreviatura": "AR",
+        "prefijo": "+54",
+        "confederacion": "FIFA",
+        "grupo": "B",
+        "puntos": 0
+    },
+    {
+        "id": "B2",
+        "pais": "Chile",
+        "abreviatura": "CL",
+        "prefijo": "+56",
+        "confederacion": "FIFA",
+        "grupo": "B",
+        "puntos": 0
+    },
+    {
+        "id": "B3",
+        "pais": "Venezuela",
+        "abreviatura": "VE",
+        "prefijo": "+58",
+        "confederacion": "FIFA",
+        "grupo": "B",
+        "puntos": 0
+    },
+    {
+        "id": "B4",
+        "pais": "Argentina",
+        "abreviatura": "AR",
+        "prefijo": "+54",
+        "confederacion": "FIFA",
+        "grupo": "B",
+        "puntos": 0
+    },
+    {
+        "id": "B5",
+        "pais": "Chile",
+        "abreviatura": "CL",
+        "prefijo": "+56",
+        "confederacion": "FIFA",
+        "grupo": "B",
+        "puntos": 0
+    },
+    {
+        "id": "B6",
+        "pais": "Venezuela",
+        "abreviatura": "VE",
+        "prefijo": "+58",
+        "confederacion": "FIFA",
+        "grupo": "B",
+        "puntos": 0
+    },
+    {
+        "id": "C1",
         "pais": "Brasil",
-        "abreviatura": "BRA",
+        "abreviatura": "BR",
         "prefijo": "+55",
-        "confederacion": "CONMEBOL",
-        "grupo": "B",
+        "confederacion": "FIFA",
+        "grupo": "C",
         "puntos": 0
     },
     {
-        "id": "P4",
+        "id": "C2",
+        "pais": "Peru",
+        "abreviatura": "PE",
+        "prefijo": "+51",
+        "confederacion": "FIFA",
+        "grupo": "C",
+        "puntos": 0
+    },
+    {
+        "id": "C3",
+        "pais": "Brasil",
+        "abreviatura": "BR",
+        "prefijo": "+55",
+        "confederacion": "FIFA",
+        "grupo": "C",
+        "puntos": 0
+    },
+    {
+        "id": "C4",
+        "pais": "Peru",
+        "abreviatura": "PE",
+        "prefijo": "+51",
+        "confederacion": "FIFA",
+        "grupo": "C",
+        "puntos": 0
+    },
+    {
+        "id": "D1",
         "pais": "Uruguay",
-        "abreviatura": "URY",
+        "abreviatura": "UY",
         "prefijo": "+598",
-        "confederacion": "CONMEBOL",
-        "grupo": "B",
-        "puntos": 0
+        "confederacion": "FIFA",
+        "grupo": "D",
+        "puntos": 1
     },
     {
-        "id": "P5",
-        "pais": "Espa\u00f1a",
-        "abreviatura": "ESP",
-        "prefijo": "+34",
-        "confederacion": "UEFA",
-        "grupo": "C",
-        "puntos": 0
+        "id": "D2",
+        "pais": "Bolivia",
+        "abreviatura": "BO",
+        "prefijo": "+591",
+        "confederacion": "FIFA",
+        "grupo": "D",
+        "puntos": 1
     },
     {
-        "id": "P6",
-        "pais": "Francia",
-        "abreviatura": "FRA",
-        "prefijo": "+33",
-        "confederacion": "UEFA",
-        "grupo": "C",
-        "puntos": 0
-    },
-    {
-        "id": "P7",
-        "pais": "Alemania",
-        "abreviatura": "GER",
-        "prefijo": "+49",
-        "confederacion": "UEFA",
+        "id": "D3",
+        "pais": "Uruguay",
+        "abreviatura": "UY",
+        "prefijo": "+598",
+        "confederacion": "FIFA",
         "grupo": "D",
         "puntos": 0
     },
     {
-        "id": "P8",
-        "pais": "Italia",
-        "abreviatura": "ITA",
-        "prefijo": "+39",
-        "confederacion": "UEFA",
+        "id": "D4",
+        "pais": "Bolivia",
+        "abreviatura": "BO",
+        "prefijo": "+591",
+        "confederacion": "FIFA",
         "grupo": "D",
-        "puntos": 0
-    },
-    {
-        "id": "P10",
-        "pais": "Senegal",
-        "abreviatura": "SEN",
-        "prefijo": "+221",
-        "confederacion": "CAF",
-        "grupo": "E",
-        "puntos": 0
-    },
-    {
-        "id": "P9",
-        "pais": "Nigeria",
-        "abreviatura": "NGA",
-        "prefijo": "+234",
-        "confederacion": "CAF",
-        "grupo": "E",
         "puntos": 0
     }
 ]

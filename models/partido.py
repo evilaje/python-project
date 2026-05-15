@@ -47,16 +47,20 @@ class Partido:
 
         if file_exists(filename):
             with open(filename, "r") as file:
-                partidos = json.load(file)
+                if not is_file_empty(filename):
+                    partidos = json.load(file)
 
         partidos.append(self.toDict())
-
         with open(filename, "w") as file:
             json.dump(partidos, file, indent=4)
 
         # aumentar los puntos de los equipos segun el resultado
-        with open(get_path("data", "equipos.json"), "w") as file:
-            equipos = json.load(file)
+        equipos = []
+        with open(get_path("data", "equipos.json"), "r") as file:
+            if not is_file_empty(get_path("data", "equipos.json")):
+                equipos = json.load(file)
+
+        if (len(equipos) != 0):
             for eq in equipos:
                 if self.golesT1 > self.golesT2:
                     if eq["id"] == self.idEquipo1:
@@ -68,16 +72,17 @@ class Partido:
                         eq["puntos"] += 3
                     if eq["id"] == self.idEquipo1:
                         eq["puntos"] += 0
-                
-                # che cuando pio hay penales yo no se
-                # dudoso de esta parte del code
+
+                    # che cuando pio hay penales yo no se
+                    # dudoso de esta parte del code
                 else:
                     if eq["id"] == self.idEquipo1:
                         eq["puntos"] += 1
                     if eq["id"] == self.idEquipo2:
                         eq["puntos"] += 1
 
-            json.dump(equipos, file, indent=4)
+            with open(get_path("data", "equipos.json"), "w") as file:
+                json.dump(equipos, file, indent=4)
 
 
     # esto es para el autoincrement
@@ -89,8 +94,10 @@ class Partido:
             return 1
 
         with open(filename, "r") as file:
-            partidos = json.load(file) #json load carga el contenido del archivo a la variable, en este caso como vector
-            return len(partidos) + 1 if len(partidos) != 0 else 1
+            if not is_file_empty(filename):
+                partidos = json.load(file) #json load carga el contenido del archivo a la variable, en este caso como vector
+                return len(partidos) + 1 if len(partidos) != 0 else 1
+        return 1
 
     # al abrir la app se cargar todo en un arreglo
     def getAllPartidos(filename:str = None):
@@ -99,8 +106,9 @@ class Partido:
         arr = []
         if (file_exists(filename)):
             with open(filename, "r") as file:
-                arr = json.load(file)
-                return arr if len(arr) > 0 else None
+                if not is_file_empty(filename):
+                    arr = json.load(file)
+                    return arr if len(arr) > 0 else None
         return None
 
 def getPartido(id, filename:str = None):
@@ -109,7 +117,8 @@ def getPartido(id, filename:str = None):
     arr = []
     if (file_exists(filename)):
         with open(filename, "r") as file:
-            arr = json.load(file)
+            if not is_file_empty(filename):
+                arr = json.load(file)
     for obj in arr:
         if (id == obj["id"]): return obj
     return None

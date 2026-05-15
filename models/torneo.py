@@ -10,7 +10,7 @@ class Torneo:
 		self.fin = fin #DD/MM/AAAA
 		self.estaActivo = False # siempre false al crearse, cuando se cumplan los requisitos cambia a true
 		# los requisitos serian que los grupos esten cargados totalmente y las fechas de los partidos tambien
-	
+
 	def toDict(self):
 		return {
 			"id" : self.id,
@@ -28,7 +28,8 @@ class Torneo:
 		torneos = []
 		if (file_exists(filename)):
 			with open(filename, "r") as file:
-				torneos = json.load(file)
+				if not is_file_empty(filename):
+					torneos = json.load(file)
 
 		# mirar si ya existe el nombre que se metio en el archivo, es que el id es autoincremental xd
 		#a lo mejor hay que echarle un ojo a esta valiacion
@@ -49,7 +50,7 @@ class Torneo:
 		# tengo pensado que no se pueden cambiar los nombres de los torneos, solo las fechas
 		self.inicio = inicio
 		self.fin = fin
-		
+
 		# como no hay mas de un torneo entonces guardar nomas nb
 		self.saveTorneo()
 
@@ -62,8 +63,11 @@ class Torneo:
 			return 1
 
 		with open(filename, "r") as file:
-			torneos = json.load(file)
-			return len(torneos) + 1 if len(torneos) != 0 else 1
+			if not is_file_empty(filename):
+				torneos = json.load(file)
+				return len(torneos) + 1 if len(torneos) != 0 else 1
+			else:
+				return 1
 
 	# al abrir la app se cargar todo en un arreglo
 	def getAllTorneos(filename:str = None):
@@ -72,8 +76,9 @@ class Torneo:
 		arr = []
 		if (file_exists(filename)):
 			with open(filename, "r") as file:
-				arr = json.load(file)
-				return arr if len(arr) > 0 else None
+				if not is_file_empty(filename):
+					arr = json.load(file)
+					return arr if len(arr) > 0 else None
 		return None
 
 def getTorneo(id, filename:str = None):
@@ -82,7 +87,8 @@ def getTorneo(id, filename:str = None):
 	arr = []
 	if (file_exists(filename)):
 		with open(filename, "r") as file:
-			arr = json.load(file)
+			if not is_file_empty(filename):
+				arr = json.load(file)
 	for obj in arr:
 		if (id == obj["id"]): return obj
 	return None
