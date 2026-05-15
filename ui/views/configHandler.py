@@ -31,4 +31,3 @@ def open_torneo_config(root):
 
     close_btn = tk.CTkButton(window, text="Salir", command=window.destroy)
     close_btn.pack(pady=10)
-
