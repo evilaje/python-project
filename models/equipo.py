@@ -111,27 +111,7 @@ class Equipo:
                 if not is_file_empty(filename):
                     arr = json.load(file)
                     return arr if len(arr) > 0 else None
-        return None #importante verificar siempre el None
-    
-    
-def avanzarFase(filename:str = None):
-    if (filename is None):
-        filename = PATH
-    if (file_exists(filename)):
-        with open(filename, "r") as file:
-            if not is_file_empty(filename):
-                arr = json.load(file)
-
-                mejoresEquipos = getMejoresEquiposGrupo(filename)
-                for eq in arr:
-                    for mejorEq in mejoresEquipos:
-                        if eq["id"] == mejorEq["id"]:
-                            eq["fase"] = "eliminatorias"
-                            break
-                with open(filename, "w") as file:
-                    json.dump(arr, file, indent=4)
-                    
-            
+        return None #importante verificar siempre el None            
 
 
 # obtiene los goles de x equipo
@@ -145,10 +125,10 @@ def getGoles(id, filename:str = get_path("data", "partidos.json")):
             partidos = json.load(file)
             goles = 0
             for p in partidos:
-                if p["equipo1"] == id:
-                    goles += p["golesEquipo1"]
-                elif p["equipo2"] == id:
-                    goles += p["golesEquipo2"]
+                if p["idEquipo1"] == id:
+                    goles += p["golesT1"]
+                elif p["idEquipo2"] == id:
+                    goles += p["golesT2"]
 
             return goles
         return None
@@ -165,12 +145,12 @@ def getDiferenciaGoles(id, filename:str = get_path("data", "partidos.json")):
             golesFavor = 0
             golesContra = 0
             for p in partidos:
-                if p["equipo1"] == id:
-                    golesFavor = p["golesEquipo1"]
-                    golesContra = p["golesEquipo2"]
-                elif p["equipo2"] == id:
-                    golesFavor = p["golesEquipo2"]
-                    golesContra = p["golesEquipo1"]
+                if p["idEquipo1"] == id:
+                    golesFavor = p["golesT1"]
+                    golesContra = p["golesT2"]
+                elif p["idEquipo2"] == id:
+                    golesFavor = p["golesT2"]
+                    golesContra = p["golesT1"]
 
                 if mejorDiferencia is None or golesFavor - golesContra > mejorDiferencia:
                     mejorDiferencia = golesFavor - golesContra
@@ -178,7 +158,24 @@ def getDiferenciaGoles(id, filename:str = get_path("data", "partidos.json")):
             return mejorDiferencia
         return None
 
-    
+# ngl este yo estaba viendo la comparacion de los mejores terceros y copilot se altero y me dijo
+# escribi esto y yo le hice caso, voy a comentar lo que entiendo igual
+def ordenar_terceros(terceros):
+    # definir la funcion aca adentro es tipo hacer private funcion porque total no se usa en ningun otro lado xd
+    def key_eq(eq):
+        diferencia = getDiferenciaGoles(eq["id"])
+        goles = getGoles(eq["id"])
+        return (
+            eq.get("puntos", 0),
+            diferencia if diferencia is not None else -9999,
+            goles if goles is not None else -9999,
+            eq.get("prefijo", "")
+        )
+    # ok al parecer key=key_eq lo que hace es alterar el funcionamiento del sort
+    # le dice que ordene primero por puntos, despues por la mayor diferencia de goles en un partido
+    # (esa funcion hice esta en algun lado), despues goles totales (tambien otra funcion) y de ultimo compara los prefix
+    return sorted(terceros, key=key_eq, reverse=True)
+
 """verificar validaciones despues"""
 # esta funcion retorna la id del equipo que quedo puesto pos en el grupo que se le mande
 # eso en teoria no se no probe me dio paja
@@ -228,43 +225,22 @@ def getMejoresEquiposGrupo(filename:str = None):
                 tercerosPuestos = []
 
                 # esto agrega los 2 mejores equipos per grupo
-                for grupo in ["A", "B", "C", "D", "E", "F", "G", "H", "E", "J", "K", "L"]:
+                for grupo in ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]:
                     equiposGrupo = []
                     for eq in arr:
                         if eq["grupo"] == grupo:
                             equiposGrupo.append(eq)
                     equiposGrupo.sort(key=lambda x: x["puntos"], reverse=True) 
+                    i = 0
+                    for eq in equiposGrupo:
+                        eq["posicion"] = i+1
+                        i += 1
+
                     mejoresEquipos.append(equiposGrupo[0])
                     mejoresEquipos.append(equiposGrupo[1])
                     tercerosPuestos.append(equiposGrupo[2])     
 
-                n = len(tercerosPuestos)
-                for i in range(n):
-                    swapped = False
-                    for j in range(0, n-i-1):
-                        # ordenado normal
-                        if tercerosPuestos[j]["puntos"] < tercerosPuestos[j+1]["puntos"]:
-                            tercerosPuestos[j], tercerosPuestos[j+1] = tercerosPuestos[j+1], tercerosPuestos[j]
-
-                        # si empata en puntos
-                        elif tercerosPuestos[j]["puntos"] == tercerosPuestos[j+1]["puntos"]:
-                            # tratar de ordenar por mayot diferencia de goles a favor
-                            if getDiferenciaGoles(tercerosPuestos[j]["id"]) < getDiferenciaGoles(tercerosPuestos[j+1]["id"]):
-                                tercerosPuestos[j], tercerosPuestos[j+1] = tercerosPuestos[j+1], tercerosPuestos[j]
-                            
-                            # tratar de ordenar por goles totales
-                            elif getGoles(tercerosPuestos[j]["id"]) < getGoles(tercerosPuestos[j+1]["id"]):
-                                tercerosPuestos[j], tercerosPuestos[j+1] = tercerosPuestos[j+1], tercerosPuestos[j]
-
-                            # ordenar por fokin prefijo mierda, el que tiene un numero mayor en prefix gana
-                            elif tercerosPuestos[j]["prefijo"] < tercerosPuestos[j+1]["prefijo"]: 
-                                tercerosPuestos[j], tercerosPuestos[j+1] = tercerosPuestos[j+1], tercerosPuestos[j]
-
-                            
-                            swapped = True
-                    if not swapped: break
-
-                mejoresEquipos.extend(tercerosPuestos[:8]) #agrega los 8 mejores terceros puestos
+                mejoresEquipos.extend(ordenar_terceros(tercerosPuestos)[:8]) #agrega los 8 mejores terceros puestos
                 return mejoresEquipos
                     
     return None

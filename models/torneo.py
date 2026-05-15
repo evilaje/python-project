@@ -1,4 +1,6 @@
 from utils.files_utils import *
+import models.equipo as equipo
+import models.partido as partido
 
 PATH = get_path("data", "torneos.json")
 
@@ -92,3 +94,22 @@ def getTorneo(id, filename:str = None):
 	for obj in arr:
 		if (id == obj["id"]): return obj
 	return None
+
+
+def avanzarFase(filename:str = None):
+	if (filename is None):
+		filename = equipo.PATH
+	if (file_exists(filename)):
+		with open(filename, "r") as file:
+			if not is_file_empty(filename):
+				arr = json.load(file)
+
+				mejoresEquipos = equipo.getMejoresEquiposGrupo(filename)
+				for eq in arr:
+					for mejorEq in mejoresEquipos:
+						if eq["id"] == mejorEq["id"]:
+							eq["fase"] = "eliminatorias"
+							eq["posicion"] = mejorEq["posicion"]
+							break
+				with open(filename, "w") as file:
+					json.dump(arr, file, indent=4)

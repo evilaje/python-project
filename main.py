@@ -9,8 +9,15 @@ from models.partido import *
 from models.equipo import *
 from models.torneo import *
 
-avanzarFase()
+# for i in range(0, 16):
+#     aux = Partido(None, None, None)
+#     aux.savePartido()
 
+# setEquiposFaseGrupos()
+
+# avanzarFase()
+
+# setEliminatorias()
 
 # ventana principal
 root = App()

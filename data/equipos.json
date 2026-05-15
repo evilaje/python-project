@@ -8,7 +8,7 @@
         "grupo": "A",
         "puntos": 5,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 3
     },
     {
         "id": "A2",
@@ -19,7 +19,7 @@
         "grupo": "A",
         "puntos": 8,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 2
     },
     {
         "id": "A3",
@@ -41,7 +41,7 @@
         "grupo": "A",
         "puntos": 9,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 1
     },
     {
         "id": "B1",
@@ -52,7 +52,7 @@
         "grupo": "B",
         "puntos": 2,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 3
     },
     {
         "id": "B2",
@@ -63,7 +63,7 @@
         "grupo": "B",
         "puntos": 8,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 1
     },
     {
         "id": "B3",
@@ -85,7 +85,7 @@
         "grupo": "B",
         "puntos": 4,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 2
     },
     {
         "id": "C1",
@@ -96,7 +96,7 @@
         "grupo": "C",
         "puntos": 6,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 2
     },
     {
         "id": "C2",
@@ -107,7 +107,7 @@
         "grupo": "C",
         "puntos": 3,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 3
     },
     {
         "id": "C3",
@@ -129,7 +129,7 @@
         "grupo": "C",
         "puntos": 7,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 1
     },
     {
         "id": "D1",
@@ -140,7 +140,7 @@
         "grupo": "D",
         "puntos": 7,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 2
     },
     {
         "id": "D2",
@@ -151,7 +151,7 @@
         "grupo": "D",
         "puntos": 8,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 1
     },
     {
         "id": "D3",
@@ -162,7 +162,7 @@
         "grupo": "D",
         "puntos": 4,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 3
     },
     {
         "id": "D4",
@@ -184,7 +184,7 @@
         "grupo": "E",
         "puntos": 5,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 2
     },
     {
         "id": "E2",
@@ -195,7 +195,7 @@
         "grupo": "E",
         "puntos": 5,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 3
     },
     {
         "id": "E3",
@@ -217,7 +217,7 @@
         "grupo": "E",
         "puntos": 7,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 1
     },
     {
         "id": "F1",
@@ -239,7 +239,7 @@
         "grupo": "F",
         "puntos": 7,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 2
     },
     {
         "id": "F3",
@@ -250,7 +250,7 @@
         "grupo": "F",
         "puntos": 9,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 1
     },
     {
         "id": "F4",
@@ -261,7 +261,7 @@
         "grupo": "F",
         "puntos": 4,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 3
     },
     {
         "id": "G1",
@@ -272,7 +272,7 @@
         "grupo": "G",
         "puntos": 7,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 2
     },
     {
         "id": "G2",
@@ -305,7 +305,7 @@
         "grupo": "G",
         "puntos": 8,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 1
     },
     {
         "id": "H1",
@@ -316,7 +316,7 @@
         "grupo": "H",
         "puntos": 1,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 3
     },
     {
         "id": "H2",
@@ -327,7 +327,7 @@
         "grupo": "H",
         "puntos": 5,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 2
     },
     {
         "id": "H3",
@@ -338,7 +338,7 @@
         "grupo": "H",
         "puntos": 9,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 1
     },
     {
         "id": "H4",
@@ -381,8 +381,8 @@
         "confederacion": "CONCACAF",
         "grupo": "I",
         "puntos": 6,
-        "fase": "grupos",
-        "posicion": null
+        "fase": "eliminatorias",
+        "posicion": 1
     },
     {
         "id": "I4",
@@ -392,8 +392,8 @@
         "confederacion": "AFC",
         "grupo": "I",
         "puntos": 6,
-        "fase": "grupos",
-        "posicion": null
+        "fase": "eliminatorias",
+        "posicion": 2
     },
     {
         "id": "J1",
@@ -403,8 +403,8 @@
         "confederacion": "UEFA",
         "grupo": "J",
         "puntos": 1,
-        "fase": "grupos",
-        "posicion": null
+        "fase": "eliminatorias",
+        "posicion": 3
     },
     {
         "id": "J2",
@@ -426,7 +426,7 @@
         "grupo": "J",
         "puntos": 9,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 1
     },
     {
         "id": "J4",
@@ -437,7 +437,7 @@
         "grupo": "J",
         "puntos": 4,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 2
     },
     {
         "id": "K1",
@@ -459,7 +459,7 @@
         "grupo": "K",
         "puntos": 3,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 2
     },
     {
         "id": "K3",
@@ -470,7 +470,7 @@
         "grupo": "K",
         "puntos": 4,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 1
     },
     {
         "id": "K4",
@@ -514,7 +514,7 @@
         "grupo": "L",
         "puntos": 8,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 1
     },
     {
         "id": "L4",
@@ -525,6 +525,6 @@
         "grupo": "L",
         "puntos": 7,
         "fase": "eliminatorias",
-        "posicion": null
+        "posicion": 2
     }
 ]
