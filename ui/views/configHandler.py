@@ -2,7 +2,7 @@ import customtkinter as tk
 
 #comando del btn1
 """validar que no se pueda abrir mas de una vez"""
-def open_torneo_config(root):
+def open_torneo_config(root, btn1=None, btn2=None, btn3=None):
     window = tk.CTkToplevel(root)
     window.after(10, window.lift) #levanta por encima de la ventana princpal, asi se muestra arriba
     window.title("Configuración del Torneo")
@@ -25,9 +25,14 @@ def open_torneo_config(root):
     # y cuando se toque este boton recien se va a habilitar el btn2 en main
     # capaz necesitemos un txt con estados que hay que mantener al cerrar la app
 
-    # para habilitar este boton tienen que haber 104 partidos, 48 equipos y 12 grupos segun el reglamento 
-    btnCerrarConfig = tk.CTkButton(window, text="Cerrar Configuración")
+    # para habilitar este boton tienen que haber 104 partidos, 48 equipos y 12 grupos segun el reglamento
+    btnCerrarConfig = tk.CTkButton(window, text="Cerrar Configuración", command=lambda: close_torneo_config(btn1, btn2, btn3))
     btnCerrarConfig.pack(pady=10)
 
     close_btn = tk.CTkButton(window, text="Salir", command=window.destroy)
     close_btn.pack(pady=10)
+
+def close_torneo_config(btn1, btn2, btn3):
+    btn2.configure(state="normal")
+    btn3.configure(state="normal")
+    btn1.configure(state="disabled", text="Configuracion Cerrada")

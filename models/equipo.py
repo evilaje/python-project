@@ -1,16 +1,19 @@
 from utils.files_utils import *
-
+import utils.json_utils as json_utils
 # path tiene la ruta del json donde se guardan los equipos
 # pero no es la ruta completa, es la variable archivo que se pasa a get_path en files_utils
 PATH = get_path("data", "equipos.json")
 class Equipo:
     def __init__(self, pais, abv, prefix, conf, grupo, puntos = 0):
         self.id = None # depende del grupo y el orden de carga
+        self.pais = pais.capitalize()
         self.abreviatura = abv
         self.prefijo = prefix
         self.confederacion = conf
         self.grupo = grupo
         self.puntos = puntos
+        self.fase = "grupos"
+        self.posicion = None # para cuando aavance de fase, tipo que diga puesto 1 o una mierda asi
 
         self.setId()
 
@@ -24,7 +27,9 @@ class Equipo:
             "prefijo" : self.prefijo,
             "confederacion" : self.confederacion,
             "grupo" : self.grupo,
-            "puntos" : self.puntos
+            "puntos" : self.puntos,
+            "fase" : self.fase,
+            "posicion" : self.posicion
         }
 
 
@@ -35,7 +40,10 @@ class Equipo:
         equipos = []
         if file_exists(filename):
             with open(filename, "r") as file:
-                equipos = json.load(file)
+                if not is_file_empty(filename):
+                    equipos = json.load(file)
+                else:
+                    print("El archivo de equipos esta vacio")
 
         # el id depende del grupo, tipo si es el primero del grupo A entonces id = "A1", el segundo es "A2"
         # el primero del grupo B es "B1", el segundo "B2" y sigue
@@ -47,7 +55,7 @@ class Equipo:
                 count += 1
 
         self.id = self.grupo + str(count)
-        
+
 
     # bs para guardar la data en un archivo
     # podemos usar el identificador para encontrar el lugar
@@ -57,22 +65,22 @@ class Equipo:
         equipos = []
         if file_exists(filename):
             with open(filename, "r") as file:
-                # tbs es para cargar un arreglo con los diccionarios que estan en el json
-                equipos = json.load(file)
+                if not is_file_empty(filename): #verifica que el archivo no este vacio
+                    # tbs es para cargar un arreglo con los diccionarios que estan en el json
+                    equipos = json.load(file)
 
         # i = len(equipos) + 1
         # bucle para evitar equipos repetidos
         # compara todos los equipos existentes en el json con self y existe uno con la misma id, return/exit
-        for eq in equipos:
-            if (eq["id"] == self.id):
-                print("No se guardara el equipo")
-                return
+        if len(equipos) != 0: #no hace falta buscar nada si no hay nada
+            for eq in equipos:
+                if (eq["id"] == self.id or eq["prefijo"] == self.prefijo):
+                    print("No se guardara el equipo")
+                    return
 
         equipos.append(self.toDict())
-        # key = lambda eq -> esta bs define un criterio despues del :, le llama eq a cada elemento del arreglo
-        # basicamente ordena primero por grupo, y en el orden por grupo hace un sort por id
-        """ver para cambiar"""
-        equipos.sort(key=lambda eq: (eq["grupo"], eq["id"]))
+        json_utils.sort_json(equipos)
+
 
         # guarda el diccionario equipos en la direccion de file, con indentacion de 4 espacios (1 tab)
         with open(filename, "w") as file:
@@ -87,25 +95,11 @@ class Equipo:
             return 1
 
         with open(filename, "r") as file:
-            equipos = json.load(file) #json load carga el contenido del archivo a la variable, en este caso como vector
-            return len(equipos) + 1 if len(equipos) != 0 else 1
-        
-    # obtiene los goles de x equipo
-    def getGoles(self, filename:str = get_path("data", "partidos.json")):
-                
-        if not file_exists(filename):
+            if not is_file_empty(filename):
+                equipos = json.load(file) #json load carga el contenido del archivo a la variable, en este caso como vector
+                return len(equipos) + 1 if len(equipos) != 0 else 1
             return 1
-        
-        with open(filename, "r") as file:
-            partidos = json.load(file)
-            goles = 0
-            for p in partidos:
-                if p["equipo1"] == self.id:
-                    goles += p["golesEquipo1"]
-                elif p["equipo2"] == self.id:
-                    goles += p["golesEquipo2"]
 
-            return goles
 
     # al abrir la app se cargar todo en un arreglo
     def getAllEquipos(filename:str = None):
@@ -114,17 +108,163 @@ class Equipo:
         arr = []
         if (file_exists(filename)):
             with open(filename, "r") as file:
+                if not is_file_empty(filename):
+                    arr = json.load(file)
+                    return arr if len(arr) > 0 else None
+        return None #importante verificar siempre el None
+    
+    
+def avanzarFase(filename:str = None):
+    if (filename is None):
+        filename = PATH
+    if (file_exists(filename)):
+        with open(filename, "r") as file:
+            if not is_file_empty(filename):
                 arr = json.load(file)
-                return arr if len(arr) > 0 else None
+
+                mejoresEquipos = getMejoresEquiposGrupo(filename)
+                for eq in arr:
+                    for mejorEq in mejoresEquipos:
+                        if eq["id"] == mejorEq["id"]:
+                            eq["fase"] = "eliminatorias"
+                            break
+                with open(filename, "w") as file:
+                    json.dump(arr, file, indent=4)
+                    
+            
+
+
+# obtiene los goles de x equipo
+def getGoles(id, filename:str = get_path("data", "partidos.json")):
+
+    if not file_exists(filename):
+        return 1
+
+    with open(filename, "r") as file:
+        if not is_file_empty(filename):
+            partidos = json.load(file)
+            goles = 0
+            for p in partidos:
+                if p["equipo1"] == id:
+                    goles += p["golesEquipo1"]
+                elif p["equipo2"] == id:
+                    goles += p["golesEquipo2"]
+
+            return goles
+        return None
+    
+def getDiferenciaGoles(id, filename:str = get_path("data", "partidos.json")):
+
+    if not file_exists(filename):
+        return 1
+
+    with open(filename, "r") as file:
+        if not is_file_empty(filename):
+            partidos = json.load(file)
+            mejorDiferencia = None
+            golesFavor = 0
+            golesContra = 0
+            for p in partidos:
+                if p["equipo1"] == id:
+                    golesFavor = p["golesEquipo1"]
+                    golesContra = p["golesEquipo2"]
+                elif p["equipo2"] == id:
+                    golesFavor = p["golesEquipo2"]
+                    golesContra = p["golesEquipo1"]
+
+                if mejorDiferencia is None or golesFavor - golesContra > mejorDiferencia:
+                    mejorDiferencia = golesFavor - golesContra
+
+            return mejorDiferencia
         return None
 
-def getTorneo(id, filename:str = None):
+    
+"""verificar validaciones despues"""
+# esta funcion retorna la id del equipo que quedo puesto pos en el grupo que se le mande
+# eso en teoria no se no probe me dio paja
+def getPosicionGrupo(pos, grupo, filename:str = None):
     if (filename is None):
         filename = PATH
     arr = []
     if (file_exists(filename)):
         with open(filename, "r") as file:
-            arr = json.load(file)
+            if not is_file_empty(filename):
+                arr = json.load(file)
+                equiposGrupo = []
+                for eq in arr:
+                    if eq["grupo"] == grupo:
+                        equiposGrupo.append(eq)
+                equiposGrupo.sort(key=lambda x: x["puntos"], reverse=True) 
+
+                return equiposGrupo[pos-1]["id"] if len(equiposGrupo) >= pos else None
+            
+
+def getEquipo(id, filename:str = None):
+    if (filename is None):
+        filename = PATH
+    arr = []
+    if (file_exists(filename)):
+        with open(filename, "r") as file:
+            if not is_file_empty(filename):
+                arr = json.load(file)
+            else: #si el archivo esta vacio no obtenemos nada
+                return None
     for obj in arr:
         if (id == obj["id"]): return obj
+    return None
+
+# funcion de mierda para conseguir los equipo que pasan la puta fase de grupos
+# que muchas validaciones mierdon
+"""no se ni si funciona esto, verificar"""
+def getMejoresEquiposGrupo(filename:str = None):
+    if (filename is None):
+        filename = PATH
+    arr = []
+    if (file_exists(filename)):
+        with open(filename, "r") as file:
+            if not is_file_empty(filename):
+                arr = json.load(file)
+                mejoresEquipos = []
+                tercerosPuestos = []
+
+                # esto agrega los 2 mejores equipos per grupo
+                for grupo in ["A", "B", "C", "D", "E", "F", "G", "H", "E", "J", "K", "L"]:
+                    equiposGrupo = []
+                    for eq in arr:
+                        if eq["grupo"] == grupo:
+                            equiposGrupo.append(eq)
+                    equiposGrupo.sort(key=lambda x: x["puntos"], reverse=True) 
+                    mejoresEquipos.append(equiposGrupo[0])
+                    mejoresEquipos.append(equiposGrupo[1])
+                    tercerosPuestos.append(equiposGrupo[2])     
+
+                n = len(tercerosPuestos)
+                for i in range(n):
+                    swapped = False
+                    for j in range(0, n-i-1):
+                        # ordenado normal
+                        if tercerosPuestos[j]["puntos"] < tercerosPuestos[j+1]["puntos"]:
+                            tercerosPuestos[j], tercerosPuestos[j+1] = tercerosPuestos[j+1], tercerosPuestos[j]
+
+                        # si empata en puntos
+                        elif tercerosPuestos[j]["puntos"] == tercerosPuestos[j+1]["puntos"]:
+                            # tratar de ordenar por mayot diferencia de goles a favor
+                            if getDiferenciaGoles(tercerosPuestos[j]["id"]) < getDiferenciaGoles(tercerosPuestos[j+1]["id"]):
+                                tercerosPuestos[j], tercerosPuestos[j+1] = tercerosPuestos[j+1], tercerosPuestos[j]
+                            
+                            # tratar de ordenar por goles totales
+                            elif getGoles(tercerosPuestos[j]["id"]) < getGoles(tercerosPuestos[j+1]["id"]):
+                                tercerosPuestos[j], tercerosPuestos[j+1] = tercerosPuestos[j+1], tercerosPuestos[j]
+
+                            # ordenar por fokin prefijo mierda, el que tiene un numero mayor en prefix gana
+                            elif tercerosPuestos[j]["prefijo"] < tercerosPuestos[j+1]["prefijo"]: 
+                                tercerosPuestos[j], tercerosPuestos[j+1] = tercerosPuestos[j+1], tercerosPuestos[j]
+
+                            
+                            swapped = True
+                    if not swapped: break
+
+                mejoresEquipos.extend(tercerosPuestos[:8]) #agrega los 8 mejores terceros puestos
+                return mejoresEquipos
+                    
     return None

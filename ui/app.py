@@ -1,5 +1,4 @@
 import customtkinter as tk
-import ui.views.configHandler as handler
 
 class App(tk.CTk):
     def __init__(self):
