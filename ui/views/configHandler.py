@@ -11,42 +11,122 @@ class TorneoConfigFrame(tk.CTkFrame):
         self.root = root
         self.main_frame = main_frame
 
-        tk.CTkLabel(self, text="Configuración del Torneo").pack(pady=20, padx=20)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=2)
+        self.grid_columnconfigure(2, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(2, weight=1)
+        self.grid_rowconfigure(3, weight=1)
+        self.grid_rowconfigure(4, weight=1)
 
-        # Campo nombre
-        tk.CTkLabel(self, text="Nombre del Torneo").pack()
-        self.input_nombre = tk.CTkEntry(self, placeholder_text="Ej: Copa Mundial 2026")
-        self.input_nombre.pack(pady=5, padx=20, fill="x")
+        """vista 1 - torneo"""
+        self.frame_torneo = tk.CTkFrame(self, fg_color="transparent")
+        self.frame_torneo.grid(row=0, column=0, columnspan=3, rowspan=5, sticky="nsew")
 
-        # Campo fecah inicio
-        tk.CTkLabel(self, text="Fecha de Inicio").pack()
-        self.input_fecha_inicio = tk.CTkEntry(self, placeholder_text="DD/MM/AAAA")
-        self.input_fecha_inicio.pack(pady=5, padx=20, fill="x")
+        self.frame_torneo.grid_columnconfigure(0, weight=1)
+        self.frame_torneo.grid_columnconfigure(1, weight=2)
+        self.frame_torneo.grid_columnconfigure(2, weight=1)
+        self.frame_torneo.grid_rowconfigure(0, weight=1)
+        self.frame_torneo.grid_rowconfigure(1, weight=1)
+        self.frame_torneo.grid_rowconfigure(2, weight=1)
+        self.frame_torneo.grid_rowconfigure(3, weight=1)
 
-        # Campo fecha fin
-        tk.CTkLabel(self, text="Fecha de Fin").pack()
-        self.input_fecha_fin = tk.CTkEntry(self, placeholder_text="DD/MM/AAAA")
-        self.input_fecha_fin.pack(pady=5, padx=20, fill="x")
+        tk.CTkButton(
+            self.frame_torneo, text="go back", width=100,
+            fg_color="transparent", border_width=1,
+            command=self.volver
+        ).grid(row=0, column=0, padx=20, pady=20, sticky="nw")
 
-        tk.CTkButton(self, text="Guardar datos", command=self.guardar_data_torneo).pack(pady=10)
-        #tk.CTkButton(self, text="Grupos").pack(pady=10)
-        #tk.CTkButton(self, text="Equipos").pack(pady=10)
-        #tk.CTkButton(self, text="Calendario").pack(pady=10)
+        self.input_nombre = tk.CTkEntry(self.frame_torneo, placeholder_text="Nombre del Torneo", width=200)
+        self.input_nombre.grid(row=0, column=1, pady=(40, 10))
 
-        tk.CTkButton(self, text="Cerrar Configuración", command=self.cerrar_config).pack(pady=10)
-        tk.CTkButton(self, text="Volver", command=self.volver).pack(pady=10)
+        self.input_fecha_inicio = tk.CTkEntry(self.frame_torneo, placeholder_text="Fecha de Inicio DD/MM/AAAA", width=200)
+        self.input_fecha_inicio.grid(row=1, column=1, pady=10)
+
+        self.input_fecha_fin = tk.CTkEntry(self.frame_torneo, placeholder_text="Fecha de Final DD/MM/AAAA", width=200)
+        self.input_fecha_fin.grid(row=2, column=1, pady=10)
+
+        tk.CTkButton(
+            self.frame_torneo, text="Guardar Torneo", width=200,
+            fg_color="#29ABE2",
+            command=self.guardar_data_torneo
+        ).grid(row=3, column=1, pady=(20, 10))
+
+        tk.CTkButton(
+            self.frame_torneo, text="Grupos ->", width=110,
+            fg_color="#29ABE2", border_width=0,
+            command=self.go_to_grupos
+        ).grid(row=2, column=2, padx=20, sticky="e")
+
+
+
+        # -----------------------------------------------------------------------------------------------
+
+        """aca empieza la pagina 2 o vista 2 idk es lo de los grupos"""
+        
+        # frame 2, se crea sendo transparente para que no se muestre hasta que se toque
+        # el boton de Grupos ->
+        self.frame_grupos = tk.CTkFrame(self, fg_color="transparent")
+        # no se hace grid todavia, se muestra solo cuando se llama go_to_grupos
+
+        self.frame_grupos.grid_columnconfigure(0, weight=1)
+        self.frame_grupos.grid_columnconfigure(1, weight=2)
+        self.frame_grupos.grid_columnconfigure(2, weight=1)
+        self.frame_grupos.grid_rowconfigure(0, weight=1)
+        self.frame_grupos.grid_rowconfigure(1, weight=1)
+        self.frame_grupos.grid_rowconfigure(2, weight=1)
+        self.frame_grupos.grid_rowconfigure(3, weight=1)
+
+        tk.CTkButton(
+            self.frame_grupos, text="<- Torneo", width=100,
+            fg_color="transparent", border_width=1,
+            command=self.go_to_torneo
+        ).grid(row=0, column=0, padx=20, pady=20, sticky="nw")
+
+        # Por aca tienen que estar los campos 
+        tk.CTkLabel(self.frame_grupos, text="Configuración de Grupos").grid(row=0, column=1, pady=(40, 10))
+
+        
+
+        tk.CTkButton(
+            self.frame_grupos, text="Guardar Grupos", width=200,
+            fg_color="#29ABE2",
+            command=self.guardar_grupos
+        ).grid(row=3, column=1, pady=(20, 10))
+
+        tk.CTkButton(
+            self.frame_grupos, text="Equipos ->", width=110,
+            fg_color="transparent", border_width=0,
+            command=lambda: None  # proxima vista
+        ).grid(row=2, column=2, padx=20, sticky="e")
+
+
+
+
+    #----------------------------------------------------------------------------------------------------------
+    """vista 3 por aca"""
+
+    # esta es la funcion para cambiar de pagina
+    def go_to_grupos(self):
+        # grid remove borra el grid pero no el frame, entonces podes llamar grid otra vez para volver a mostrar
+        self.frame_torneo.grid_remove()
+        # se habilita el grid
+        self.frame_grupos.grid(row=0, column=0, columnspan=3, rowspan=5, sticky="nsew")
+
+    def go_to_torneo(self):
+        self.frame_grupos.grid_remove()
+        self.frame_torneo.grid(row=0, column=0, columnspan=3, rowspan=5, sticky="nsew")
 
     def guardar_data_torneo(self):
         nombre = self.input_nombre.get().strip()
         fecha_inicio = self.input_fecha_inicio.get().strip()
         fecha_fin = self.input_fecha_fin.get().strip()
 
-        # salta error si algun campo esta vacio
         if not nombre or not fecha_inicio or not fecha_fin:
             CTkMessagebox(title="Error", message="Todos los campos son obligatorios", icon="cancel")
             return
 
-        # validar formato de fecha
         try:
             dt_inicio = datetime.strptime(fecha_inicio, "%d/%m/%Y")
             dt_fin = datetime.strptime(fecha_fin, "%d/%m/%Y")
@@ -54,13 +134,11 @@ class TorneoConfigFrame(tk.CTkFrame):
             CTkMessagebox(title="Error", message="Formato de fecha invalido, usa DD/MM/AAAA", icon="cancel")
             return
 
-        # fecha inicio no puede ser antes de hoy
         hoy = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
         if dt_inicio < hoy:
             CTkMessagebox(title="Error", message="La fecha de inicio no puede ser anterior a hoy", icon="cancel")
             return
 
-        # fecha fin no puede ser antes o igual que fecha inicio
         if dt_fin <= dt_inicio:
             CTkMessagebox(title="Error", message="La fecha de fin debe ser posterior a la de inicio", icon="cancel")
             return
@@ -68,8 +146,8 @@ class TorneoConfigFrame(tk.CTkFrame):
         cargarTorneo(nombre, fecha_inicio, fecha_fin)
         CTkMessagebox(title="Exito", message="Torneo guardado correctamente", icon="check")
 
-
-        
+    def guardar_grupos(self):
+        pass
 
     def cerrar_config(self):
         self.main_frame.habilitar_botones()
