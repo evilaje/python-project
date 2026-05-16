@@ -270,52 +270,76 @@ def setEliminatorias(filename:str = None):
     # ordenar_terceros es la funcion custom que ordena siguiendo las reglas de fokin fifa
     mejores_terceros = equipo.ordenar_terceros(terceros)[:8]
 
-    # bueno aca inicializo una lista vacia de partidos, una de partidos para almacenar
-    # una que copia la de ganadores para hacerle pop a los que ya uso y lo mismo para los 
-    # subcampeones same shiet
+    # Construir emparejamientos en el orden requerido por el usuario
     matches = []
-    available_ganadores = ganadores.copy()
-    available_subcampeones = subcampeones.copy()
 
-
-    
-    for terc in mejores_terceros:
-        # esto es basicamente emparejar a un tercer puesto contra un puesto 1 random
-        # al parecer un puesto 3 siempre se enfrenta a un puesto 1, y como un puesto 1 no puede
-        # enfrentarse a otro puesto 1 segun el reglamento entonces vamos recortando
-        rival = next((g for g in available_ganadores if g["grupo"] != terc["grupo"]), None)
-
-        # esto es una validacion bullshit por que si no hay rival entonces no hay append y
-        # al final va a retornar None pero mi cerebro esta frito y no pienso hacer esto mas eficiente ahora
-        if rival is None:
-            continue
-        # agregas el conjunto de id y removes el puesto 1 que ya se uso
-        matches.append((rival["id"], terc["id"]))
-        available_ganadores.remove(rival)
-
-    #esto es lo mismo que el otro basicamente
-    # con la diferencia de que aca vamos a vaciar ya los ganadores y evitamos puesto 1 vs puesto 1
-    for gan in available_ganadores.copy():
-        rival = next((s for s in available_subcampeones if s["grupo"] != gan["grupo"]), None)
-        if rival is None:
-            continue
-        matches.append((gan["id"], rival["id"]))
-        available_ganadores.remove(gan)
-        available_subcampeones.remove(rival)
-
-    # recorrer todos los que quedan en subChamps
-    while len(available_subcampeones) >= 2:
-        # salvas el dato mientras le popeas de la lista
-        first = available_subcampeones.pop(0)
-        second_index = next((i for i, s in enumerate(available_subcampeones) if s["grupo"] != first["grupo"]), None)
-        if second_index is None:
-            break
-        second = available_subcampeones.pop(second_index)
-        matches.append((first["id"], second["id"]))
-
-    # si no son 16 partidos medio que algo salio mal entonces return none
-    if len(matches) != 16:
+    # defino aca porque no creo usar en otro lado
+    def pick_by_label(label: str):
+        # los labels son tipo 1A, 2B pero no son lo mismo que la id
+        # aca 1A es el primer puesto de A y asi
+        if not label or len(label) < 2:
+            return None
+        
+        # que todos los labels sean solo eso (evitar caracteres raros)
+        lab = label.strip().upper()
+        pos = lab[0]
+        grp = lab[1]
+        if pos == '1':
+            return next((g for g in ganadores if g['grupo'].upper() == grp), None)
+        if pos == '2':
+            return next((s for s in subcampeones if s['grupo'].upper() == grp), None)
         return None
+
+    def conseguirMejorTercero(allowed_groups, pool):
+        allowed = set([g.upper() for g in allowed_groups])
+        for i, t in enumerate(pool):
+            if t.get('grupo', '').upper() in allowed:
+                return pool.pop(i)
+        return None
+
+    # copia de los mejores terceros para hacer pop cuando ya se hayan usado
+    pool_terceros = mejores_terceros.copy()
+
+    # estos son los matchups que aparecen en el reglamento
+    # hardcodeado nomas por que habia sido para decidir esto ven donde se juegan todos los partidos
+    # y por un algoritmo de proximidad rarete en anda a saber que lenguaje se decide
+    sequence = [
+        ('2A', '2B'),
+        ('1E', ('best_third', ['A','B','C','D','F'])),
+        ('1F', '2C'),
+        ('1C', '2F'),
+        ('1I', ('best_third', ['C','D','F','G','H'])),
+        ('2E', '2I'),
+        ('1A', ('best_third', ['C','E','F','H','I'])),
+        ('1L', ('best_third', ['E','H','I','J','K'])),
+        ('1D', ('best_third', ['B','E','F','I','J'])),
+        ('1G', ('best_third', ['A','E','H','I','J'])),
+        ('2K', '2L'),
+        ('1H', '2J'),
+        ('1B', ('best_third', ['E','F','G','I','J'])),
+        ('1J', '2H'),
+        ('1K', ('best_third', ['D','E','I','J','L'])),
+        ('2D', '2G')
+    ]
+
+    for l, r in sequence:
+        # esto lo que hace es verificar que sea una tupla porque defini todo como tuplas nomas para
+        # no hacer alguna estupidez, y si es una tupla pregunta si su primer elemento es best_third
+        if isinstance(l, tuple) and l[0] == 'best_third':
+            equipo1 = conseguirMejorTercero(l[1], pool_terceros)
+        else:
+            equipo1 = pick_by_label(l)
+
+        # same shit que arriba pero probando con el elemento de la derecha
+        if isinstance(r, tuple) and r[0] == 'best_third':
+            equipo2 = conseguirMejorTercero(r[1], pool_terceros)
+        else:
+            equipo2 = pick_by_label(r)
+
+        if equipo1 is None or equipo2 is None:
+            return None
+
+        matches.append((equipo1['id'], equipo2['id']))
 
     # cargamos todos los partidos que hay en el json
     partidos = []
@@ -336,3 +360,16 @@ def setEliminatorias(filename:str = None):
         json.dump(partidos, file, indent=4)
 
     return None
+
+def setOctavos(filename:str = None):
+    pass
+
+def setCuartos(filename:str = None):
+    pass
+
+def setSemis(filename:str = None):
+    pass
+
+# esto setea el partido por el tercer puesto tambien
+def setFinal(filename:str = None):
+    pass
