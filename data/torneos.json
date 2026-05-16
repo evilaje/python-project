@@ -5,5 +5,12 @@
         "inicio": "10/05/2026",
         "fin": "14/05/2026",
         "estaActivo": false
+    },
+    {
+        "id": 2,
+        "nombre": "test",
+        "inicio": "26/06/2026",
+        "fin": "27/06/2026",
+        "estaActivo": false
     }
 ]
