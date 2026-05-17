@@ -12,6 +12,7 @@ class Torneo:
 		self.fin = fin #DD/MM/AAAA
 		self.estaActivo = False # siempre false al crearse, cuando se cumplan los requisitos cambia a true
 		# los requisitos serian que los grupos esten cargados totalmente y las fechas de los partidos tambien
+		self.fase = "Fase de Grupos"
 
 	def toDict(self):
 		return {
@@ -19,7 +20,8 @@ class Torneo:
 			"nombre" : self.nombre,
 			"inicio" : self.inicio,
 			"fin" : self.fin,
-			"estaActivo" : self.estaActivo
+			"estaActivo" : self.estaActivo,
+			"fase" : getattr(self, "fase", "Fase de Grupos")
 		}
 
 	# validaciones en la UI
@@ -113,3 +115,14 @@ def avanzarFase(filename:str = None):
 							break
 				with open(filename, "w") as file:
 					json.dump(arr, file, indent=4)
+
+	# actualizar la fase del torneo en el archivo de torneos
+	if file_exists(PATH):
+		with open(PATH, "r") as tf:
+			if not is_file_empty(PATH):
+				torneos = json.load(tf)
+				if torneos and len(torneos) > 0:
+					# se asume un único torneo activo; actualizar el primero
+					torneos[0]["fase"] = "16avos de Final"
+					with open(PATH, "w") as tfw:
+						json.dump(torneos, tfw, indent=4)

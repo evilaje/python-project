@@ -1,9 +1,9 @@
 [
     {
         "id": 1,
-        "fecha": null,
-        "hora": null,
-        "lugar": null,
+        "fecha": "17/05/26",
+        "hora": "06:70",
+        "lugar": "bilewater",
         "idEquipo1": "A1",
         "idEquipo2": "A2",
         "golesT1": 0,
