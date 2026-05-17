@@ -12,5 +12,19 @@
         "inicio": "26/06/2026",
         "fin": "27/06/2026",
         "estaActivo": false
+    },
+    {
+        "id": 3,
+        "nombre": "FIFA WORLD  CUP 2026",
+        "inicio": "11/06/2026",
+        "fin": "19/07/2026",
+        "estaActivo": false
+    },
+    {
+        "id": 4,
+        "nombre": "testeo",
+        "inicio": "11/08/2026",
+        "fin": "12/09/2026",
+        "estaActivo": false
     }
 ]
