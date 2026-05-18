@@ -15,5 +15,5 @@ from ui.app import *
 # ventana principal
 root = App()
 
-# bs que inicia la app
+# bs que inicia la appW
 root.mainloop()

@@ -1,0 +1,10 @@
+[
+    {
+        "id": 1,
+        "nombre": "OTra prueba",
+        "inicio": "18/06/2026",
+        "fin": "19/07/2026",
+        "estaActivo": false,
+        "fase": "Fase de Grupos"
+    }
+]

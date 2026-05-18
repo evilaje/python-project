@@ -1,14 +1,14 @@
 [
-    {
+	    {
         "id": "A1",
         "pais": "Paraguay",
         "abreviatura": "PY",
         "prefijo": "+595",
         "confederacion": "CONMEBOL",
         "grupo": "A",
-        "puntos": 5,
-        "fase": "eliminatorias",
-        "posicion": 3
+        "puntos": 0,
+        "fase": "grupos",
+        "posicion": null
     },
     {
         "id": "A2",
@@ -526,5 +526,16 @@
         "puntos": 7,
         "fase": "eliminatorias",
         "posicion": 2
+    },
+    {
+        "id": "L5",
+        "pais": "Pais prueba",
+        "abreviatura": "ttt",
+        "prefijo": "+6767",
+        "confederacion": "SIXSEVEN",
+        "grupo": "L",
+        "puntos": 0,
+        "fase": "grupos",
+        "posicion": null
     }
 ]

@@ -74,17 +74,23 @@ class Equipo:
         # compara todos los equipos existentes en el json con self y existe uno con la misma id, return/exit
         if len(equipos) != 0: #no hace falta buscar nada si no hay nada
             for eq in equipos:
-                if (eq["id"] == self.id or eq["prefijo"] == self.prefijo):
+                #como el id depende del orden de carga y el grupo no se repite nunca:
+                #mejor busco pais o prefijo
+                if (eq["pais"] == self.pais or eq["prefijo"] == self.prefijo):
                     print("No se guardara el equipo")
-                    return
+                    print(f"Equipo no guardado: {self.toDict()}")
+                    print(f"Este equipo es igual: {eq}")
+                    return False
 
         equipos.append(self.toDict())
         json_utils.sort_json(equipos)
 
 
+
         # guarda el diccionario equipos en la direccion de file, con indentacion de 4 espacios (1 tab)
         with open(filename, "w") as file:
             json.dump(equipos, file, indent=4)
+        return True
 
     # esto es para el autoincrement
     def obtenerId(self, filename=None):
@@ -111,7 +117,7 @@ class Equipo:
                 if not is_file_empty(filename):
                     arr = json.load(file)
                     return arr if len(arr) > 0 else None
-        return None #importante verificar siempre el None            
+        return None #importante verificar siempre el None
 
 
 # obtiene los goles de x equipo
@@ -132,7 +138,7 @@ def getGoles(id, filename:str = get_path("data", "partidos.json")):
 
             return goles
         return None
-    
+
 def getDiferenciaGoles(id, filename:str = get_path("data", "partidos.json")):
 
     if not file_exists(filename):
@@ -191,10 +197,10 @@ def getPosicionGrupo(pos, grupo, filename:str = None):
                 for eq in arr:
                     if eq["grupo"] == grupo:
                         equiposGrupo.append(eq)
-                equiposGrupo.sort(key=lambda x: x["puntos"], reverse=True) 
+                equiposGrupo.sort(key=lambda x: x["puntos"], reverse=True)
 
                 return equiposGrupo[pos-1]["id"] if len(equiposGrupo) >= pos else None
-            
+
 
 def getEquipo(id, filename:str = None):
     if (filename is None):
@@ -230,7 +236,7 @@ def getMejoresEquiposGrupo(filename:str = None):
                     for eq in arr:
                         if eq["grupo"] == grupo:
                             equiposGrupo.append(eq)
-                    equiposGrupo.sort(key=lambda x: x["puntos"], reverse=True) 
+                    equiposGrupo.sort(key=lambda x: x["puntos"], reverse=True)
                     i = 0
                     for eq in equiposGrupo:
                         eq["posicion"] = i+1
@@ -238,9 +244,23 @@ def getMejoresEquiposGrupo(filename:str = None):
 
                     mejoresEquipos.append(equiposGrupo[0])
                     mejoresEquipos.append(equiposGrupo[1])
-                    tercerosPuestos.append(equiposGrupo[2])     
+                    tercerosPuestos.append(equiposGrupo[2])
 
                 mejoresEquipos.extend(ordenar_terceros(tercerosPuestos)[:8]) #agrega los 8 mejores terceros puestos
                 return mejoresEquipos
-                    
+
     return None
+
+def getCantidadEquiposPorGrupo(grupo:str, filename = PATH):
+    count = 0
+    equipos = []
+    if file_exists(filename):
+        with open(filename, "r") as file:
+            if not is_file_empty(filename):
+                equipos = json.load(file)
+                for eq in equipos:
+                    if eq["grupo"] == grupo:
+                        count += 1
+            else:
+                return -1 #archivo vacio, no creo que se use
+    return count
