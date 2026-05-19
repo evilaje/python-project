@@ -4,13 +4,13 @@ import utils.json_utils as json_utils
 # pero no es la ruta completa, es la variable archivo que se pasa a get_path en files_utils
 PATH = get_path("data", "equipos.json")
 class Equipo:
-    def __init__(self, pais, abv, prefix, conf, grupo, puntos = 0):
+    def __init__(self, pais, abv, prefix, conf, puntos = 0):
         self.id = None # depende del grupo y el orden de carga
         self.pais = pais.capitalize()
         self.abreviatura = abv
         self.prefijo = prefix
         self.confederacion = conf
-        self.grupo = grupo
+        self.grupo = "placeholder"
         self.puntos = puntos
         self.fase = "grupos"
         self.posicion = None # para cuando aavance de fase, tipo que diga puesto 1 o una mierda asi
@@ -91,6 +91,7 @@ class Equipo:
         with open(filename, "w") as file:
             json.dump(equipos, file, indent=4)
         return True
+    
 
     # esto es para el autoincrement
     def obtenerId(self, filename=None):
@@ -118,6 +119,40 @@ class Equipo:
                     arr = json.load(file)
                     return arr if len(arr) > 0 else None
         return None #importante verificar siempre el None
+    
+
+# funcion para setear grupo en la vista 3 de configHandler
+def setGrupo(pais: str, grupo: str, filename = PATH):
+
+    if not file_exists(filename):
+        return 1
+    
+    equipos = []
+
+    with open(filename, "r") as file:
+        if not is_file_empty(filename):
+            equipos = json.load(file)
+            for eq in equipos:
+                if pais == eq["pais"]:
+                    equipo = Equipo(
+                        eq["pais"],
+                        eq["abreviatura"],
+                        eq["prefijo"],
+                        eq["confederacion"],
+                        eq["puntos"]
+                    )
+
+                    equipo.grupo = grupo
+                    equipo.setId()
+                    eq["grupo"] = grupo
+                    eq["id"] = equipo.id
+                    break
+                    
+
+    with open(filename, "w") as file:
+        json.dump(equipos, file, indent=4)
+    
+    return None
 
 
 # obtiene los goles de x equipo
@@ -261,6 +296,18 @@ def getCantidadEquiposPorGrupo(grupo:str, filename = PATH):
                 for eq in equipos:
                     if eq["grupo"] == grupo:
                         count += 1
+            else:
+                return -1 #archivo vacio, no creo que se use
+    return count
+
+def getCantidadAllEquipos(filename = PATH):
+    count = 0
+    equipos = []
+    if file_exists(filename):
+        with open(filename, "r") as file:
+            if not is_file_empty(filename):
+                equipos = json.load(file)
+                count = len(equipos)
             else:
                 return -1 #archivo vacio, no creo que se use
     return count

@@ -15,5 +15,7 @@ from ui.app import *
 # ventana principal
 root = App()
 
+# cargarGrupo("Hallownest", "H")
+
 # bs que inicia la appW
 root.mainloop()
