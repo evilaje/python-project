@@ -34,10 +34,20 @@ class TorneoConfigFrame(tk.CTkFrame):
         """vista 3 por aca"""
         self.vista3()
 
+        self.vista4()
+
     def go_to_grupos(self):
         self.frame_equipos.grid_remove()
         self.frame_grupos.grid(row=0, column=0, columnspan=3, rowspan=5, sticky="nsew")
-        
+
+    def go_to_partidos(self):
+        self.frame_grupos.grid_remove()
+        self.frame_partidos.grid(row=0, column=0, columnspan=3, rowspan=5, sticky="nsew")
+
+    def go_to_grupos_from_partidos(self):
+        self.frame_partidos.grid_remove()
+        self.frame_grupos.grid(row=0, column=0, columnspan=3, rowspan=5, sticky="nsew")
+
     # esta es la funcion para cambiar de pagina
     def go_to_equipos(self):
         # grid remove borra el grid pero no el frame, entonces podes llamar grid otra vez para volver a mostrar
@@ -121,6 +131,17 @@ class TorneoConfigFrame(tk.CTkFrame):
 
         CTkMessagebox(title="Éxito", message=mensaje, icon="check")
 
+    def guardar_partidos(self):
+        campo1 = self.input_partido1.get().strip()
+        campo2 = self.input_partido2.get().strip()
+        campo3 = self.input_partido3.get().strip()
+
+        if not campo1 or not campo2 or not campo3:
+            CTkMessagebox(title="Error", message="Todos los campos son obligatorios", icon="cancel")
+            return
+
+        
+        CTkMessagebox(title="Exito", message="Partidos guardados correctamente", icon="check")
 
     def seleccionarGrupo(self, value=None):
         grupo = value.strip() if isinstance(value, str) else self.comboGrupo.get().strip()
@@ -317,7 +338,7 @@ class TorneoConfigFrame(tk.CTkFrame):
         )
         self.comboGrupo.grid(row=2, column=0, padx=(20, 40), sticky="e")
 
-        # --- 4 ComboBoxes en la columna central cargadas con todos los equipos disponibles ---
+        #  ComboBoxes en la columna central cargadas con todos los equipos disponibles 
         equipos = Equipo.getAllEquipos()
         team_values = [e["pais"] for e in equipos] if equipos else []
 
@@ -337,7 +358,6 @@ class TorneoConfigFrame(tk.CTkFrame):
         self.combo_team4.grid(row=4, column=1, padx=10, pady=5, sticky="ew")
         self.combo_team4.set("")
 
-        # --- Botón guardar ---
         tk.CTkButton(
             self.frame_grupos,
             text="GuardarGrupo",
@@ -346,6 +366,79 @@ class TorneoConfigFrame(tk.CTkFrame):
             text_color="#01547a",
             command=self.guardar_grupos
         ).grid(row=5, column=1, padx=10, pady=(10, 0), sticky="ew")
+
+
+        tk.CTkButton(
+            self.frame_grupos, text="Partidos ->", width=110,
+            fg_color="transparent", border_width=0,
+            command=self.go_to_partidos
+        ).grid(row=5, column=2, padx=20, sticky="e")
+
+
+
+    def vista4(self):
+        self.frame_partidos = tk.CTkFrame(self, fg_color="transparent")
+
+        self.frame_partidos.grid_columnconfigure(0, weight=1)
+        self.frame_partidos.grid_columnconfigure(1, weight=2)
+        self.frame_partidos.grid_columnconfigure(2, weight=1)
+        self.frame_partidos.grid_rowconfigure(0, weight=1)
+        self.frame_partidos.grid_rowconfigure(1, weight=1)
+        self.frame_partidos.grid_rowconfigure(2, weight=1)
+        self.frame_partidos.grid_rowconfigure(3, weight=1)
+        self.frame_partidos.grid_rowconfigure(4, weight=1)
+        self.frame_partidos.grid_rowconfigure(5, weight=1)
+
+        # --- Botón volver a Grupos ---
+        tk.CTkButton(
+            self.frame_partidos, text="<- Grupos", width=100,
+            fg_color="transparent", border_width=1,
+            command=self.go_to_grupos_from_partidos
+        ).grid(row=0, column=0, padx=20, pady=(20, 0), sticky="nw")
+
+        tk.CTkLabel(
+            self.frame_partidos,
+            text="Configuracion de Partidos"
+        ).grid(row=0, column=1, pady=(20, 0), sticky="n")
+
+        # fecha
+        tk.CTkLabel(self.frame_partidos,
+            text="Campo 1"
+        ).grid(row=2, column=0, padx=(80, 0))
+
+        self.input_partido1 = tk.CTkEntry(self.frame_partidos, placeholder_text="fecha", width=200)
+        self.input_partido1.grid(row=2, column=1, pady=(20, 10))
+
+        # hora
+        tk.CTkLabel(self.frame_partidos,
+            text="Campo 2"
+        ).grid(row=3, column=0, padx=(80, 0))
+
+        self.input_partido2 = tk.CTkEntry(self.frame_partidos, placeholder_text="hora", width=200)
+        self.input_partido2.grid(row=3, column=1, pady=10)
+
+        # lugar
+        tk.CTkLabel(self.frame_partidos,
+            text="Campo 3"
+        ).grid(row=4, column=0, padx=(80, 0))
+
+        self.input_partido3 = tk.CTkEntry(self.frame_partidos, placeholder_text="lugar", width=200)
+        self.input_partido3.grid(row=4, column=1, pady=10)
+
+        # guardar
+        tk.CTkButton(
+            self.frame_partidos, text="Guardar Partidos", width=200,
+            fg_color="#29ABE2",
+            command=self.guardar_partidos
+        ).grid(row=5, column=1, pady=(20, 10))
+
+        # cerrar config
+        tk.CTkButton(
+            self.frame_partidos, text="Cerrar Configuracion", width=180,
+            fg_color="#e05252", hover_color="#b33a3a",
+            command=self.cerrar_config
+        ).grid(row=5, column=2, padx=20, sticky="e")
+
 
     def cleanInputs(self, inputs):
         for input in inputs:

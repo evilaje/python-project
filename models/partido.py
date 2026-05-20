@@ -229,37 +229,59 @@ def setEquiposFaseGrupos(filename:str = None):
 
     return None
 
-# en teoria ya tienen que estar cargados los horarios pero con las ID como None
-# esto es casi hardcoded por el mierdon de reglamento de fifa
-"""esto se puede cambiar todavia"""
-def setEliminatorias(filename:str = None):
-    if (filename is None):
+
+# Se carga una sola vez al importar el modulo; sin costo en cada llamada.
+with open("tabla_anexo_c.json", "r") as _f:
+    _TABLA_ANEXO_C: list[dict] = json.load(_f)
+
+# Índice preconstruido: frozenset de grupos -> orden de slots como lista.
+# Permite buscar en O(1) en lugar de iterar las 495 combinaciones cada vez.
+# gracias jarvis
+_ANEXO_C_INDEX: dict[frozenset, list[str]] = {
+    frozenset(entry["combinacion"]): entry["combinacion"]
+    for entry in _TABLA_ANEXO_C
+}
+
+
+def _orden_terceros(mejores_terceros: list) -> list[str] | None:
+    """
+    Dado el pool de mejores terceros clasificados, devuelve la lista ordenada
+    de grupos según la tabla del anexo C.
+
+    Retorna la combinacion (lista de grupos en orden de slots) o None si la
+    combinación no existe en la tabla.
+
+    Si no existe entonces me quejo en fifa por cojones
+    """
+    clave = frozenset(eq["grupo"].upper() for eq in mejores_terceros)
+    return _ANEXO_C_INDEX.get(clave)
+
+
+def setEliminatorias(filename: str = None):
+    if filename is None:
         filename = PATH
 
     equipos = equipo.Equipo.getAllEquipos()
     if equipos is None:
         return None
 
-    # esta parte crea un diccionario que es tipo -> mismo que en la funcion anterior, pego todo nomas
-    # "A": [equipo1, equipo2, equipo3, equipo4], "B": [equipo5, ...]
-    # lo valores del arreglo son del tipo Equipo
-    # eso es para asignar los id de los equipos
+    # Construir dict de grupos: { "A": [equipo1, equipo2, ...], "B": [...], ... }
+    # Solo equipos cuya fase sea "eliminatorias"
     grupos = {}
     for eq in equipos:
         if eq.get("fase") != "eliminatorias":
             continue
         grupos.setdefault(eq["grupo"], []).append(eq)
 
-    # ordeno por puntos, si tienen los mismo puntos se ordena por id
+    # Ordenar cada grupo por puntos desc, desempate por id desc
     for grupo in grupos:
         grupos[grupo].sort(key=lambda x: (x["puntos"], x["id"]), reverse=True)
 
-    # separo por puesto
-    # algunos grupos solo llevan 2 clasificados y otros llevan 3 entonces son 2 if separados
-    # para que no explote todo
-    ganadores = []
+    # Separar por puesto dentro de cada grupo
+    ganadores    = []
     subcampeones = []
-    terceros = []
+    terceros     = []
+
     for grupo in sorted(grupos.keys()):
         if len(grupos[grupo]) >= 2:
             ganadores.append(grupos[grupo][0])
@@ -267,72 +289,68 @@ def setEliminatorias(filename:str = None):
             if len(grupos[grupo]) >= 3:
                 terceros.append(grupos[grupo][2])
 
-    # ordenar_terceros es la funcion custom que ordena siguiendo las reglas de fokin fifa
+    # Tomar los 8 mejores terceros según el criterio FIFA
     mejores_terceros = equipo.ordenar_terceros(terceros)[:8]
 
-    # Construir emparejamientos en el orden requerido por el usuario
-    matches = []
+    # Obtener el orden de slots desde el anexo C
+    orden_grupos = _orden_terceros(mejores_terceros)
+    if orden_grupos is None:
+        return None
 
-    # defino aca porque no creo usar en otro lado
+    # Mapeo grupo -> equipo para acceso directo al asignar
+    tercero_por_grupo = {eq["grupo"].upper(): eq for eq in mejores_terceros}
+
+    # Iterador sobre el orden definido por el anexo C
+    iter_terceros = iter(orden_grupos)
+
+    # Emparejamientos en el orden requerido.
+    # 'best_third' indica que ese slot consume el siguiente grupo del anexo C.
+    sequence = [
+        ('2A', '2B'),
+        ('1E', ('best_third', ['A', 'B', 'C', 'D', 'F'])),
+        ('1F', '2C'),
+        ('1C', '2F'),
+        ('1I', ('best_third', ['C', 'D', 'F', 'G', 'H'])),
+        ('2E', '2I'),
+        ('1A', ('best_third', ['C', 'E', 'F', 'H', 'I'])),
+        ('1L', ('best_third', ['E', 'H', 'I', 'J', 'K'])),
+        ('1D', ('best_third', ['B', 'E', 'F', 'I', 'J'])),
+        ('1G', ('best_third', ['A', 'E', 'H', 'I', 'J'])),
+        ('2K', '2L'),
+        ('1H', '2J'),
+        ('1B', ('best_third', ['E', 'F', 'G', 'I', 'J'])),
+        ('1J', '2H'),
+        ('1K', ('best_third', ['D', 'E', 'I', 'J', 'L'])),
+        ('2D', '2G'),
+    ]
+
     def pick_by_label(label: str):
-        # los labels son tipo 1A, 2B pero no son lo mismo que la id
-        # aca 1A es el primer puesto de A y asi
+        """Traduce '1A' -> ganador del grupo A, '2B' -> subcampeon del grupo B."""
         if not label or len(label) < 2:
             return None
-        
-        # que todos los labels sean solo eso (evitar caracteres raros)
         lab = label.strip().upper()
         pos = lab[0]
         grp = lab[1]
         if pos == '1':
-            return next((g for g in ganadores if g['grupo'].upper() == grp), None)
+            return next((g for g in ganadores    if g['grupo'].upper() == grp), None)
         if pos == '2':
             return next((s for s in subcampeones if s['grupo'].upper() == grp), None)
         return None
 
-    def conseguirMejorTercero(allowed_groups, pool):
-        allowed = set([g.upper() for g in allowed_groups])
-        for i, t in enumerate(pool):
-            if t.get('grupo', '').upper() in allowed:
-                return pool.pop(i)
-        return None
-
-    # copia de los mejores terceros para hacer pop cuando ya se hayan usado
-    pool_terceros = mejores_terceros.copy()
-
-    # estos son los matchups que aparecen en el reglamento
-    # hardcodeado nomas por que habia sido para decidir esto ven donde se juegan todos los partidos
-    # y por un algoritmo de proximidad rarete en anda a saber que lenguaje se decide
-    sequence = [
-        ('2A', '2B'),
-        ('1E', ('best_third', ['A','B','C','D','F'])),
-        ('1F', '2C'),
-        ('1C', '2F'),
-        ('1I', ('best_third', ['C','D','F','G','H'])),
-        ('2E', '2I'),
-        ('1A', ('best_third', ['C','E','F','H','I'])),
-        ('1L', ('best_third', ['E','H','I','J','K'])),
-        ('1D', ('best_third', ['B','E','F','I','J'])),
-        ('1G', ('best_third', ['A','E','H','I','J'])),
-        ('2K', '2L'),
-        ('1H', '2J'),
-        ('1B', ('best_third', ['E','F','G','I','J'])),
-        ('1J', '2H'),
-        ('1K', ('best_third', ['D','E','I','J','L'])),
-        ('2D', '2G')
-    ]
+    matches = []
 
     for l, r in sequence:
-        # esto lo que hace es verificar que sea una tupla porque defini todo como tuplas nomas para
-        # no hacer alguna estupidez, y si es una tupla pregunta si su primer elemento es best_third
+        # Lado izquierdo
         if isinstance(l, tuple) and l[0] == 'best_third':
-            equipo1 = conseguirMejorTercero(l[1], pool_terceros)
+            grupo_asignado = next(iter_terceros, None)
+            equipo1 = tercero_por_grupo.get(grupo_asignado) if grupo_asignado else None
         else:
             equipo1 = pick_by_label(l)
 
-        # same shit que arriba pero probando con el elemento de la derecha
+        # Lado derecho
         if isinstance(r, tuple) and r[0] == 'best_third':
-            equipo2 = conseguirMejorTercero(r[1], pool_terceros)
+            grupo_asignado = next(iter_terceros, None)
+            equipo2 = tercero_por_grupo.get(grupo_asignado) if grupo_asignado else None
         else:
             equipo2 = pick_by_label(r)
 
@@ -341,21 +359,18 @@ def setEliminatorias(filename:str = None):
 
         matches.append((equipo1['id'], equipo2['id']))
 
-    # cargamos todos los partidos que hay en el json
+    # Cargar partidos existentes del JSON
     partidos = []
     if file_exists(filename):
         with open(filename, "r") as file:
             if not is_file_empty(filename):
                 partidos = json.load(file)
 
-    # enumerate devuelve una matriz que es tipo (contador, value) pero itera solo como value
-    # index es como le llamas a la variable, y como matches ya era luego una matriz id1 e id2 son
-    # los valores i[0] e i[1]
+    # Asignar equipos a los partidos de eliminatorias (arrancan en el índice 72)
     for index, (id1, id2) in enumerate(matches, start=72):
         partidos[index]["idEquipo1"] = id1
         partidos[index]["idEquipo2"] = id2
 
-    # guardar todo y off al fin
     with open(filename, "w") as file:
         json.dump(partidos, file, indent=4)
 
