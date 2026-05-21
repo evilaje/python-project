@@ -42,5 +42,49 @@
         "puntos": 0,
         "fase": "grupos",
         "posicion": null
+    },
+    {
+        "id": "B1",
+        "pais": "Parry",
+        "abreviatura": "ASD",
+        "prefijo": "+123",
+        "confederacion": "Sad",
+        "grupo": "B",
+        "puntos": 0,
+        "fase": "grupos",
+        "posicion": null
+    },
+    {
+        "id": "B2",
+        "pais": "Uhhhhhhhhhhh",
+        "abreviatura": "SI",
+        "prefijo": "+51",
+        "confederacion": "He",
+        "grupo": "B",
+        "puntos": 0,
+        "fase": "grupos",
+        "posicion": null
+    },
+    {
+        "id": "B3",
+        "pais": "Awrq",
+        "abreviatura": "T3Q",
+        "prefijo": "+61",
+        "confederacion": "Be",
+        "grupo": "B",
+        "puntos": 0,
+        "fase": "grupos",
+        "posicion": null
+    },
+    {
+        "id": "B4",
+        "pais": "Yryr",
+        "abreviatura": "T2",
+        "prefijo": "+41",
+        "confederacion": "Geb",
+        "grupo": "B",
+        "puntos": 0,
+        "fase": "grupos",
+        "posicion": null
     }
 ]

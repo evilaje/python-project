@@ -45,6 +45,9 @@ class TorneoReportFrame(tk.CTkFrame):
         self._build_frame_siguiente()
 
         # ----------------------------------------------------------------------------
+        # informe todos los grupos
+        self.frame_all_grupos = tk.CTkFrame(self, fg_color="transparent")
+        self._build_frame_all_grupos()
 
     # =============================================================================
     # BUILD: frame_fecha
@@ -365,7 +368,7 @@ class TorneoReportFrame(tk.CTkFrame):
     
 
     # =============================================================================
-    # informe siguiente partido
+    # BUILD + RENDER: informe siguiente partido (informe 4)
     # =============================================================================
 
     def _build_frame_siguiente(self):
@@ -470,7 +473,7 @@ class TorneoReportFrame(tk.CTkFrame):
         sep = tk.CTkFrame(card, height=1, fg_color=("gray80", "gray35"))
         sep.pack(fill="x", padx=14, pady=(4, 0))
 
-        # equipos + hora 
+        # --- fila central: equipos + hora ---
         mid_row = tk.CTkFrame(card, fg_color="transparent")
         mid_row.pack(fill="x", padx=14, pady=14)
 
@@ -506,21 +509,110 @@ class TorneoReportFrame(tk.CTkFrame):
             text=f"Fecha : {datetime.today().strftime('%d/%m/%Y')}"
         )
 
-        # getSiguientePartido devuelve el dict del proximo partido o None
         partido = getSiguientePartido(equipo)
         self._render_siguiente_partido(partido)
 
-        self.frame_fecha.pack_forget()
-        self.frame_grupo.pack_forget()
-        self.frame_equipo.pack_forget()
-        self.frame_menu.pack_forget()
-        self.frame_siguiente.pack(fill="both", expand=True)
+    # =============================================================================
+    # informe todos los grupos 
+    # =============================================================================
+
+    def _build_frame_all_grupos(self):
+        header = tk.CTkFrame(self.frame_all_grupos, fg_color="transparent")
+        header.pack(fill="x", padx=20, pady=(20, 5))
+
+        tk.CTkButton(header, text="<- Volver", width=100,
+                     fg_color="transparent", border_width=1,
+                     command=self.go_to_menu).pack(side="left")
+
+        tk.CTkLabel(header, text="Informe 5", font=("Arial", 16, "bold")).pack(side="left", padx=20)
+
+        self.label_fecha_all_grupos = tk.CTkLabel(
+            self.frame_all_grupos,
+            text=f"Fecha de emisión del Informe: {datetime.today().strftime('%d/%m/%Y')}",
+            text_color="gray",
+            anchor="w"
+        )
+        self.label_fecha_all_grupos.pack(anchor="w", padx=20, pady=(0, 2))
+
+        tk.CTkLabel(self.frame_all_grupos, text="Formato modelo",
+                    text_color="gray", anchor="w").pack(anchor="w", padx=20)
+
+        # un unico scroll con todos los grupos apilados
+        self.scroll_all_grupos = tk.CTkScrollableFrame(self.frame_all_grupos)
+        self.scroll_all_grupos.pack(fill="both", expand=True, padx=20, pady=10)
+
+    def _render_all_grupos(self):
+        for widget in self.scroll_all_grupos.winfo_children():
+            widget.destroy()
+
+        grupos = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
+
+        # cabecera de columnas reutilizable
+        cols        = ["", "PJ", "G", "E", "P", "GF", "GC", "DG", "Pts"]
+        col_widths  = [220, 36, 36, 36, 36, 36, 36, 36, 44]
+        col_anchors = ["w", "center","center","center","center","center","center","center","center"]
+
+        for grupo in grupos:
+            equipos = getTablaDeGrupo(grupo) or []
+
+            # no mostrar grupos vacios
+            if not equipos:
+                continue
+
+            # --- titulo del grupo ---
+            tk.CTkLabel(
+                self.scroll_all_grupos,
+                text=f"Grupo {grupo}",
+                font=("Arial", 11, "bold"),
+                anchor="w"
+            ).pack(fill="x", padx=5, pady=(14, 0))
+
+            # --- cabecera de columnas ---
+            header_row = tk.CTkFrame(self.scroll_all_grupos,
+                                     fg_color=("gray80", "gray30"), corner_radius=4)
+            header_row.pack(fill="x", padx=5, pady=(2, 0))
+
+            for col, width, anchor in zip(cols, col_widths, col_anchors):
+                tk.CTkLabel(
+                    header_row, text=col, width=width, anchor=anchor,
+                    font=("Arial", 9, "bold")
+                ).pack(side="left", padx=1, pady=2)
+
+            # --- filas de equipos ---
+            for eq in equipos:
+                fila = tk.CTkFrame(self.scroll_all_grupos, corner_radius=3, height=24)
+                fila.pack(fill="x", padx=5, pady=1)
+                fila.pack_propagate(False)
+
+                # posicion + nombre
+                nombre_frame = tk.CTkFrame(fila, fg_color="transparent", width=220, height=24)
+                nombre_frame.pack(side="left", padx=1)
+                nombre_frame.pack_propagate(False)
+
+                tk.CTkLabel(nombre_frame, text=str(eq.get("posicion", "")),
+                            width=20, text_color="gray",
+                            font=("Arial", 9)).pack(side="left")
+                tk.CTkLabel(nombre_frame, text=eq.get("pais", ""),
+                            anchor="w", font=("Arial", 9)).pack(side="left", padx=(3, 0))
+
+                # stats
+                stats = ["pj", "g", "e", "p", "gf", "gc", "dg", "pts"]
+                for key, width in zip(stats, col_widths[1:]):
+                    es_pts = key == "pts"
+                    tk.CTkLabel(
+                        fila,
+                        text=str(eq.get(key, 0)),
+                        width=width,
+                        anchor="center",
+                        font=("Arial", 9, "bold") if es_pts else ("Arial", 9)
+                    ).pack(side="left", padx=1)
 
     def go_to_menu(self):
         self.frame_fecha.pack_forget()
         self.frame_grupo.pack_forget()
         self.frame_equipo.pack_forget()
         self.frame_siguiente.pack_forget()
+        self.frame_all_grupos.pack_forget()
         self.frame_menu.pack(fill="both", expand=True)
 
     def go_to_informe_por_fecha(self):
@@ -543,7 +635,12 @@ class TorneoReportFrame(tk.CTkFrame):
         self.frame_siguiente.pack(fill="both", expand=True)
 
     def go_to_informe_all_grupos(self):
-        pass
+        self.frame_menu.pack_forget()
+        self.label_fecha_all_grupos.configure(
+            text=f"Fecha de emisión del Informe: {datetime.today().strftime('%d/%m/%Y')}"
+        )
+        self._render_all_grupos()
+        self.frame_all_grupos.pack(fill="both", expand=True)
 
     def volver(self):
         self.root.back_to_main(self)
