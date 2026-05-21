@@ -5,7 +5,7 @@ import models.equipo as equipo
 
 PATH = get_path("data", "partidos.json")
 class Partido:
-    def __init__(self, date, hora, lugar):
+    def __init__(self, date, hora, lugar, fase: str = "Fase de Grupos"):
         self.id = self.obtenerId()
         self.fecha = date
         self.hora = hora
@@ -16,6 +16,7 @@ class Partido:
         self.golesT2 = 0
         self.penalesT1 = 0
         self.penalesT2 = 0
+        self.fase = fase
 
     def toDict(self):
          return {
@@ -28,7 +29,8 @@ class Partido:
               "golesT1" : self.golesT1,
               "golesT2" : self.golesT2,
               "penalesT1" : self.penalesT1,
-              "penalesT2" : self.penalesT2
+              "penalesT2" : self.penalesT2,
+              "fase" : self.fase
          }
 
     """
@@ -276,6 +278,7 @@ def setEquiposFaseGrupos(filename:str = None):
                         
                         partidos[partido_index]["idEquipo1"] = grupos[grupo][local1]["id"]
                         partidos[partido_index]["idEquipo2"] = grupos[grupo][local2]["id"]
+                        partidos[partido_index]["fase"] = "Fase de Grupos"
                         partido_index += 1
 
                     if partido_index >= 72 or partido_index >= len(partidos):
@@ -428,6 +431,7 @@ def setEliminatorias(filename: str = None):
     for index, (id1, id2) in enumerate(matches, start=72):
         partidos[index]["idEquipo1"] = id1
         partidos[index]["idEquipo2"] = id2
+        partidos[index]["fase"] = "Eliminatorias"
 
     with open(filename, "w") as file:
         json.dump(partidos, file, indent=4)

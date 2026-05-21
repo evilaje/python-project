@@ -9,18 +9,20 @@
         "golesT1": 3,
         "golesT2": 1,
         "penalesT1": 0,
-        "penalesT2": 0
+        "penalesT2": 0,
+        "fase": "Fase de Grupos"
     },
     {
         "id": 2,
         "fecha": "17/06/2026",
         "hora": "18:00",
         "lugar": "asd",
-        "idEquipo1": null,
-        "idEquipo2": null,
+        "idEquipo1": "A1",
+        "idEquipo2": "A3",
         "golesT1": 0,
         "golesT2": 0,
         "penalesT1": 0,
-        "penalesT2": 0
+        "penalesT2": 0,
+        "fase": "Fase de Grupos"
     }
 ]

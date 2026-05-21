@@ -1,5 +1,5 @@
 import customtkinter as tk
-from services.partido_controller import getPartidoPorFecha, getPartidosPorEquipo
+from services.partido_controller import getPartidoPorFecha, getPartidosPorEquipo, getSiguientePartido
 from services.equipo_controller import getTablaDeGrupo
 from models.equipo import Equipo
 from datetime import datetime
@@ -40,6 +40,9 @@ class TorneoReportFrame(tk.CTkFrame):
         self._build_frame_equipo()
 
         # ----------------------------------------------------------------------------
+        # informe siguiente partido de equipo
+        self.frame_siguiente = tk.CTkFrame(self, fg_color="transparent")
+        self._build_frame_siguiente()
 
         # ----------------------------------------------------------------------------
 
@@ -253,7 +256,7 @@ class TorneoReportFrame(tk.CTkFrame):
                         text_color="gray", font=("Arial", 11)).pack(pady=(0, 8))
 
     # =============================================================================
-    # informe por equipo
+    # BUILD + RENDER: informe por equipo
     # =============================================================================
 
     def _build_frame_equipo(self):
@@ -361,10 +364,163 @@ class TorneoReportFrame(tk.CTkFrame):
 
     
 
+    # =============================================================================
+    # informe siguiente partido
+    # =============================================================================
+
+    def _build_frame_siguiente(self):
+        header = tk.CTkFrame(self.frame_siguiente, fg_color="transparent")
+        header.pack(fill="x", padx=20, pady=(20, 5))
+
+        tk.CTkButton(header, text="<- Volver", width=100,
+                     fg_color="transparent", border_width=1,
+                     command=self.go_to_menu).pack(side="left")
+
+        tk.CTkLabel(header, text="Informe 4", font=("Arial", 16, "bold")).pack(side="left", padx=20)
+
+        # fila: selector de equipo + fecha de emision
+        input_row = tk.CTkFrame(self.frame_siguiente, fg_color="transparent")
+        input_row.pack(fill="x", padx=20, pady=5)
+
+        tk.CTkLabel(input_row, text="Equipo:").pack(side="left")
+
+        equipos = Equipo.getAllEquipos() or []
+        equipo_names = [e["pais"] for e in equipos]
+
+        self.combo_equipo_siguiente = tk.CTkComboBox(
+            input_row,
+            values=equipo_names,
+            width=180,
+            command=self.buscar_siguiente_partido
+        )
+        self.combo_equipo_siguiente.set(equipo_names[0] if equipo_names else "")
+        self.combo_equipo_siguiente.pack(side="left", padx=10)
+
+        self.label_fecha_siguiente = tk.CTkLabel(
+            input_row,
+            text=f"Fecha : {datetime.today().strftime('%d/%m/%Y')}",
+            text_color="gray"
+        )
+        self.label_fecha_siguiente.pack(side="left", padx=20)
+
+        tk.CTkLabel(self.frame_siguiente, text="Formato modelo", text_color="gray").pack(anchor="w", padx=20)
+
+        # contenedor donde se monta la card del partido
+        self.container_siguiente = tk.CTkFrame(self.frame_siguiente, fg_color="transparent")
+        self.container_siguiente.pack(fill="both", expand=True, padx=20, pady=10)
+
+    def _render_siguiente_partido(self, partido):
+        """
+        partido: dict con estructura:
+        {
+            "torneo":    "Copa Mundial Sub-20 de la FIFA Chile 2025™",
+            "fase":      "Octavos de final",
+            "lugar":     "Estadio Fiscal",
+            "fecha":     "08/10/2025",
+            "hora":      "20:00",
+            "local":     "PAR",
+            "visitante": "NOR"
+        }
+        O None si no hay próximo partido.
+        """
+        for widget in self.container_siguiente.winfo_children():
+            widget.destroy()
+
+        if not partido:
+            tk.CTkLabel(
+                self.container_siguiente,
+                text="No hay próximos partidos para este equipo.",
+                text_color="gray"
+            ).pack(pady=40)
+            return
+
+        # card principal
+        card = tk.CTkFrame(self.container_siguiente, corner_radius=8, border_width=1,
+                           border_color=("gray75", "gray35"))
+        card.pack(fill="x", padx=5, pady=5)
+
+        # --- fila superior: torneo+fase a la izquierda, fecha a la derecha ---
+        top_row = tk.CTkFrame(card, fg_color="transparent")
+        top_row.pack(fill="x", padx=14, pady=(12, 4))
+
+        info_col = tk.CTkFrame(top_row, fg_color="transparent")
+        info_col.pack(side="left", fill="x", expand=True)
+
+        tk.CTkLabel(info_col,
+                    text=partido.get("torneo", ""),
+                    font=("Arial", 11),
+                    anchor="w").pack(anchor="w")
+
+        fase_lugar = partido.get("fase", "")
+        if partido.get("lugar"):
+            fase_lugar += f"  ·  {partido['lugar']}"
+
+        tk.CTkLabel(info_col,
+                    text=fase_lugar,
+                    font=("Arial", 10),
+                    text_color="gray",
+                    anchor="w").pack(anchor="w")
+
+        tk.CTkLabel(top_row,
+                    text=partido.get("fecha", ""),
+                    font=("Arial", 10),
+                    text_color="gray").pack(side="right", anchor="n")
+
+        # separador
+        sep = tk.CTkFrame(card, height=1, fg_color=("gray80", "gray35"))
+        sep.pack(fill="x", padx=14, pady=(4, 0))
+
+        # equipos + hora 
+        mid_row = tk.CTkFrame(card, fg_color="transparent")
+        mid_row.pack(fill="x", padx=14, pady=14)
+
+        # columna equipos (izquierda)
+        equipos_col = tk.CTkFrame(mid_row, fg_color="transparent")
+        equipos_col.pack(side="left", fill="y")
+
+        for nombre_equipo in [partido.get("local", ""), partido.get("visitante", "")]:
+            fila_eq = tk.CTkFrame(equipos_col, fg_color="transparent")
+            fila_eq.pack(anchor="w", pady=4)
+
+            # banderita placeholder (cuadradito de color) — reemplazala por CTkImage si tenes banderas
+            tk.CTkFrame(fila_eq, width=24, height=16,
+                        corner_radius=2,
+                        fg_color=("gray70", "gray40")).pack(side="left", padx=(0, 8))
+
+            tk.CTkLabel(fila_eq,
+                        text=nombre_equipo,
+                        font=("Arial", 13, "bold"),
+                        anchor="w").pack(side="left")
+
+        # hora (derecha, centrada verticalmente)
+        tk.CTkLabel(mid_row,
+                    text=partido.get("hora", ""),
+                    font=("Arial", 26, "bold")).pack(side="right", padx=10)
+
+    def buscar_siguiente_partido(self, value=None):
+        equipo = value or self.combo_equipo_siguiente.get()
+        if not equipo:
+            return
+
+        self.label_fecha_siguiente.configure(
+            text=f"Fecha : {datetime.today().strftime('%d/%m/%Y')}"
+        )
+
+        # getSiguientePartido devuelve el dict del proximo partido o None
+        partido = getSiguientePartido(equipo)
+        self._render_siguiente_partido(partido)
+
+        self.frame_fecha.pack_forget()
+        self.frame_grupo.pack_forget()
+        self.frame_equipo.pack_forget()
+        self.frame_menu.pack_forget()
+        self.frame_siguiente.pack(fill="both", expand=True)
+
     def go_to_menu(self):
         self.frame_fecha.pack_forget()
         self.frame_grupo.pack_forget()
         self.frame_equipo.pack_forget()
+        self.frame_siguiente.pack_forget()
         self.frame_menu.pack(fill="both", expand=True)
 
     def go_to_informe_por_fecha(self):
@@ -373,18 +529,18 @@ class TorneoReportFrame(tk.CTkFrame):
 
     def go_to_informe_por_grupo(self):
         self.frame_menu.pack_forget()
-        # Cargar el grupo por defecto al entrar
         self.buscar_tabla_de_grupo(self.combo_grupo.get())
         self.frame_grupo.pack(fill="both", expand=True)
 
     def go_to_informe_por_equipo(self):
         self.frame_menu.pack_forget()
-        # Cargar el primer equipo por defecto al entrar
         self.buscar_informe_equipo(self.combo_equipo.get())
         self.frame_equipo.pack(fill="both", expand=True)
 
     def go_to_informe_siguiente_partido(self):
-        pass
+        self.frame_menu.pack_forget()
+        self.buscar_siguiente_partido(self.combo_equipo_siguiente.get())
+        self.frame_siguiente.pack(fill="both", expand=True)
 
     def go_to_informe_all_grupos(self):
         pass

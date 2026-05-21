@@ -53,9 +53,8 @@ def getPartidoPorFecha(fecha:str):
         else:
             visitante = "Por definir"
 
-        # determinar fase (si alguno de los equipos ya está en eliminatorias, marcar eliminatorias)
-        fase = "Fase de Grupos"
-        if (p.get("idEquipo1") and p.get("idEquipo2")):
+        fase = p.get("fase") or "Fase de Grupos"
+        if fase == "Fase de Grupos" and p.get("idEquipo1") and p.get("idEquipo2"):
             eq1 = equipo.getEquipo(p.get("idEquipo1"))
             eq2 = equipo.getEquipo(p.get("idEquipo2"))
             if (eq1 and eq1.get("fase") == "eliminatorias") or (eq2 and eq2.get("fase") == "eliminatorias"):
@@ -104,8 +103,8 @@ def getPartidosPorEquipo(equipo_nombre: str):
         goles_local = p.get("golesT1", 0) if p.get("idEquipo1") == equipo_id else p.get("golesT2", 0)
         goles_visit = p.get("golesT2", 0) if p.get("idEquipo1") == equipo_id else p.get("golesT1", 0)
 
-        fase = "Fase de Grupos"
-        if p.get("idEquipo1") and p.get("idEquipo2"):
+        fase = p.get("fase") or "Fase de Grupos"
+        if fase == "Fase de Grupos" and p.get("idEquipo1") and p.get("idEquipo2"):
             eq1 = equipo.getEquipo(p.get("idEquipo1"))
             eq2 = equipo.getEquipo(p.get("idEquipo2"))
             if (eq1 and eq1.get("fase") == "eliminatorias") or (eq2 and eq2.get("fase") == "eliminatorias"):
@@ -176,3 +175,73 @@ def getPartidosPorEquipo(equipo_nombre: str):
                     clasificacion = "Eliminado de la fase de grupos"
 
     return {"partidos": resultado, "clasificacion": clasificacion}
+
+
+def getSiguientePartido(equipo_nombre: str):
+    equipos = equipo.Equipo.getAllEquipos()
+    if not equipos:
+        return None
+
+    equipo_obj = next((e for e in equipos if e.get("pais", "").strip().lower() == equipo_nombre.strip().lower()), None)
+    if not equipo_obj:
+        return None
+
+    equipo_id = equipo_obj.get("id")
+    partidos = Partido.getAllPartidos() or []
+
+    proximos = []
+    from datetime import datetime
+    ahora = datetime.now()
+
+    for p in partidos:
+        if p.get("idEquipo1") != equipo_id and p.get("idEquipo2") != equipo_id:
+            continue
+
+        fecha = p.get("fecha")
+        hora = p.get("hora", "00:00")
+        if not fecha:
+            continue
+
+        try:
+            dt = datetime.strptime(f"{fecha} {hora}", "%d/%m/%Y %H:%M")
+        except Exception:
+            continue
+
+        if dt <= ahora:
+            continue
+
+        proximos.append((dt, p))
+
+    if not proximos:
+        return None
+
+    proximos.sort(key=lambda item: item[0])
+    proximo = proximos[0][1]
+
+    torneo_obj = torneo.getTorneo(1)
+    torneo_nombre = torneo_obj.get("nombre") if torneo_obj else "Torneo"
+    fecha = proximo.get("fecha")
+    hora = proximo.get("hora", "")
+
+    eq1 = equipo.getEquipo(proximo.get("idEquipo1"))
+    eq2 = equipo.getEquipo(proximo.get("idEquipo2"))
+    local_abrev = eq1.get("abreviatura") if eq1 and eq1.get("abreviatura") else eq1.get("pais") if eq1 else proximo.get("idEquipo1") or "Por definir"
+    visitante_abrev = eq2.get("abreviatura") if eq2 and eq2.get("abreviatura") else eq2.get("pais") if eq2 else proximo.get("idEquipo2") or "Por definir"
+
+    partido_info = {
+        "torneo": torneo_nombre,
+        "fase": proximo.get("fase") or "Fase de Grupos",
+        "lugar": proximo.get("lugar", ""),
+        "fecha": fecha,
+        "hora": hora,
+        "local": local_abrev,
+        "visitante": visitante_abrev
+    }
+
+    if partido_info["fase"] == "Fase de Grupos" and proximo.get("idEquipo1") and proximo.get("idEquipo2"):
+        eq1 = equipo.getEquipo(proximo.get("idEquipo1"))
+        eq2 = equipo.getEquipo(proximo.get("idEquipo2"))
+        if (eq1 and eq1.get("fase") == "eliminatorias") or (eq2 and eq2.get("fase") == "eliminatorias"):
+            partido_info["fase"] = "Eliminatorias"
+
+    return partido_info
