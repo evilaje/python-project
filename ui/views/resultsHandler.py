@@ -121,6 +121,7 @@ class TorneoResultFrame(tk.CTkFrame):
         if resultado[0]:
             CTkMessagebox(title="Exito", message=resultado[1], icon="check")
             # Refrescar el combobox sin el partido ya cargado
+            
             self._refrescar_combo()
             self._partido_seleccionado = None
         else:

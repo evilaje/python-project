@@ -156,6 +156,10 @@ class Partido:
 
             for partido in partidos:
                 if partido["id"] == self.id:
+                    # conservar goles previos para evitar doble conteo
+                    prev_g1 = partido.get("golesT1", 0)
+                    prev_g2 = partido.get("golesT2", 0)
+
                     partido["golesT1"] = self.golesT1
                     partido["golesT2"] = self.golesT2
                     partido["penalesT1"] = self.penalesT1
@@ -163,7 +167,36 @@ class Partido:
 
                     with open(filename, "w") as file:
                         json.dump(partidos, file, indent=4)
-                    
+
+                    # actualizar puntos de los equipos segun el resultado
+                    # solo si antes no tenia goles 
+                    id_t1 = partido.get("idEquipo1")
+                    id_t2 = partido.get("idEquipo2")
+
+                    if prev_g1 == 0 and prev_g2 == 0 and id_t1 and id_t2:
+                        equipos = []
+                        equipos_file = get_path("data", "equipos.json")
+                        if file_exists(equipos_file):
+                            with open(equipos_file, "r") as f_eq:
+                                if not is_file_empty(equipos_file):
+                                    equipos = json.load(f_eq)
+
+                        if len(equipos) != 0:
+                            for eq in equipos:
+                                eq.setdefault("puntos", 0)
+                                if self.golesT1 > self.golesT2:
+                                    if eq["id"] == id_t1:
+                                        eq["puntos"] += 3
+                                elif self.golesT2 > self.golesT1:
+                                    if eq["id"] == id_t2:
+                                        eq["puntos"] += 3
+                                else:
+                                    if eq["id"] == id_t1 or eq["id"] == id_t2:
+                                        eq["puntos"] += 1
+
+                            with open(equipos_file, "w") as f_eq:
+                                json.dump(equipos, f_eq, indent=4)
+
                     return True
             
         return None
