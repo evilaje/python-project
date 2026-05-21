@@ -86,5 +86,16 @@
         "puntos": 0,
         "fase": "grupos",
         "posicion": null
+    },
+    {
+        "id": "placeholder1",
+        "pais": "Wer2",
+        "abreviatura": "SDHGWRE",
+        "prefijo": "23",
+        "confederacion": "243",
+        "grupo": "placeholder",
+        "puntos": 0,
+        "fase": "grupos",
+        "posicion": null
     }
 ]

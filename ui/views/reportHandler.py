@@ -50,7 +50,7 @@ class TorneoReportFrame(tk.CTkFrame):
         self._build_frame_all_grupos()
 
     # =============================================================================
-    # BUILD: frame_fecha
+    # frame_fecha
     # =============================================================================
 
     def _build_frame_fecha(self):
@@ -80,7 +80,7 @@ class TorneoReportFrame(tk.CTkFrame):
         self.scroll_fecha.pack(fill="both", expand=True, padx=20, pady=10)
 
     # =============================================================================
-    # BUILD: frame_grupo
+    # frame_grupo
     # =============================================================================
 
     def _build_frame_grupo(self):
@@ -123,7 +123,7 @@ class TorneoReportFrame(tk.CTkFrame):
         self.scroll_grupo.pack(fill="both", expand=True, padx=20, pady=10)
 
     # =============================================================================
-    # RENDER: tabla de grupo
+    # tabla de grupo
     # =============================================================================
 
     def _render_tabla_grupo(self, grupo, equipos):
@@ -164,8 +164,8 @@ class TorneoReportFrame(tk.CTkFrame):
             fila.pack(fill="x", padx=5, pady=2)
 
             # posicion + nombre
-            nombre_frame = tk.CTkFrame(fila, fg_color="transparent", width=220)
-            nombre_frame.pack(side="left", padx=2, pady=6)
+            nombre_frame = tk.CTkFrame(fila, fg_color="transparent",height = 24, width=220)
+            nombre_frame.pack(side="left", padx=2)
             nombre_frame.pack_propagate(False)
 
             tk.CTkLabel(nombre_frame, text=str(eq.get("posicion", "")),
@@ -187,7 +187,7 @@ class TorneoReportFrame(tk.CTkFrame):
                 ).pack(side="left", padx=2, pady=6)
 
     # =============================================================================
-    # LOGICA: busquedas
+    # busquedas
     # =============================================================================
 
     def buscar_partidos_por_fecha(self):
@@ -217,7 +217,7 @@ class TorneoReportFrame(tk.CTkFrame):
         self._render_tabla_grupo(grupo, equipos or [])
 
     # =============================================================================
-    # RENDER: partidos por fecha (sin cambios)
+    # partidos por fecha
     # =============================================================================
 
     def _render_partidos(self, partidos):
@@ -259,7 +259,7 @@ class TorneoReportFrame(tk.CTkFrame):
                         text_color="gray", font=("Arial", 11)).pack(pady=(0, 8))
 
     # =============================================================================
-    # BUILD + RENDER: informe por equipo
+    # informe por equipo
     # =============================================================================
 
     def _build_frame_equipo(self):
@@ -368,7 +368,7 @@ class TorneoReportFrame(tk.CTkFrame):
     
 
     # =============================================================================
-    # BUILD + RENDER: informe siguiente partido (informe 4)
+    # informe siguiente partido
     # =============================================================================
 
     def _build_frame_siguiente(self):

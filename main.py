@@ -12,6 +12,8 @@ from ui.app import *
 
 #todo el resto esta en las views xd
 
+""""""
+
 # ventana principal
 root = App()
 
