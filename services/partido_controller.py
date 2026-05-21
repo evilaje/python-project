@@ -7,10 +7,22 @@ def cargarPartido(fecha:str, hora:str, lugar:str):
     #validaciones hechas en los controllers/front, por eso aca na de na
     t = torneo.getTorneo(1)
 
-    # validar esto
-
     partido:Partido = Partido(fecha, hora, lugar)
     partido.savePartido()
+
+def guardarResultado(id: int, g1: int, g2: int, gp1: int, gp2: int):
+    partido = Partido(None, None, None)
+    partido.id = id
+    partido.golesT1 = g1
+    partido.golesT2 = g2
+    partido.penalesT1 = gp1
+    partido.penalesT2 = gp2
+
+    if partido.setGoles():
+        return [True, "Exito"]
+
+    # true, mensaje
+    return [True, "Cagada"]
     
 def getPartidoPorFecha(fecha:str):
     # fecha expected format: "DD/MM/AAAA" (exact match)

@@ -121,6 +121,24 @@ class Equipo:
         return None #importante verificar siempre el None
     
 
+    def getAbreviatura(self, filename: str = None):
+        if (filename is None):
+            filename = PATH
+
+        equipos = []
+
+        if (file_exists(filename)):
+            with open(filename, "r") as file:
+                equipos = json.load(file)
+
+                for equipo in equipos:
+                    if equipo["id"] == self.id:
+                        return equipo["abreviatura"]
+        
+        return None
+
+    
+
 # funcion para setear grupo en la vista 3 de configHandler
 def setGrupo(pais: str, grupo: str, filename = PATH):
 

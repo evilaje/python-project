@@ -2,6 +2,7 @@ import customtkinter as tk
 from services.torneo_controller import *
 from datetime import datetime
 from services.equipo_controller import *
+from services.partido_controller import *
 from models.equipo import Equipo
 # este es para los popUps, ponele un title, mensaje y icon nomas, icon acepta las palabras cancel, warning y check
 from CTkMessagebox import CTkMessagebox
@@ -132,15 +133,15 @@ class TorneoConfigFrame(tk.CTkFrame):
         CTkMessagebox(title="Éxito", message=mensaje, icon="check")
 
     def guardar_partidos(self):
-        campo1 = self.input_partido1.get().strip()
-        campo2 = self.input_partido2.get().strip()
-        campo3 = self.input_partido3.get().strip()
+        fecha = self.input_partido1.get().strip()
+        hora = self.input_partido2.get().strip()
+        lugar = self.input_partido3.get().strip()
 
-        if not campo1 or not campo2 or not campo3:
+        if not fecha or not hora or not lugar:
             CTkMessagebox(title="Error", message="Todos los campos son obligatorios", icon="cancel")
             return
 
-        
+        cargarPartido(fecha, hora, lugar)
         CTkMessagebox(title="Exito", message="Partidos guardados correctamente", icon="check")
 
     def seleccionarGrupo(self, value=None):

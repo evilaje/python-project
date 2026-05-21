@@ -123,6 +123,7 @@ class Partido:
 
 
     # al abrir la app se cargar todo en un arreglo
+    @staticmethod
     def getAllPartidos(filename:str = None):
         if (filename is None):
             filename = PATH
@@ -142,7 +143,31 @@ class Partido:
         partidos = []
         
         pass
-    
+
+    def setGoles(self, filename: str = None):
+        if (filename is None):
+            filename = PATH
+        
+        partidos = []
+
+        if (file_exists(filename)):
+            with open(filename, "r") as file:
+                partidos = json.load(file)
+
+            for partido in partidos:
+                if partido["id"] == self.id:
+                    partido["golesT1"] = self.golesT1
+                    partido["golesT2"] = self.golesT2
+                    partido["penalesT1"] = self.penalesT1
+                    partido["penalesT2"] = self.penalesT2
+
+                    with open(filename, "w") as file:
+                        json.dump(partidos, file, indent=4)
+                    
+                    return True
+            
+        return None
+                    
 
 def getPartido(id, filename:str = None):
     if (filename is None):
@@ -231,7 +256,7 @@ def setEquiposFaseGrupos(filename:str = None):
 
 
 # Se carga una sola vez al importar el modulo; sin costo en cada llamada.
-with open("tabla_anexo_c.json", "r") as _f:
+with open(get_path("data", "tabla_anexo_c.json"), "r") as _f:
     _TABLA_ANEXO_C: list[dict] = json.load(_f)
 
 # Índice preconstruido: frozenset de grupos -> orden de slots como lista.

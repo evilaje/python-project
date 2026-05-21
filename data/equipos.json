@@ -1,22 +1,44 @@
 [
     {
-        "id": "H1",
+        "id": "A1",
         "pais": "Hallownest",
         "abreviatura": "HLN",
         "prefijo": "+112",
         "confederacion": "Paleking",
-        "grupo": "H",
+        "grupo": "A",
         "puntos": 0,
         "fase": "grupos",
         "posicion": null
     },
     {
-        "id": "I1",
+        "id": "A2",
         "pais": "Pharloom",
         "abreviatura": "PH",
         "prefijo": "+100",
         "confederacion": "Silkmother",
-        "grupo": "I",
+        "grupo": "A",
+        "puntos": 0,
+        "fase": "grupos",
+        "posicion": null
+    },
+    {
+        "id": "A3",
+        "pais": "Test",
+        "abreviatura": "TE",
+        "prefijo": "+22",
+        "confederacion": "Si",
+        "grupo": "A",
+        "puntos": 0,
+        "fase": "grupos",
+        "posicion": null
+    },
+    {
+        "id": "A4",
+        "pais": "Test2",
+        "abreviatura": "AD",
+        "prefijo": "+2",
+        "confederacion": "Qw",
+        "grupo": "A",
         "puntos": 0,
         "fase": "grupos",
         "posicion": null
