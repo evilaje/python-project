@@ -12,7 +12,7 @@ from ui.app import *
 
 #todo el resto esta en las views xd
 
-""""""
+"""cambiar validaciones de fecha"""
 
 # ventana principal
 root = App()

@@ -77,13 +77,8 @@ class TorneoConfigFrame(tk.CTkFrame):
             CTkMessagebox(title="Error", message="Formato de fecha invalido, usa DD/MM/AAAA", icon="cancel")
             return
 
-        hoy = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
-        if dt_inicio < hoy:
-            CTkMessagebox(title="Error", message="La fecha de inicio no puede ser anterior a hoy", icon="cancel")
-            return
-
-        if dt_fin <= dt_inicio:
-            CTkMessagebox(title="Error", message="La fecha de fin debe ser posterior a la de inicio", icon="cancel")
+        if dt_inicio > dt_fin:
+            CTkMessagebox(title="Error", message="La fecha de inicio no puede ser posterior a la fecha de fin", icon="cancel")
             return
 
         cargarTorneo(nombre, fecha_inicio, fecha_fin)
