@@ -1,6 +1,7 @@
 import customtkinter as tk
-from services.partido_controller import getPartidoPorFecha
+from services.partido_controller import getPartidoPorFecha, getPartidosPorEquipo
 from services.equipo_controller import getTablaDeGrupo
+from models.equipo import Equipo
 from datetime import datetime
 
 
@@ -34,12 +35,17 @@ class TorneoReportFrame(tk.CTkFrame):
         self._build_frame_grupo()
 
         # ----------------------------------------------------------------------------
+        # informe por equipo
+        self.frame_equipo = tk.CTkFrame(self, fg_color="transparent")
+        self._build_frame_equipo()
 
         # ----------------------------------------------------------------------------
 
         # ----------------------------------------------------------------------------
 
-    
+    # =============================================================================
+    # BUILD: frame_fecha
+    # =============================================================================
 
     def _build_frame_fecha(self):
 
@@ -67,9 +73,12 @@ class TorneoReportFrame(tk.CTkFrame):
         self.scroll_fecha = tk.CTkScrollableFrame(self.frame_fecha)
         self.scroll_fecha.pack(fill="both", expand=True, padx=20, pady=10)
 
-    
+    # =============================================================================
+    # BUILD: frame_grupo
+    # =============================================================================
 
     def _build_frame_grupo(self):
+        # --- header ---
         header = tk.CTkFrame(self.frame_grupo, fg_color="transparent")
         header.pack(fill="x", padx=20, pady=(20, 5))
 
@@ -79,7 +88,7 @@ class TorneoReportFrame(tk.CTkFrame):
 
         tk.CTkLabel(header, text="Informe 2", font=("Arial", 16, "bold")).pack(side="left", padx=20)
 
-        
+        # --- fila: selector de grupo + fecha de emision ---
         input_row = tk.CTkFrame(self.frame_grupo, fg_color="transparent")
         input_row.pack(fill="x", padx=20, pady=5)
 
@@ -103,12 +112,13 @@ class TorneoReportFrame(tk.CTkFrame):
 
         tk.CTkLabel(self.frame_grupo, text="Formato modelo", text_color="gray").pack(anchor="w", padx=20)
 
+        # --- tabla scrollable ---
         self.scroll_grupo = tk.CTkScrollableFrame(self.frame_grupo)
         self.scroll_grupo.pack(fill="both", expand=True, padx=20, pady=10)
 
-    # -----------------------------------------------------------------------------
-    # tabla de grupo
-    # -----------------------------------------------------------------------------
+    # =============================================================================
+    # RENDER: tabla de grupo
+    # =============================================================================
 
     def _render_tabla_grupo(self, grupo, equipos):
         """
@@ -128,36 +138,34 @@ class TorneoReportFrame(tk.CTkFrame):
             tk.CTkLabel(self.scroll_grupo, text="Sin datos para este grupo.", text_color="gray").pack(pady=20)
             return
 
+        # --- cabecera de la tabla ---
         cols = ["Grupo " + grupo, "PJ", "G", "E", "P", "GF", "GC", "DG", "Pts"]
         col_widths  = [220, 40, 40, 40, 40, 40, 40, 40, 50]
         col_anchors = ["w",  "center","center","center","center","center","center","center","center"]
 
         header_row = tk.CTkFrame(self.scroll_grupo, fg_color=("gray80", "gray30"), corner_radius=4)
-        header_row.pack(fill="x", padx=5, pady=(1, 0))
+        header_row.pack(fill="x", padx=5, pady=(4, 0))
 
         for col, width, anchor in zip(cols, col_widths, col_anchors):
             tk.CTkLabel(
-                header_row, text=col, width=width, height=22, anchor=anchor,
-                font=("Arial", 10, "bold")
-            ).pack(side="left", padx=2, pady=1)
+                header_row, text=col, width=width, anchor=anchor,
+                font=("Arial", 11, "bold")
+            ).pack(side="left", padx=2, pady=4)
 
         # --- filas de equipos ---
         for eq in equipos:
-            fila = tk.CTkFrame(self.scroll_grupo, corner_radius=4, height=28)
-            fila.pack(fill="x", padx=5, pady=1)
-            fila.pack_propagate(False)
+            fila = tk.CTkFrame(self.scroll_grupo, corner_radius=4)
+            fila.pack(fill="x", padx=5, pady=2)
 
             # posicion + nombre
-            nombre_frame = tk.CTkFrame(fila, fg_color="transparent", width=220, height=28)
-            nombre_frame.pack(side="left", padx=2, pady=1)
+            nombre_frame = tk.CTkFrame(fila, fg_color="transparent", width=220)
+            nombre_frame.pack(side="left", padx=2, pady=6)
             nombre_frame.pack_propagate(False)
 
             tk.CTkLabel(nombre_frame, text=str(eq.get("posicion", "")),
-                        width=24, height=22, text_color="gray",
-                        font=("Arial", 10)).pack(side="left")
+                        width=24, text_color="gray").pack(side="left")
             tk.CTkLabel(nombre_frame, text=eq.get("pais", ""),
-                        width=180, height=22, anchor="w",
-                        font=("Arial", 10)).pack(side="left", padx=(4, 0))
+                        anchor="w").pack(side="left", padx=(4, 0))
 
             # stats
             stats = ["pj", "g", "e", "p", "gf", "gc", "dg", "pts"]
@@ -168,14 +176,13 @@ class TorneoReportFrame(tk.CTkFrame):
                     fila,
                     text=str(valor),
                     width=width,
-                    height=22,
                     anchor="center",
-                    font=("Arial", 10, "bold") if es_pts else ("Arial", 10)
-                ).pack(side="left", padx=2, pady=1)
+                    font=("Arial", 12, "bold") if es_pts else ("Arial", 12)
+                ).pack(side="left", padx=2, pady=6)
 
-    # -----------------------------------------------------------------------------
-    # busquedas
-    # -----------------------------------------------------------------------------
+    # =============================================================================
+    # LOGICA: busquedas
+    # =============================================================================
 
     def buscar_partidos_por_fecha(self):
         fecha = self.input_fecha.get().strip()
@@ -203,9 +210,9 @@ class TorneoReportFrame(tk.CTkFrame):
         equipos = getTablaDeGrupo(grupo)
         self._render_tabla_grupo(grupo, equipos or [])
 
-    # -----------------------------------------------------------------------------
-    # partidos por fecha
-    # -----------------------------------------------------------------------------
+    # =============================================================================
+    # RENDER: partidos por fecha (sin cambios)
+    # =============================================================================
 
     def _render_partidos(self, partidos):
         """
@@ -245,13 +252,119 @@ class TorneoReportFrame(tk.CTkFrame):
             tk.CTkLabel(card, text=f'{p["fase"]}  ·  {p["lugar"]}',
                         text_color="gray", font=("Arial", 11)).pack(pady=(0, 8))
 
-    # -----------------------------------------------------------------------------
-    # nav
-    # -----------------------------------------------------------------------------
+    # =============================================================================
+    # informe por equipo
+    # =============================================================================
+
+    def _build_frame_equipo(self):
+        header = tk.CTkFrame(self.frame_equipo, fg_color="transparent")
+        header.pack(fill="x", padx=20, pady=(20, 5))
+
+        tk.CTkButton(header, text="<- Volver", width=100,
+                     fg_color="transparent", border_width=1,
+                     command=self.go_to_menu).pack(side="left")
+
+        tk.CTkLabel(header, text="Informe 3", font=("Arial", 16, "bold")).pack(side="left", padx=20)
+
+        # fila: selector de equipo + fecha de emision
+        input_row = tk.CTkFrame(self.frame_equipo, fg_color="transparent")
+        input_row.pack(fill="x", padx=20, pady=5)
+
+        tk.CTkLabel(input_row, text="Equipo:").pack(side="left")
+
+        equipos = Equipo.getAllEquipos() or []
+        equipo_names = [e["pais"] for e in equipos]
+
+        self.combo_equipo = tk.CTkComboBox(
+            input_row,
+            values=equipo_names,
+            width=180,
+            command=self.buscar_informe_equipo
+        )
+        self.combo_equipo.set(equipo_names[0] if equipo_names else "")
+        self.combo_equipo.pack(side="left", padx=10)
+
+        self.label_fecha_emision_equipo = tk.CTkLabel(
+            input_row,
+            text=f"Fecha de emisión del informe: {datetime.today().strftime('%d/%m/%Y')}",
+            text_color="gray"
+        )
+        self.label_fecha_emision_equipo.pack(side="left", padx=20)
+
+        tk.CTkLabel(self.frame_equipo, text="Formato modelo", text_color="gray").pack(anchor="w", padx=20)
+
+        self.scroll_equipo = tk.CTkScrollableFrame(self.frame_equipo)
+        self.scroll_equipo.pack(fill="both", expand=True, padx=20, pady=10)
+
+    def _render_informe_equipo(self, partidos, clasificacion=None):
+        """
+        partidos: lista de dicts con estructura:
+        {
+            "fecha":      "28/09/2025",
+            "fase":       "Fase de Grupos",
+            "local":      "Marruecos",
+            "visitante":  "España",
+            "golesLocal": 2,
+            "golesVisit": 0
+        }
+        clasificacion: str opcional, ej: "Clasificado a Octavos de Final"
+        """
+        for widget in self.scroll_equipo.winfo_children():
+            widget.destroy()
+
+        if not partidos:
+            tk.CTkLabel(self.scroll_equipo,
+                        text="Este equipo no tiene partidos jugados aún.",
+                        text_color="gray").pack(pady=20, anchor="w", padx=5)
+        else:
+            for p in partidos:
+                linea = (
+                    f"{p['fecha']}  -  {p['fase']}  -  "
+                    f"{p['local']} {p['golesLocal']} : {p['golesVisit']} {p['visitante']}"
+                )
+                tk.CTkLabel(
+                    self.scroll_equipo,
+                    text=linea,
+                    anchor="w",
+                    font=("Arial", 12)
+                ).pack(fill="x", padx=5, pady=2, anchor="w")
+
+        # clasificacion en bold al final, si la hay
+        if clasificacion:
+            tk.CTkLabel(
+                self.scroll_equipo,
+                text=clasificacion,
+                anchor="w",
+                font=("Arial", 12, "bold")
+            ).pack(fill="x", padx=5, pady=(10, 2), anchor="w")
+
+    def buscar_informe_equipo(self, value=None):
+        equipo = value or self.combo_equipo.get()
+        if not equipo:
+            return
+
+        self.label_fecha_emision_equipo.configure(
+            text=f"Fecha de emisión del informe: {datetime.today().strftime('%d/%m/%Y')}"
+        )
+
+        resultado = getPartidosPorEquipo(equipo)
+        # getPartidosPorEquipo devuelve un dict: {"partidos": [...], "clasificacion": str|None}
+        # o directamente una lista si no hay clasificacion, adaptate a lo que devuelva tu controller
+        if isinstance(resultado, dict):
+            partidos = resultado.get("partidos", [])
+            clasificacion = resultado.get("clasificacion", None)
+        else:
+            partidos = resultado or []
+            clasificacion = None
+
+        self._render_informe_equipo(partidos, clasificacion)
+
+    
 
     def go_to_menu(self):
         self.frame_fecha.pack_forget()
         self.frame_grupo.pack_forget()
+        self.frame_equipo.pack_forget()
         self.frame_menu.pack(fill="both", expand=True)
 
     def go_to_informe_por_fecha(self):
@@ -265,7 +378,10 @@ class TorneoReportFrame(tk.CTkFrame):
         self.frame_grupo.pack(fill="both", expand=True)
 
     def go_to_informe_por_equipo(self):
-        pass
+        self.frame_menu.pack_forget()
+        # Cargar el primer equipo por defecto al entrar
+        self.buscar_informe_equipo(self.combo_equipo.get())
+        self.frame_equipo.pack(fill="both", expand=True)
 
     def go_to_informe_siguiente_partido(self):
         pass
