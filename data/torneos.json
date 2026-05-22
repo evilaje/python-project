@@ -1,9 +1,9 @@
 [
     {
         "id": 1,
-        "nombre": "OTra prueba",
-        "inicio": "18/06/2026",
-        "fin": "19/07/2026",
+        "nombre": "FIFITA",
+        "inicio": "21/05/2026",
+        "fin": "22/06/2026",
         "estaActivo": false,
         "fase": "Fase de Grupos"
     }

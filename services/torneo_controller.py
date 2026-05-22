@@ -7,3 +7,21 @@ def cargarTorneo(nombre:str, inicio:str, fin:str):
 
 def buscarTorneo(id:int):
 	return getTorneo(id, PATH)
+
+def getRangoTorneo():
+	if torneoExits():
+		t:dict = getTorneo(1)
+		torneo_ini = t["inicio"]
+		torneo_fin = t["fin"]
+		return (torneo_ini, torneo_fin)
+	else:
+		return None
+
+def canSkipTorneoVista():
+	return torneoExits()
+
+def isTorneoActivo():
+	if torneoExits():
+		t:dict = getTorneo(1)
+		return t["estaActivo"]
+	return False

@@ -7,7 +7,7 @@ from models.equipo import Equipo
 # este es para los popUps, ponele un title, mensaje y icon nomas, icon acepta las palabras cancel, warning y check
 from CTkMessagebox import CTkMessagebox
 
-
+#constantes
 class TorneoConfigFrame(tk.CTkFrame):
     def __init__(self, root, main_frame):
         super().__init__(root)
@@ -23,22 +23,29 @@ class TorneoConfigFrame(tk.CTkFrame):
         self.grid_rowconfigure(3, weight=1)
         self.grid_rowconfigure(4, weight=1)
 
-        """vista 1 - torneo"""
+        #inicializa
+        self.eqs = Equipo.getAllEquipos() or []
+
+
+
         self.vista1()
-
-        # -----------------------------------------------------------------------------------------------
-
-        """aca empieza la pagina 2 o vista 2 idk es lo de los grupos"""
         self.vista2()
-
-        #----------------------------------------------------------------------------------------------------------
-        """vista 3 por aca"""
         self.vista3()
-
         self.vista4()
 
+        if canSkipTorneoVista():
+            self.frame_torneo.grid_remove()
+            self.go_to_equipos()
+
+
     def go_to_grupos(self):
+        #se necesita refrescar el combobox
+        self.eqs = Equipo.getAllEquipos()
+        team_values = [e["pais"] for e in self.eqs]
+        self._update_team_values(team_values)
+
         self.frame_equipos.grid_remove()
+
         self.frame_grupos.grid(row=0, column=0, columnspan=3, rowspan=5, sticky="nsew")
 
     def go_to_partidos(self):
@@ -58,7 +65,9 @@ class TorneoConfigFrame(tk.CTkFrame):
         self.frame_equipos.grid(row=0, column=0, columnspan=3, rowspan=5, sticky="nsew")
 
     def go_to_torneo(self):
+
         self.frame_equipos.grid_remove()
+        self.vista1()
         self.frame_torneo.grid(row=0, column=0, columnspan=3, rowspan=5, sticky="nsew")
 
     def guardar_data_torneo(self):
@@ -84,6 +93,9 @@ class TorneoConfigFrame(tk.CTkFrame):
         cargarTorneo(nombre, fecha_inicio, fecha_fin)
         CTkMessagebox(title="Exito", message="Torneo guardado correctamente", icon="check")
 
+        #RECARGA LA VISTA (NO SE QUE IMPACTO TIENE ESTO EN MEMORIA O EN GENERAL)
+        self.go_to_torneo()
+
     def guardar_equipos(self):
         pais = self.paisInput.get().strip().capitalize()
         abv = self.abvInput.get().strip().upper()
@@ -103,7 +115,7 @@ class TorneoConfigFrame(tk.CTkFrame):
         else:
             CTkMessagebox(title="Error", message=resultado[1], icon="cancel")
             return
-        
+
     def guardar_grupos(self):
         grupo = self.comboGrupo.get().strip()
 
@@ -132,9 +144,24 @@ class TorneoConfigFrame(tk.CTkFrame):
         hora = self.input_partido2.get().strip()
         lugar = self.input_partido3.get().strip()
 
+        #validacion de fechas
+        torneo_ini, torneo_fin = getRangoTorneo()[0], getRangoTorneo()[1]
+        print(f"{torneo_ini} \n {torneo_fin}")
+        if not (torneo_ini is None or torneo_fin is None):
+            t_ini = datetime.strptime(torneo_ini, "%d/%m/%Y")
+            t_fin = datetime.strptime(torneo_fin, "%d/%m/%Y")
+            f = datetime.strptime(fecha, "%d/%m/%Y")
+
+            if (fecha < torneo_ini or fecha > torneo_fin):
+                msj = f"La fecha ingresada es invalida, debe ser de {torneo_ini} a {torneo_fin}"
+                CTkMessagebox(title="Error", message=msj, icon="cancel")
+                return
+
+
         if not fecha or not hora or not lugar:
             CTkMessagebox(title="Error", message="Todos los campos son obligatorios", icon="cancel")
             return
+
 
         cargarPartido(fecha, hora, lugar)
         CTkMessagebox(title="Exito", message="Partidos guardados correctamente", icon="check")
@@ -145,13 +172,13 @@ class TorneoConfigFrame(tk.CTkFrame):
             return
 
         # Carga todos los equipos registrados y si no hay entonces una lista vacia nomas
-        equipos = Equipo.getAllEquipos() or []
+        equipos = self.eqs
         team_values = [e["pais"] for e in equipos]
 
         # Actualiza las opciones disponibles en los 4 combos de equipos
         self._update_team_values(team_values)
 
-        # Filtra los equipos que ya pertenecen al grupo 
+        # Filtra los equipos que ya pertenecen al grupo
         grupo_equipos = [e["pais"] for e in equipos if e.get("grupo", "") == grupo]
 
         # Si el grupo ya tiene 4 equipos, muestra los combos deshabilitado
@@ -199,6 +226,23 @@ class TorneoConfigFrame(tk.CTkFrame):
         self.frame_torneo.grid_rowconfigure(2, weight=1)
         self.frame_torneo.grid_rowconfigure(3, weight=1)
 
+        #desactivar carga si ya hay torneo
+        nombre = None
+        ini = None
+        fin = None
+        #sirve para definir mas tarde el estado de los inputs
+        estado_inputs = "normal"
+
+        #COMENTAR ESTE BLOQUE PARA FUNCIONAMIENTO ANTIGUO
+        if torneoExits():
+            #obtenemos la data del torneo
+            t = getTorneo(1)
+            nombre = t["nombre"]
+            ini = t["inicio"]
+            fin = t["fin"]
+            estado_inputs = "disabled"
+
+
         tk.CTkButton(
             self.frame_torneo, text="go back", width=100,
             fg_color="transparent", border_width=1,
@@ -206,12 +250,34 @@ class TorneoConfigFrame(tk.CTkFrame):
         ).grid(row=0, column=0, padx=20, pady=20, sticky="nw")
 
         self.input_nombre = tk.CTkEntry(self.frame_torneo, placeholder_text="Nombre del Torneo", width=200)
+        #cargar el nombre del torneo y luego desactivar el campo
+        if nombre:
+            self.input_nombre.configure(state="normal")
+            self.input_nombre.delete(0, "end")
+            self.input_nombre.insert(0, nombre)
+            self.input_nombre.configure(state=estado_inputs)
+
         self.input_nombre.grid(row=0, column=1, pady=(40, 10))
 
         self.input_fecha_inicio = tk.CTkEntry(self.frame_torneo, placeholder_text="Fecha de Inicio DD/MM/AAAA", width=200)
+
+        if ini:
+            self.input_fecha_inicio.configure(state="normal")
+            self.input_fecha_inicio.delete(0, "end")
+            self.input_fecha_inicio.insert(0, ini)
+            self.input_fecha_inicio.configure(state=estado_inputs)
+
+
         self.input_fecha_inicio.grid(row=1, column=1, pady=10)
 
         self.input_fecha_fin = tk.CTkEntry(self.frame_torneo, placeholder_text="Fecha de Final DD/MM/AAAA", width=200)
+
+        if fin:
+            self.input_fecha_fin.configure(state="normal")
+            self.input_fecha_fin.delete(0, "end")
+            self.input_fecha_fin.insert(0, fin)
+            self.input_fecha_fin.configure(state=estado_inputs)
+
         self.input_fecha_fin.grid(row=2, column=1, pady=10)
 
         tk.CTkButton(
@@ -252,7 +318,7 @@ class TorneoConfigFrame(tk.CTkFrame):
 
         tk.CTkLabel(
             self.frame_equipos,
-            text="Configuracion de Grupos"
+            text="Configuracion de Equipos"
         ).grid(row = 0, column = 1, pady=(20, 0), sticky="n")
 
         #body
@@ -323,6 +389,12 @@ class TorneoConfigFrame(tk.CTkFrame):
 
         tk.CTkLabel(
             self.frame_grupos,
+            text="Configuracion de grupos"
+        ).grid(row=0, column=1, sticky="n", pady=(10,0))
+
+
+        tk.CTkLabel(
+            self.frame_grupos,
             text="Seleccione el grupo:"
         ).grid(row=1, column=0, padx=(20, 10), pady=(0, 4), sticky="s")
 
@@ -334,8 +406,8 @@ class TorneoConfigFrame(tk.CTkFrame):
         )
         self.comboGrupo.grid(row=2, column=0, padx=(20, 40), sticky="e")
 
-        #  ComboBoxes en la columna central cargadas con todos los equipos disponibles 
-        equipos = Equipo.getAllEquipos()
+        #  ComboBoxes en la columna central cargadas con todos los equipos disponibles
+        equipos = self.eqs
         team_values = [e["pais"] for e in equipos] if equipos else []
 
         self.combo_team1 = tk.CTkComboBox(self.frame_grupos, values=team_values)

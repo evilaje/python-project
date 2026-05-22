@@ -8,13 +8,23 @@ class MainFrame(tk.CTkFrame):
         super().__init__(root)
         self.root = root
 
+        torneoAcivo = isTorneoActivo()
+        boton_activo, config_abierto = "normal" if torneoAcivo else "disabled", "normal" if not torneoAcivo else "disabled"
+
+        #DESACTIVAR
+        '''descomentar sgte linea para habilitar todos los botones ni bollo'''
+        #boton_acitvo, config_abierto = "normal", "normal"
+
         self.btn1 = tk.CTkButton(self, text="Configuración del Torneo", height=50, command=self.ir_a_config)
+        self.btn1.configure(state=config_abierto) #lo contrario al resto
         self.btn1.pack(pady=10, padx=10, fill="x")
 
         self.btn2 = tk.CTkButton(self, text="Registro de Resultados", height=50, command=self.ir_a_result)
+        self.btn2.configure(state=boton_activo)
         self.btn2.pack(pady=10, padx=10, fill="x")
 
         self.btn3 = tk.CTkButton(self, text="Emisión de Informes", height=50, command=self.ir_a_report)
+        self.btn3.configure(state=boton_activo)
         self.btn3.pack(pady=10, padx=10, fill="x")
 
         tk.CTkButton(self, text="Salir", height=50, command=root.destroy).pack(pady=10, padx=10, fill="x")

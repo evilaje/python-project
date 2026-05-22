@@ -97,5 +97,60 @@
         "puntos": 0,
         "fase": "grupos",
         "posicion": null
+    },
+    {
+        "id": "placeholder2",
+        "pais": "Peruvian army",
+        "abreviatura": "PER",
+        "prefijo": "+67",
+        "confederacion": "Peruvian kingdom",
+        "grupo": "placeholder",
+        "puntos": 0,
+        "fase": "grupos",
+        "posicion": null
+    },
+    {
+        "id": "placeholder3",
+        "pais": "Paraguayan army",
+        "abreviatura": "PYAR",
+        "prefijo": "+6767",
+        "confederacion": "Conmebol war",
+        "grupo": "placeholder",
+        "puntos": 0,
+        "fase": "grupos",
+        "posicion": null
+    },
+    {
+        "id": "placeholder4",
+        "pais": "Testeoito",
+        "abreviatura": "GTA6",
+        "prefijo": "+12",
+        "confederacion": "Danirep",
+        "grupo": "placeholder",
+        "puntos": 0,
+        "fase": "grupos",
+        "posicion": null
+    },
+    {
+        "id": "placeholder5",
+        "pais": "Testeito 5",
+        "abreviatura": "YOKO",
+        "prefijo": "+1231",
+        "confederacion": "Ozuna",
+        "grupo": "placeholder",
+        "puntos": 0,
+        "fase": "grupos",
+        "posicion": null
+    },
+    {
+        "id": "placeholder6",
+        "pais": "Alvarito",
+        "abreviatura": "ALV",
+        "prefijo": "+777",
+        "confederacion": "Sayonara",
+        "grupo": "placeholder",
+        "puntos": 0,
+        "fase": "grupos",
+        "posicion": null
     }
 ]
