@@ -4,6 +4,7 @@ from datetime import datetime
 from services.equipo_controller import *
 from services.partido_controller import *
 from models.equipo import Equipo
+from models.partido import Partido, setEquiposFaseGrupos, asignar_fases_por_orden
 # este es para los popUps, ponele un title, mensaje y icon nomas, icon acepta las palabras cancel, warning y check
 from CTkMessagebox import CTkMessagebox
 
@@ -40,9 +41,15 @@ class TorneoConfigFrame(tk.CTkFrame):
 
     def go_to_grupos(self):
         #se necesita refrescar el combobox
-        self.eqs = Equipo.getAllEquipos()
-        team_values = [e["pais"] for e in self.eqs]
+        self.eqs = Equipo.getAllEquipos() or []
+        # solo incluir equipos que no tengan grupo asignado (placeholder)
+        team_values = [e["pais"] for e in self.eqs if e.get("grupo", "") in (None, "", "placeholder")]
         self._update_team_values(team_values)
+
+        # si entramos por primera vez, preseleccionamos el grupo A y cargamos sus equipos
+        if not self.comboGrupo.get():
+            self.comboGrupo.set("A")
+        self.seleccionarGrupo(self.comboGrupo.get())
 
         self.frame_equipos.grid_remove()
 
@@ -111,6 +118,10 @@ class TorneoConfigFrame(tk.CTkFrame):
             CTkMessagebox(title="Exito", message=resultado[1], icon="check")
             #limpieza de campos
             self.cleanInputs([self.paisInput, self.abvInput, self.prefixInput, self.confInput])
+            # refrescar listado de equipos para que los combos muestren al nuevo equipo
+            self.eqs = Equipo.getAllEquipos() or []
+            team_values = [e["pais"] for e in self.eqs if e.get("grupo", "") in (None, "", "placeholder")]
+            self._update_team_values(team_values)
             self.comboGrupo.set("A")
         else:
             CTkMessagebox(title="Error", message=resultado[1], icon="cancel")
@@ -139,6 +150,18 @@ class TorneoConfigFrame(tk.CTkFrame):
 
         CTkMessagebox(title="Éxito", message=mensaje, icon="check")
 
+        # refrescar lista de equipos y actualizar comboboxes para que el cambio sea visible
+        self.eqs = Equipo.getAllEquipos() or []
+        team_values = [e["pais"] for e in self.eqs if e.get("grupo", "") in (None, "", "placeholder")]
+        self._update_team_values(team_values)
+
+        # asegurar que el grupo guardado quede seleccionado y sus cajas actualizadas
+        try:
+            self.comboGrupo.set(grupo)
+            self.seleccionarGrupo(grupo)
+        except Exception:
+            pass
+
     def guardar_partidos(self):
         fecha = self.input_partido1.get().strip()
         hora = self.input_partido2.get().strip()
@@ -152,7 +175,7 @@ class TorneoConfigFrame(tk.CTkFrame):
             t_fin = datetime.strptime(torneo_fin, "%d/%m/%Y")
             f = datetime.strptime(fecha, "%d/%m/%Y")
 
-            if (fecha < torneo_ini or fecha > torneo_fin):
+            if (f < t_ini or f > t_fin):
                 msj = f"La fecha ingresada es invalida, debe ser de {torneo_ini} a {torneo_fin}"
                 CTkMessagebox(title="Error", message=msj, icon="cancel")
                 return
@@ -172,8 +195,9 @@ class TorneoConfigFrame(tk.CTkFrame):
             return
 
         # Carga todos los equipos registrados y si no hay entonces una lista vacia nomas
-        equipos = self.eqs
-        team_values = [e["pais"] for e in equipos]
+        equipos = self.eqs or []
+        # solo mostrar en las opciones los equipos sin grupo asignado
+        team_values = [e["pais"] for e in equipos if e.get("grupo", "") in (None, "", "placeholder")]
 
         # Actualiza las opciones disponibles en los 4 combos de equipos
         self._update_team_values(team_values)
@@ -192,22 +216,86 @@ class TorneoConfigFrame(tk.CTkFrame):
         for combo in [self.combo_team1, self.combo_team2, self.combo_team3, self.combo_team4]:
             combo.configure(values=team_values)
 
+    def _validar_grupos_completos(self):
+        equipos = Equipo.getAllEquipos() or []
+        if len(equipos) > 48:
+            return False, "Solo se pueden cargar hasta 48 equipos."
+
+        grupos = {}
+        for eq in equipos:
+            grupo = str(eq.get("grupo", "")).strip().upper()
+            if grupo in (None, "", "PLACEHOLDER"):
+                continue
+            grupos.setdefault(grupo, []).append(eq)
+
+        grupos_necesarios = [chr(ord("A") + i) for i in range(12)]
+        if sorted(grupos.keys()) != grupos_necesarios:
+            return False, "Deben existir 12 grupos completos (A-L)."
+
+        for grupo, miembros in grupos.items():
+            if len(miembros) != 4:
+                return False, f"El grupo {grupo} debe tener exactamente 4 equipos."
+
+        return True, None
+
+    def _validar_partidos(self):
+        partidos = Partido.getAllPartidos() or []
+        if len(partidos) != 104:
+            return False, "Deben haber 104 partidos cargados."
+
+        for partido in partidos:
+            fecha = partido.get("fecha", "").strip()
+            hora = partido.get("hora", "").strip()
+            try:
+                datetime.strptime(f"{fecha} {hora}", "%d/%m/%Y %H:%M")
+            except Exception:
+                return False, "Todos los partidos deben tener fecha y hora válidas."
+
+        return True, None
 
     def _set_team_boxes(self, nombres, enabled=True):
         combos = [self.combo_team1, self.combo_team2, self.combo_team3, self.combo_team4]
 
         for index, combo in enumerate(combos):
+            # cambio a normal un rato para que se ponga el texto por que fokin tkinter es mierda
+            combo.configure(state="normal")
+
             if index < len(nombres) and nombres[index]:
-                # Si hay un equipo para esta posicion muestra
                 combo.set(nombres[index])
             else:
-                # Si no hay equipo limpia el combo
                 combo.set("")
 
-            # Habilita o deshabilita el combo segun lo que le llegue
             combo.configure(state=("normal" if enabled else "disabled"))
 
     def cerrar_config(self):
+        grupos_ok, grupo_msg = self._validar_grupos_completos()
+        if not grupos_ok:
+            CTkMessagebox(title="Error", message=grupo_msg, icon="warning")
+            return
+
+        partidos_ok, partidos_msg = self._validar_partidos()
+        if not partidos_ok:
+            CTkMessagebox(title="Error", message=partidos_msg, icon="warning")
+            return
+
+        if not Partido.ordenar_partidos_por_fecha_y_reasignar_ids():
+            CTkMessagebox(title="Error", message="Error al ordenar y reasignar partidos.", icon="cancel")
+            return
+
+        if not asignar_fases_por_orden():
+            CTkMessagebox(title="Error", message="Error al asignar fases a los partidos.", icon="cancel")
+            return
+
+        if not activarTorneo():
+            CTkMessagebox(title="Error", message="No se pudo activar el torneo.", icon="cancel")
+            return
+
+        set_result = setEquiposFaseGrupos()
+        if set_result is None:
+            CTkMessagebox(title="Error", message="No se pudieron asignar los equipos de fase de grupos.", icon="cancel")
+            return
+
+        CTkMessagebox(title="Exito", message="configuracion cerrada", icon="check")
         self.main_frame.habilitar_botones()
         self.root.back_to_main(self)
 
@@ -406,9 +494,9 @@ class TorneoConfigFrame(tk.CTkFrame):
         )
         self.comboGrupo.grid(row=2, column=0, padx=(20, 40), sticky="e")
 
-        #  ComboBoxes en la columna central cargadas con todos los equipos disponibles
-        equipos = self.eqs
-        team_values = [e["pais"] for e in equipos] if equipos else []
+        #  ComboBoxes en la columna central cargadas con los equipos disponibles (sin grupo)
+        equipos = self.eqs or []
+        team_values = [e["pais"] for e in equipos if e.get("grupo", "") in (None, "", "placeholder")]
 
         self.combo_team1 = tk.CTkComboBox(self.frame_grupos, values=team_values)
         self.combo_team1.grid(row=1, column=1, padx=10, pady=(0, 5), sticky="ew")

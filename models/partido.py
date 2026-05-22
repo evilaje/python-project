@@ -17,6 +17,7 @@ class Partido:
         self.penalesT1 = 0
         self.penalesT2 = 0
         self.fase = fase
+        self.jugado = False
 
     def toDict(self):
          return {
@@ -30,7 +31,8 @@ class Partido:
               "golesT2" : self.golesT2,
               "penalesT1" : self.penalesT1,
               "penalesT2" : self.penalesT2,
-              "fase" : self.fase
+              "fase" : self.fase,
+              "jugado" : self.jugado
          }
 
     """
@@ -136,6 +138,40 @@ class Partido:
                     arr = json.load(file)
                     return arr if len(arr) > 0 else None
         return None
+
+    @staticmethod
+    def ordenar_partidos_por_fecha_y_reasignar_ids(filename:str = None):
+        if (filename is None):
+            filename = PATH
+        if not file_exists(filename):
+            return False
+
+        with open(filename, "r") as file:
+            if is_file_empty(filename):
+                return False
+            partidos = json.load(file)
+
+        from datetime import datetime
+        for partido in partidos:
+            fecha = partido.get("fecha", "").strip()
+            hora = partido.get("hora", "").strip()
+            try:
+                datetime.strptime(f"{fecha} {hora}", "%d/%m/%Y %H:%M")
+            except Exception:
+                return False
+
+        partidos.sort(key=lambda partido: datetime.strptime(
+            f"{partido.get('fecha', '').strip()} {partido.get('hora', '').strip()}",
+            "%d/%m/%Y %H:%M"
+        ))
+
+        for index, partido in enumerate(partidos, start=1):
+            partido["id"] = index
+
+        with open(filename, "w") as file:
+            json.dump(partidos, file, indent=4)
+
+        return True
     
     # a partir del partido 73 ya deberia ser todo puesto automaticamente
     # tipo ganador de grupo x vs ganador de grupo y
@@ -166,6 +202,7 @@ class Partido:
                     partido["golesT2"] = self.golesT2
                     partido["penalesT1"] = self.penalesT1
                     partido["penalesT2"] = self.penalesT2
+                    partido["jugado"] = True
 
                     with open(filename, "w") as file:
                         json.dump(partidos, file, indent=4)
@@ -288,7 +325,47 @@ def setEquiposFaseGrupos(filename:str = None):
         with open(filename, "w") as file:
             json.dump(partidos, file, indent=4)
 
-    return None
+    return True
+
+
+def _fase_por_indice(index: int) -> str:
+    if index < 72:
+        return "Fase de Grupos"
+    if index < 88:
+        return "16avos de Final"
+    if index < 96:
+        return "Octavos de Final"
+    if index < 100:
+        return "Cuartos de Final"
+    if index < 102:
+        return "Semifinal"
+    if index == 102:
+        return "Tercer Puesto"
+    return "Final"
+
+
+def asignar_fases_por_orden(filename: str = None):
+    if filename is None:
+        filename = PATH
+
+    if not file_exists(filename):
+        return False
+
+    with open(filename, "r") as file:
+        if is_file_empty(filename):
+            return False
+        partidos = json.load(file)
+
+    if len(partidos) != 104:
+        return False
+
+    for index, partido in enumerate(partidos):
+        partido["fase"] = _fase_por_indice(index)
+
+    with open(filename, "w") as file:
+        json.dump(partidos, file, indent=4)
+
+    return True
 
 
 # Se carga una sola vez al importar el modulo; sin costo en cada llamada.
@@ -326,46 +403,25 @@ def setEliminatorias(filename: str = None):
     if equipos is None:
         return None
 
-    # Construir dict de grupos: { "A": [equipo1, equipo2, ...], "B": [...], ... }
-    # Solo equipos cuya fase sea "eliminatorias"
-    grupos = {}
-    for eq in equipos:
-        if eq.get("fase") != "eliminatorias":
-            continue
-        grupos.setdefault(eq["grupo"], []).append(eq)
+    mejores_equipos = equipo.getMejoresEquiposGrupo()
+    if not mejores_equipos or len(mejores_equipos) < 32:
+        return None
 
-    # Ordenar cada grupo por puntos desc, desempate por id desc
-    for grupo in grupos:
-        grupos[grupo].sort(key=lambda x: (x["puntos"], x["id"]), reverse=True)
+    ganadores = [eq for eq in mejores_equipos if eq.get("posicion") == 1]
+    subcampeones = [eq for eq in mejores_equipos if eq.get("posicion") == 2]
+    terceros = [eq for eq in mejores_equipos if eq.get("posicion") == 3]
 
-    # Separar por puesto dentro de cada grupo
-    ganadores    = []
-    subcampeones = []
-    terceros     = []
+    if len(ganadores) != 12 or len(subcampeones) != 12 or len(terceros) != 8:
+        return None
 
-    for grupo in sorted(grupos.keys()):
-        if len(grupos[grupo]) >= 2:
-            ganadores.append(grupos[grupo][0])
-            subcampeones.append(grupos[grupo][1])
-            if len(grupos[grupo]) >= 3:
-                terceros.append(grupos[grupo][2])
-
-    # Tomar los 8 mejores terceros según el criterio FIFA
     mejores_terceros = equipo.ordenar_terceros(terceros)[:8]
-
-    # Obtener el orden de slots desde el anexo C
     orden_grupos = _orden_terceros(mejores_terceros)
     if orden_grupos is None:
         return None
 
-    # Mapeo grupo -> equipo para acceso directo al asignar
     tercero_por_grupo = {eq["grupo"].upper(): eq for eq in mejores_terceros}
-
-    # Iterador sobre el orden definido por el anexo C
     iter_terceros = iter(orden_grupos)
 
-    # Emparejamientos en el orden requerido.
-    # 'best_third' indica que ese slot consume el siguiente grupo del anexo C.
     sequence = [
         ('2A', '2B'),
         ('1E', ('best_third', ['A', 'B', 'C', 'D', 'F'])),
@@ -401,14 +457,12 @@ def setEliminatorias(filename: str = None):
     matches = []
 
     for l, r in sequence:
-        # Lado izquierdo
         if isinstance(l, tuple) and l[0] == 'best_third':
             grupo_asignado = next(iter_terceros, None)
             equipo1 = tercero_por_grupo.get(grupo_asignado) if grupo_asignado else None
         else:
             equipo1 = pick_by_label(l)
 
-        # Lado derecho
         if isinstance(r, tuple) and r[0] == 'best_third':
             grupo_asignado = next(iter_terceros, None)
             equipo2 = tercero_por_grupo.get(grupo_asignado) if grupo_asignado else None
@@ -420,33 +474,190 @@ def setEliminatorias(filename: str = None):
 
         matches.append((equipo1['id'], equipo2['id']))
 
-    # Cargar partidos existentes del JSON
     partidos = []
     if file_exists(filename):
         with open(filename, "r") as file:
             if not is_file_empty(filename):
                 partidos = json.load(file)
 
-    # Asignar equipos a los partidos de eliminatorias (arrancan en el índice 72)
     for index, (id1, id2) in enumerate(matches, start=72):
         partidos[index]["idEquipo1"] = id1
         partidos[index]["idEquipo2"] = id2
-        partidos[index]["fase"] = "Eliminatorias"
+        partidos[index]["fase"] = "16avos de Final"
 
     with open(filename, "w") as file:
         json.dump(partidos, file, indent=4)
 
-    return None
+    return True
 
-def setOctavos(filename:str = None):
-    pass
+def _get_ganador_partido(partidos, id_partido):
+    """Retorna el ID del equipo ganador de un partido por goles y penales."""
+    p = partidos[id_partido - 1]
+    if not p.get("jugado"):
+        return None
+    g1, g2 = p.get("golesT1", 0), p.get("golesT2", 0)
+    if g1 > g2:
+        return p["idEquipo1"]
+    elif g2 > g1:
+        return p["idEquipo2"]
+    else:
+        p1, p2 = p.get("penalesT1", 0), p.get("penalesT2", 0)
+        return p["idEquipo1"] if p1 > p2 else p["idEquipo2"]
 
-def setCuartos(filename:str = None):
-    pass
+def _get_perdedor_partido(partidos, id_partido):
+    """Retorna el ID del equipo perdedor de un partido."""
+    p = partidos[id_partido - 1]
+    if not p.get("jugado"):
+        return None
+    g1, g2 = p.get("golesT1", 0), p.get("golesT2", 0)
+    if g1 > g2:
+        return p["idEquipo2"]
+    elif g2 > g1:
+        return p["idEquipo1"]
+    else:
+        p1, p2 = p.get("penalesT1", 0), p.get("penalesT2", 0)
+        return p["idEquipo2"] if p1 > p2 else p["idEquipo1"]
 
-def setSemis(filename:str = None):
-    pass
+def setOctavos(filename: str = None):
+    if filename is None:
+        filename = PATH
 
-# esto setea el partido por el tercer puesto tambien
-def setFinal(filename:str = None):
-    pass
+    partidos = []
+    if file_exists(filename):
+        with open(filename, "r") as file:
+            if not is_file_empty(filename):
+                partidos = json.load(file)
+
+    emparejamientos_octavos = [
+        (74, 77), (73, 75), (76, 78), (79, 80),
+        (83, 84), (81, 82), (86, 88), (85, 87),
+    ]
+
+    for index, (p1, p2) in enumerate(emparejamientos_octavos, start=88):
+        g1 = _get_ganador_partido(partidos, p1)
+        g2 = _get_ganador_partido(partidos, p2)
+        if g1 is None or g2 is None:
+            return None
+        partidos[index]["idEquipo1"] = g1
+        partidos[index]["idEquipo2"] = g2
+        partidos[index]["fase"] = "Octavos de Final"
+
+    with open(filename, "w") as file:
+        json.dump(partidos, file, indent=4)
+    return True
+
+
+def setCuartos(filename: str = None):
+    if filename is None:
+        filename = PATH
+
+    partidos = []
+    if file_exists(filename):
+        with open(filename, "r") as file:
+            if not is_file_empty(filename):
+                partidos = json.load(file)
+
+    emparejamientos_cuartos = [
+        (89, 90), (93, 94), (91, 92), (95, 96),
+    ]
+
+    for index, (p1, p2) in enumerate(emparejamientos_cuartos, start=96):
+        g1 = _get_ganador_partido(partidos, p1)
+        g2 = _get_ganador_partido(partidos, p2)
+        if g1 is None or g2 is None:
+            return None
+        partidos[index]["idEquipo1"] = g1
+        partidos[index]["idEquipo2"] = g2
+        partidos[index]["fase"] = "Cuartos de Final"
+
+    with open(filename, "w") as file:
+        json.dump(partidos, file, indent=4)
+    return True
+
+
+def setSemis(filename: str = None):
+    if filename is None:
+        filename = PATH
+
+    partidos = []
+    if file_exists(filename):
+        with open(filename, "r") as file:
+            if not is_file_empty(filename):
+                partidos = json.load(file)
+
+    emparejamientos_semis = [
+        (97, 98), (99, 100),
+    ]
+
+    for index, (p1, p2) in enumerate(emparejamientos_semis, start=100):
+        g1 = _get_ganador_partido(partidos, p1)
+        g2 = _get_ganador_partido(partidos, p2)
+        if g1 is None or g2 is None:
+            return None
+        partidos[index]["idEquipo1"] = g1
+        partidos[index]["idEquipo2"] = g2
+        partidos[index]["fase"] = "Semifinal"
+
+    with open(filename, "w") as file:
+        json.dump(partidos, file, indent=4)
+    return True
+
+
+def setFinal(filename: str = None):
+    if filename is None:
+        filename = PATH
+
+    partidos = []
+    if file_exists(filename):
+        with open(filename, "r") as file:
+            if not is_file_empty(filename):
+                partidos = json.load(file)
+
+    def get_ganador(id_partido):
+        p = partidos[id_partido - 1]
+        if not p.get("jugado"):
+            return None
+        g1, g2 = p.get("golesT1", 0), p.get("golesT2", 0)
+        if g1 > g2:
+            return p["idEquipo1"]
+        elif g2 > g1:
+            return p["idEquipo2"]
+        else:
+            p1, p2 = p.get("penalesT1", 0), p.get("penalesT2", 0)
+            return p["idEquipo1"] if p1 > p2 else p["idEquipo2"]
+
+    def get_perdedor(id_partido):
+        p = partidos[id_partido - 1]
+        if not p.get("jugado"):
+            return None
+        g1, g2 = p.get("golesT1", 0), p.get("golesT2", 0)
+        if g1 > g2:
+            return p["idEquipo2"]
+        elif g2 > g1:
+            return p["idEquipo1"]
+        else:
+            p1, p2 = p.get("penalesT1", 0), p.get("penalesT2", 0)
+            return p["idEquipo2"] if p1 > p2 else p["idEquipo1"]
+
+    # M103 (index 102): tercer puesto -> perdedores de SF1(101) y SF2(102)
+    perdedor_sf1 = _get_perdedor_partido(partidos, 101)
+    perdedor_sf2 = _get_perdedor_partido(partidos, 102)
+    if perdedor_sf1 is None or perdedor_sf2 is None:
+        return None
+    partidos[102]["idEquipo1"] = perdedor_sf1
+    partidos[102]["idEquipo2"] = perdedor_sf2
+    partidos[102]["fase"] = "Tercer Puesto"
+
+    # M104 (index 103): final -> ganadores de SF1(101) y SF2(102)
+    ganador_sf1 = _get_ganador_partido(partidos, 101)
+    ganador_sf2 = _get_ganador_partido(partidos, 102)
+    if ganador_sf1 is None or ganador_sf2 is None:
+        return None
+    partidos[103]["idEquipo1"] = ganador_sf1
+    partidos[103]["idEquipo2"] = ganador_sf2
+    partidos[103]["fase"] = "Final"
+
+    with open(filename, "w") as file:
+        json.dump(partidos, file, indent=4)
+
+    return True

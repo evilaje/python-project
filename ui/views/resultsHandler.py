@@ -3,6 +3,7 @@ from datetime import datetime
 from services.partido_controller import *
 from models.partido import *
 from models.equipo import Equipo
+from models.torneo import getTorneo, avanzarFase, setFaseTorneo
 from CTkMessagebox import CTkMessagebox
 
 
@@ -36,16 +37,13 @@ class TorneoResultFrame(tk.CTkFrame):
         ahora = datetime.now()
         pendientes = []
 
+        current_phase = self._get_fase_actual()
         for p in partidos:
-            # Filtrar por goles sin asignar
-            sin_goles = (
-                p.get("golesT1", 0) == 0 and
-                p.get("golesT2", 0) == 0 and
-                p.get("penalesT1", 0) == 0 and
-                p.get("penalesT2", 0) == 0
-            )
+            if not self._partido_en_fase_actual(p, current_phase):
+                continue
 
-            # Filtrar por fecha y hora posterior a ahora
+            pendiente_por_jugar = not p.get("jugado", False)
+
             try:
                 dt_partido = datetime.strptime(
                     f"{p['fecha']} {p['hora']}", "%d/%m/%Y %H:%M"
@@ -54,10 +52,59 @@ class TorneoResultFrame(tk.CTkFrame):
             except (ValueError, KeyError):
                 cargable = False
 
-            if sin_goles and cargable:
+            if pendiente_por_jugar and cargable:
                 pendientes.append(p)
 
         return pendientes
+
+    def _get_fase_actual(self):
+        torneo = getTorneo(1)
+        if torneo and torneo.get("fase"):
+            return torneo.get("fase")
+        return "Fase de Grupos"
+
+    def _partido_en_fase_actual(self, partido, fase_actual):
+        fase_partido = partido.get("fase", "Fase de Grupos")
+        if fase_actual == "16avos de Final":
+            return fase_partido in ("16avos de Final", "Eliminatorias")
+        return fase_partido == fase_actual
+
+    def _fase_completada(self, partidos, fase, total):
+        fase_matches = [p for p in partidos if p.get("fase") == fase]
+        return len(fase_matches) == total and all(p.get("jugado", False) for p in fase_matches)
+
+    def _avanzar_fase_si_corresponde(self):
+        partidos = Partido.getAllPartidos() or []
+
+        if self._fase_completada(partidos, "Fase de Grupos", 72):
+            if not any(p.get("fase") == "16avos de Final" for p in partidos):
+                if avanzarFase() and setEliminatorias():
+                    setFaseTorneo("16avos de Final")
+                    CTkMessagebox(title="Info", message="Dieciseisavos de Final configurados.", icon="check")
+
+        if self._fase_completada(partidos, "16avos de Final", 16):
+            if not any(p.get("fase") == "Octavos de Final" for p in partidos):
+                if setOctavos():
+                    setFaseTorneo("Octavos de Final")
+                    CTkMessagebox(title="Info", message="Octavos de Final configurados.", icon="check")
+
+        if self._fase_completada(partidos, "Octavos de Final", 8):
+            if not any(p.get("fase") == "Cuartos de Final" for p in partidos):
+                if setCuartos():
+                    setFaseTorneo("Cuartos de Final")
+                    CTkMessagebox(title="Info", message="Cuartos de Final configurados.", icon="check")
+
+        if self._fase_completada(partidos, "Cuartos de Final", 4):
+            if not any(p.get("fase") == "Semifinal" for p in partidos):
+                if setSemis():
+                    setFaseTorneo("Semifinal")
+                    CTkMessagebox(title="Info", message="Semifinales configurados.", icon="check")
+
+        if self._fase_completada(partidos, "Semifinal", 2):
+            if not any(p.get("fase") == "Final" for p in partidos):
+                if setFinal():
+                    setFaseTorneo("Final")
+                    CTkMessagebox(title="Info", message="Partido por el tercer puesto y Final configurados.", icon="check")
 
     def _label_partido(self, partido):
         """Genera el texto que se muestra en el combobox para cada partido.""" 
@@ -120,8 +167,7 @@ class TorneoResultFrame(tk.CTkFrame):
 
         if resultado[0]:
             CTkMessagebox(title="Exito", message=resultado[1], icon="check")
-            # Refrescar el combobox sin el partido ya cargado
-            
+            self._avanzar_fase_si_corresponde()
             self._refrescar_combo()
             self._partido_seleccionado = None
         else:

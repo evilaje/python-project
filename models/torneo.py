@@ -127,6 +127,23 @@ def avanzarFase(filename:str = None):
 					with open(PATH, "w") as tfw:
 						json.dump(torneos, tfw, indent=4)
 
+
+def setFaseTorneo(fase:str, filename:str = None):
+	if (filename is None):
+		filename = PATH
+	if not file_exists(filename):
+		return False
+	with open(filename, "r") as file:
+		if is_file_empty(filename):
+			return False
+		torneos = json.load(file)
+	if not torneos:
+		return False
+	torneos[0]["fase"] = fase
+	with open(filename, "w") as file:
+		json.dump(torneos, file, indent=4)
+	return True
+
 #preguntar si existe un torneo (literal si existe UNA unidad de torneo)
 def torneoExits()-> bool:
 	if file_exists(PATH):
