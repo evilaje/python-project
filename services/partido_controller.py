@@ -53,12 +53,8 @@ def getPartidoPorFecha(fecha:str):
         else:
             visitante = "Por definir"
 
+        # Usar la fase tal como está registrada en el partido (partidos.json)
         fase = p.get("fase") or "Fase de Grupos"
-        if fase == "Fase de Grupos" and p.get("idEquipo1") and p.get("idEquipo2"):
-            eq1 = equipo.getEquipo(p.get("idEquipo1"))
-            eq2 = equipo.getEquipo(p.get("idEquipo2"))
-            if (eq1 and eq1.get("fase") == "eliminatorias") or (eq2 and eq2.get("fase") == "eliminatorias"):
-                fase = "Eliminatorias"
 
         resultados.append({
             "fecha": p.get("fecha"),
@@ -103,12 +99,8 @@ def getPartidosPorEquipo(equipo_nombre: str):
         goles_local = p.get("golesT1", 0) if p.get("idEquipo1") == equipo_id else p.get("golesT2", 0)
         goles_visit = p.get("golesT2", 0) if p.get("idEquipo1") == equipo_id else p.get("golesT1", 0)
 
+        # Usar la fase tal como está registrada en el partido (partidos.json)
         fase = p.get("fase") or "Fase de Grupos"
-        if fase == "Fase de Grupos" and p.get("idEquipo1") and p.get("idEquipo2"):
-            eq1 = equipo.getEquipo(p.get("idEquipo1"))
-            eq2 = equipo.getEquipo(p.get("idEquipo2"))
-            if (eq1 and eq1.get("fase") == "eliminatorias") or (eq2 and eq2.get("fase") == "eliminatorias"):
-                fase = "Eliminatorias"
 
         resultado.append({
             "fecha": p.get("fecha"),
@@ -238,10 +230,6 @@ def getSiguientePartido(equipo_nombre: str):
         "visitante": visitante_abrev
     }
 
-    if partido_info["fase"] == "Fase de Grupos" and proximo.get("idEquipo1") and proximo.get("idEquipo2"):
-        eq1 = equipo.getEquipo(proximo.get("idEquipo1"))
-        eq2 = equipo.getEquipo(proximo.get("idEquipo2"))
-        if (eq1 and eq1.get("fase") == "eliminatorias") or (eq2 and eq2.get("fase") == "eliminatorias"):
-            partido_info["fase"] = "Eliminatorias"
+    # Usar la fase tal como está registrada en el partido (partidos.json)
 
     return partido_info

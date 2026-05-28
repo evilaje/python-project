@@ -355,7 +355,7 @@ class TorneoReportFrame(tk.CTkFrame):
 
         resultado = getPartidosPorEquipo(equipo)
         # getPartidosPorEquipo devuelve un dict: {"partidos": [...], "clasificacion": str|None}
-        # o directamente una lista si no hay clasificacion, adaptate a lo que devuelva tu controller
+        # o directamente una lista si no hay clasificacion
         if isinstance(resultado, dict):
             partidos = resultado.get("partidos", [])
             clasificacion = resultado.get("clasificacion", None)
@@ -363,7 +363,34 @@ class TorneoReportFrame(tk.CTkFrame):
             partidos = resultado or []
             clasificacion = None
 
-        self._render_informe_equipo(partidos, clasificacion)
+        # Obtener estado de fase directamente desde equipos.json
+        equipos_all = Equipo.getAllEquipos() or []
+        equipo_obj = next((e for e in equipos_all if e.get("pais", "").strip().lower() == equipo.strip().lower()), None)
+        estado_fase = None
+        if equipo_obj:
+            fase_val = (equipo_obj.get("fase") or "").strip().lower()
+            # Usar los nombres definidos en torneo.py 
+            if "grup" in fase_val or fase_val in ("grupos", "fase de grupos"):
+                estado_fase = "En fase de Grupos"
+            elif "16" in fase_val or "16avo" in fase_val or "16avos" in fase_val or "16avos de final" in fase_val:
+                estado_fase = "Clasificado a 16avos de Final"
+            elif "octav" in fase_val or "octavos" in fase_val:
+                estado_fase = "Clasificado a Octavos de Final"
+            elif "cuart" in fase_val or "cuartos" in fase_val:
+                estado_fase = "Clasificado a Cuartos de Final"
+            elif "semif" in fase_val or "semifinal" in fase_val:
+                estado_fase = "Clasificado a Semifinal"
+            elif "tercer" in fase_val or "tercer puesto" in fase_val:
+                estado_fase = "Clasificado a Tercer Puesto"
+            elif "final" in fase_val and "16" not in fase_val:
+                estado_fase = "Clasificado a Final"
+            elif "elimin" in fase_val or fase_val == "eliminatorias":
+                estado_fase = "Clasificado a Eliminatorias"
+
+        # Priorizar el estado tomado del equipo; si no existe, usar la clasificacion calculada
+        final_clasificacion = estado_fase or clasificacion
+
+        self._render_informe_equipo(partidos, final_clasificacion)
 
     
 
