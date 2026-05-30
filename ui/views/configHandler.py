@@ -5,78 +5,181 @@ from services.equipo_controller import *
 from services.partido_controller import *
 from models.equipo import Equipo
 from models.partido import Partido, setEquiposFaseGrupos, asignar_fases_por_orden
-# este es para los popUps, ponele un title, mensaje y icon nomas, icon acepta las palabras cancel, warning y check
 from CTkMessagebox import CTkMessagebox
 
-#constantes
+
 class TorneoConfigFrame(tk.CTkFrame):
     def __init__(self, root, main_frame):
         super().__init__(root)
         self.root = root
         self.main_frame = main_frame
 
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=2)
-        self.grid_columnconfigure(2, weight=1)
+        # sidebar, este es el grid parent ponele
+        self.grid_columnconfigure(0, weight=0)   # ancho fijo, no cambia en pantalla completa
+        self.grid_columnconfigure(1, weight=1)   # container de las vistas, ocupa todo el espacio restante
         self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=1)
-        self.grid_rowconfigure(2, weight=1)
-        self.grid_rowconfigure(3, weight=1)
-        self.grid_rowconfigure(4, weight=1)
 
-        #inicializa
         self.eqs = Equipo.getAllEquipos() or []
 
+        # constructor de sidebar
+        self._build_sidebar()
 
+        # constructor del container
+        self.content_panel = tk.CTkFrame(self, fg_color="transparent")
+        self.content_panel.grid(row=0, column=1, sticky="nsew")
+        self.content_panel.grid_columnconfigure(0, weight=1)
+        self.content_panel.grid_rowconfigure(0, weight=1)
 
-        self.vista1()
-        self.vista2()
-        self.vista3()
-        self.vista4()
+        # bueno aca construimos los 4 frames que tiene la vista pero no se muestran
+        # esto funciona asi -> el main frame que es el de la sidebar es estatico y no ocupa toda la ventana
+        # entonces un layer por encima del main frame esta el container que muestra las vistas, entonces
+        # cuando llamas una se destruye la otra y asi sucesivamente
+        # uf creo que se entiende verdad pero capaz estoy loco
+        self.vista1()   # Torneo
+        self.vista2()   # Equipos
+        self.vista3()   # Grupos
+        self.vista4()   # Partidos
 
+        # vista inicial -> la del torneo o si ya esta cargado el torneo muestra la de equipos 
         if canSkipTorneoVista():
-            self.frame_torneo.grid_remove()
-            self.go_to_equipos()
+            self._show_frame(self.frame_equipos, "equipos")
+        else:
+            self._show_frame(self.frame_torneo, "torneo")
 
+    
+    # sidebar -----------------------------------------------------------------------------
+    def _build_sidebar(self):
+        sidebar = tk.CTkFrame(self, width=200, corner_radius=0, fg_color=("gray15", "gray10"))
+        sidebar.grid(row=0, column=0, sticky="nsew")
+        sidebar.grid_propagate(False)  # mantener ancho fijo
+        sidebar.grid_columnconfigure(0, weight=1)
+
+        """
+        el titulo este de menu podemos cambiar, no me cuadra del todo
+        """
+        tk.CTkLabel(
+            sidebar,
+            text="Menu",
+            font=tk.CTkFont(size=22, weight="bold"),
+            anchor="w",
+        ).grid(row=0, column=0, padx=24, pady=(32, 20), sticky="w")
+
+        # botones para navegar
+        nav_items = [
+            ("Torneo",   "torneo"),
+            ("Equipos",  "equipos"),
+            ("Grupos",   "grupos"),
+            ("Partidos", "partidos"),
+        ]
+
+        self._nav_buttons = {}
+        for i, (label, key) in enumerate(nav_items, start=1):
+            btn = tk.CTkButton(
+                sidebar,
+                text=label,
+                anchor="w",
+                height=40,
+                fg_color="transparent",
+                hover_color=("gray25", "gray20"),
+                text_color=("gray90", "gray85"),
+                font=tk.CTkFont(size=14),
+                command=lambda k=key: self._navigate(k),
+            )
+            btn.grid(row=i, column=0, padx=16, pady=4, sticky="ew")
+            self._nav_buttons[key] = btn
+
+        # bs para que no se junten todo los botones
+        sidebar.grid_rowconfigure(len(nav_items) + 1, weight=1)
+
+        # cerrar config btn
+        tk.CTkButton(
+            sidebar,
+            text="Cerrar Config",
+            anchor="w",
+            height=40,
+            fg_color="transparent",
+            hover_color=("#5a1a1a", "#4a1010"),
+            text_color=("#e05252", "#e05252"),
+            font=tk.CTkFont(size=14),
+            command=self.cerrar_config,
+        ).grid(row=len(nav_items) + 2, column=0, padx=16, pady=(4, 8), sticky="ew")
+
+        # go back btn
+        tk.CTkButton(
+            sidebar,
+            text="← Volver",
+            anchor="w",
+            height=36,
+            fg_color="transparent",
+            hover_color=("gray25", "gray20"),
+            text_color=("gray60", "gray55"),
+            font=tk.CTkFont(size=12),
+            command=self.volver,
+        ).grid(row=len(nav_items) + 3, column=0, padx=16, pady=(0, 24), sticky="ew")
+
+    def _set_active_button(self, active_key):
+        """Resalta el boton activo en el sidebar."""
+        for key, btn in self._nav_buttons.items():
+            if key == active_key:
+                btn.configure(
+                    fg_color=("gray30", "gray25"),
+                    text_color=("white", "white"),
+                    font=tk.CTkFont(size=14, weight="bold"),
+                )
+            else:
+                btn.configure(
+                    fg_color="transparent",
+                    text_color=("gray90", "gray85"),
+                    font=tk.CTkFont(size=14, weight="normal"),
+                )
+
+    
+    # nav ---------------------------------------------------------------------------------
+    def _show_frame(self, frame, key):
+        """Oculta todos los frames de contenido y muestra el que llamas"""
+        for f in [self.frame_torneo, self.frame_equipos, self.frame_grupos, self.frame_partidos]:
+            f.grid_remove()
+        frame.grid(row=0, column=0, sticky="nsew")
+        self._set_active_button(key)
+
+    def _navigate(self, key):
+        if key == "torneo":
+            self.go_to_torneo()
+        elif key == "equipos":
+            self.go_to_equipos()
+        elif key == "grupos":
+            self.go_to_grupos()
+        elif key == "partidos":
+            self.go_to_partidos()
+
+    def go_to_torneo(self):
+        self.vista1()  # recarga para reflejar estado guardado
+        self._show_frame(self.frame_torneo, "torneo")
+
+    def go_to_equipos(self):
+        self._show_frame(self.frame_equipos, "equipos")
 
     def go_to_grupos(self):
-        #se necesita refrescar el combobox
         self.eqs = Equipo.getAllEquipos() or []
-        # solo incluir equipos que no tengan grupo asignado (placeholder)
         team_values = [e["pais"] for e in self.eqs if e.get("grupo", "") in (None, "", "placeholder")]
         self._update_team_values(team_values)
 
-        # si entramos por primera vez, preseleccionamos el grupo A y cargamos sus equipos
         if not self.comboGrupo.get():
             self.comboGrupo.set("A")
         self.seleccionarGrupo(self.comboGrupo.get())
 
-        self.frame_equipos.grid_remove()
-
-        self.frame_grupos.grid(row=0, column=0, columnspan=3, rowspan=5, sticky="nsew")
+        self._show_frame(self.frame_grupos, "grupos")
 
     def go_to_partidos(self):
-        self.frame_grupos.grid_remove()
-        self.frame_partidos.grid(row=0, column=0, columnspan=3, rowspan=5, sticky="nsew")
+        self._show_frame(self.frame_partidos, "partidos")
 
+    # esto esta aca por que hay funciones que recargan la vista y me dio paja arreglar
     def go_to_grupos_from_partidos(self):
-        self.frame_partidos.grid_remove()
-        self.frame_grupos.grid(row=0, column=0, columnspan=3, rowspan=5, sticky="nsew")
+        self.go_to_grupos()
 
-    # esta es la funcion para cambiar de pagina
-    def go_to_equipos(self):
-        # grid remove borra el grid pero no el frame, entonces podes llamar grid otra vez para volver a mostrar
-        self.frame_torneo.grid_remove()
-        self.frame_grupos.grid_remove()
-        # se habilita el grid
-        self.frame_equipos.grid(row=0, column=0, columnspan=3, rowspan=5, sticky="nsew")
+    
 
-    def go_to_torneo(self):
-
-        self.frame_equipos.grid_remove()
-        self.vista1()
-        self.frame_torneo.grid(row=0, column=0, columnspan=3, rowspan=5, sticky="nsew")
-
+    # gaurdado de data ---------------------------------------------------------------------------------
     def guardar_data_torneo(self):
         nombre = self.input_nombre.get().strip()
         fecha_inicio = self.input_fecha_inicio.get().strip()
@@ -99,8 +202,6 @@ class TorneoConfigFrame(tk.CTkFrame):
 
         cargarTorneo(nombre, fecha_inicio, fecha_fin)
         CTkMessagebox(title="Exito", message="Torneo guardado correctamente", icon="check")
-
-        #RECARGA LA VISTA (NO SE QUE IMPACTO TIENE ESTO EN MEMORIA O EN GENERAL)
         self.go_to_torneo()
 
     def guardar_equipos(self):
@@ -109,53 +210,44 @@ class TorneoConfigFrame(tk.CTkFrame):
         pref = self.prefixInput.get().strip()
         conf = self.confInput.get().strip().capitalize()
 
-        #validaciones de campos vacios
         if not pais or not abv or not pref or not conf:
             CTkMessagebox(title="Error", message="Todos los campos son obligatorios", icon="cancel")
             return
+
         resultado = cargarEquipo(pais, abv, pref, conf)
-        if (resultado[0]):
+        if resultado[0]:
             CTkMessagebox(title="Exito", message=resultado[1], icon="check")
-            #limpieza de campos
             self.cleanInputs([self.paisInput, self.abvInput, self.prefixInput, self.confInput])
-            # refrescar listado de equipos para que los combos muestren al nuevo equipo
             self.eqs = Equipo.getAllEquipos() or []
             team_values = [e["pais"] for e in self.eqs if e.get("grupo", "") in (None, "", "placeholder")]
             self._update_team_values(team_values)
             self.comboGrupo.set("A")
         else:
             CTkMessagebox(title="Error", message=resultado[1], icon="cancel")
-            return
 
     def guardar_grupos(self):
         grupo = self.comboGrupo.get().strip()
-
         paises = [
             self.combo_team1.get().strip(),
             self.combo_team2.get().strip(),
             self.combo_team3.get().strip(),
-            self.combo_team4.get().strip()
+            self.combo_team4.get().strip(),
         ]
 
-        # este guardar grupo hace todas las validaciones y devuelve el mensaje de error que toca
         resultado = guardarGrupo(grupo, paises)
         valido, mensaje, grupo_equipos = resultado
 
         if not valido:
-            # Si ya ya habia equipos en el grupo salen como puestos e incambiables
             if grupo_equipos:
                 self._set_team_boxes(grupo_equipos, enabled=False)
             CTkMessagebox(title="Error", message=mensaje, icon="warning")
             return
 
         CTkMessagebox(title="Éxito", message=mensaje, icon="check")
-
-        # refrescar lista de equipos y actualizar comboboxes para que el cambio sea visible
         self.eqs = Equipo.getAllEquipos() or []
         team_values = [e["pais"] for e in self.eqs if e.get("grupo", "") in (None, "", "placeholder")]
         self._update_team_values(team_values)
 
-        # asegurar que el grupo guardado quede seleccionado y sus cajas actualizadas
         try:
             self.comboGrupo.set(grupo)
             self.seleccionarGrupo(grupo)
@@ -167,24 +259,19 @@ class TorneoConfigFrame(tk.CTkFrame):
         hora = self.input_partido2.get().strip()
         lugar = self.input_partido3.get().strip()
 
-        #validacion de fechas
         torneo_ini, torneo_fin = getRangoTorneo()[0], getRangoTorneo()[1]
-        print(f"{torneo_ini} \n {torneo_fin}")
         if not (torneo_ini is None or torneo_fin is None):
             t_ini = datetime.strptime(torneo_ini, "%d/%m/%Y")
             t_fin = datetime.strptime(torneo_fin, "%d/%m/%Y")
             f = datetime.strptime(fecha, "%d/%m/%Y")
-
-            if (f < t_ini or f > t_fin):
+            if f < t_ini or f > t_fin:
                 msj = f"La fecha ingresada es invalida, debe ser de {torneo_ini} a {torneo_fin}"
                 CTkMessagebox(title="Error", message=msj, icon="cancel")
                 return
 
-
         if not fecha or not hora or not lugar:
             CTkMessagebox(title="Error", message="Todos los campos son obligatorios", icon="cancel")
             return
-
 
         cargarPartido(fecha, hora, lugar)
         CTkMessagebox(title="Exito", message="Partidos guardados correctamente", icon="check")
@@ -194,25 +281,14 @@ class TorneoConfigFrame(tk.CTkFrame):
         if not grupo:
             return
 
-        # Carga todos los equipos registrados y si no hay entonces una lista vacia nomas
         equipos = self.eqs or []
-        # solo mostrar en las opciones los equipos sin grupo asignado
         team_values = [e["pais"] for e in equipos if e.get("grupo", "") in (None, "", "placeholder")]
-
-        # Actualiza las opciones disponibles en los 4 combos de equipos
         self._update_team_values(team_values)
 
-        # Filtra los equipos que ya pertenecen al grupo
         grupo_equipos = [e["pais"] for e in equipos if e.get("grupo", "") == grupo]
-
-        # Si el grupo ya tiene 4 equipos, muestra los combos deshabilitado
-        # Si tiene menos de 4, los deja habilitados para seguir asignando
-        # cambiable totalmente porque no pense demasiado en esto
         self._set_team_boxes(grupo_equipos, enabled=(len(grupo_equipos) != 4))
 
-
     def _update_team_values(self, team_values):
-        # Aplica la misma lista de opciones a los 4 combos ed equipo
         for combo in [self.combo_team1, self.combo_team2, self.combo_team3, self.combo_team4]:
             combo.configure(values=team_values)
 
@@ -255,16 +331,9 @@ class TorneoConfigFrame(tk.CTkFrame):
 
     def _set_team_boxes(self, nombres, enabled=True):
         combos = [self.combo_team1, self.combo_team2, self.combo_team3, self.combo_team4]
-
         for index, combo in enumerate(combos):
-            # cambio a normal un rato para que se ponga el texto por que fokin tkinter es mierda
             combo.configure(state="normal")
-
-            if index < len(nombres) and nombres[index]:
-                combo.set(nombres[index])
-            else:
-                combo.set("")
-
+            combo.set(nombres[index] if index < len(nombres) and nombres[index] else "")
             combo.configure(state=("normal" if enabled else "disabled"))
 
     def cerrar_config(self):
@@ -295,307 +364,189 @@ class TorneoConfigFrame(tk.CTkFrame):
             CTkMessagebox(title="Error", message="No se pudieron asignar los equipos de fase de grupos.", icon="cancel")
             return
 
-        CTkMessagebox(title="Exito", message="configuracion cerrada", icon="check")
+        CTkMessagebox(title="Exito", message="Configuracion cerrada", icon="check")
         self.main_frame.habilitar_botones()
         self.root.back_to_main(self)
 
     def volver(self):
         self.root.back_to_main(self)
 
+    #  las vistas del panel de la derecha
+    #  cada frame se coloca dentro de self.content_panel pero no se hace el grid()
+    #  hasta que _show_frame() diga yes
+
+    def _make_content_frame(self):
+        """Crea un frame hijo de content_panel listo para usar en grid"""
+        f = tk.CTkFrame(self.content_panel, fg_color="transparent")
+        f.grid_columnconfigure(0, weight=1)
+        f.grid_columnconfigure(1, weight=2)
+        f.grid_columnconfigure(2, weight=1)
+        return f
+
+    # torneo ---------------------------------------------------------------------------------
     def vista1(self):
-        self.frame_torneo = tk.CTkFrame(self, fg_color="transparent")
-        self.frame_torneo.grid(row=0, column=0, columnspan=3, rowspan=5, sticky="nsew")
+        if hasattr(self, "frame_torneo"):
+            self.frame_torneo.destroy()
 
-        self.frame_torneo.grid_columnconfigure(0, weight=1)
-        self.frame_torneo.grid_columnconfigure(1, weight=2)
-        self.frame_torneo.grid_columnconfigure(2, weight=1)
-        self.frame_torneo.grid_rowconfigure(0, weight=1)
-        self.frame_torneo.grid_rowconfigure(1, weight=1)
-        self.frame_torneo.grid_rowconfigure(2, weight=1)
-        self.frame_torneo.grid_rowconfigure(3, weight=1)
+        self.frame_torneo = self._make_content_frame()
+        for r in range(5):
+            self.frame_torneo.grid_rowconfigure(r, weight=1)
 
-        #desactivar carga si ya hay torneo
+        # title
+        tk.CTkLabel(
+            self.frame_torneo,
+            text="Configuración del Torneo",
+            font=tk.CTkFont(size=18, weight="bold"),
+        ).grid(row=0, column=0, columnspan=3, pady=(32, 8), sticky="n")
+
         nombre = None
         ini = None
         fin = None
-        #sirve para definir mas tarde el estado de los inputs
         estado_inputs = "normal"
 
-        #COMENTAR ESTE BLOQUE PARA FUNCIONAMIENTO ANTIGUO
         if torneoExits():
-            #obtenemos la data del torneo
             t = getTorneo(1)
             nombre = t["nombre"]
             ini = t["inicio"]
             fin = t["fin"]
             estado_inputs = "disabled"
 
-
-        tk.CTkButton(
-            self.frame_torneo, text="go back", width=100,
-            fg_color="transparent", border_width=1,
-            command=self.volver
-        ).grid(row=0, column=0, padx=20, pady=20, sticky="nw")
-
-        self.input_nombre = tk.CTkEntry(self.frame_torneo, placeholder_text="Nombre del Torneo", width=200)
-        #cargar el nombre del torneo y luego desactivar el campo
+        self.input_nombre = tk.CTkEntry(self.frame_torneo, placeholder_text="Nombre del Torneo", width=280)
         if nombre:
             self.input_nombre.configure(state="normal")
-            self.input_nombre.delete(0, "end")
             self.input_nombre.insert(0, nombre)
             self.input_nombre.configure(state=estado_inputs)
+        self.input_nombre.grid(row=1, column=1, pady=10, sticky="ew", padx=20)
 
-        self.input_nombre.grid(row=0, column=1, pady=(40, 10))
-
-        self.input_fecha_inicio = tk.CTkEntry(self.frame_torneo, placeholder_text="Fecha de Inicio DD/MM/AAAA", width=200)
-
+        self.input_fecha_inicio = tk.CTkEntry(self.frame_torneo, placeholder_text="Fecha de Inicio DD/MM/AAAA", width=280)
         if ini:
             self.input_fecha_inicio.configure(state="normal")
-            self.input_fecha_inicio.delete(0, "end")
             self.input_fecha_inicio.insert(0, ini)
             self.input_fecha_inicio.configure(state=estado_inputs)
+        self.input_fecha_inicio.grid(row=2, column=1, pady=10, sticky="ew", padx=20)
 
-
-        self.input_fecha_inicio.grid(row=1, column=1, pady=10)
-
-        self.input_fecha_fin = tk.CTkEntry(self.frame_torneo, placeholder_text="Fecha de Final DD/MM/AAAA", width=200)
-
+        self.input_fecha_fin = tk.CTkEntry(self.frame_torneo, placeholder_text="Fecha de Final DD/MM/AAAA", width=280)
         if fin:
             self.input_fecha_fin.configure(state="normal")
-            self.input_fecha_fin.delete(0, "end")
             self.input_fecha_fin.insert(0, fin)
             self.input_fecha_fin.configure(state=estado_inputs)
-
-        self.input_fecha_fin.grid(row=2, column=1, pady=10)
+        self.input_fecha_fin.grid(row=3, column=1, pady=10, sticky="ew", padx=20)
 
         tk.CTkButton(
             self.frame_torneo, text="Guardar Torneo", width=200,
             fg_color="#29ABE2",
-            command=self.guardar_data_torneo
-        ).grid(row=3, column=1, pady=(20, 10))
+            command=self.guardar_data_torneo,
+        ).grid(row=4, column=1, pady=(20, 10))
 
-        tk.CTkButton(
-            self.frame_torneo, text="Equipos ->", width=110,
-            fg_color="#29ABE2", border_width=0,
-            command=self.go_to_equipos
-        ).grid(row=2, column=2, padx=20, sticky="e")
-
-
+    # equios ---------------------------------------------------------------------------------
     def vista2(self):
-
-        # frame 2, se crea sendo transparente para que no se muestre hasta que se toque
-        self.frame_equipos = tk.CTkFrame(self, fg_color="transparent")
-        # no se hace grid todavia, se muestra solo cuando se llama go_to_grupos
-        self.frame_equipos.grid_columnconfigure(0, weight=1)
-        self.frame_equipos.grid_columnconfigure(1, weight=2)
-        self.frame_equipos.grid_columnconfigure(2, weight=1)
-        self.frame_equipos.grid_rowconfigure(0, weight=1)
-        self.frame_equipos.grid_rowconfigure(1, weight=1)
-        self.frame_equipos.grid_rowconfigure(2, weight=1)
-        self.frame_equipos.grid_rowconfigure(3, weight=1)
-        self.frame_equipos.grid_rowconfigure(4, weight=1)
-        self.frame_equipos.grid_rowconfigure(5, weight=1)
-        self.frame_equipos.grid_rowconfigure(6, weight=1)
-
-        #header
-        tk.CTkButton(
-            self.frame_equipos, text="<- Torneo", width=100,
-            fg_color="transparent", border_width=1,
-            command=self.go_to_torneo
-        ).grid(row=0, column=0, padx=20, pady=(20,0), sticky="nw")
+        self.frame_equipos = self._make_content_frame()
+        for r in range(8):
+            self.frame_equipos.grid_rowconfigure(r, weight=1)
 
         tk.CTkLabel(
             self.frame_equipos,
-            text="Configuracion de Equipos"
-        ).grid(row = 0, column = 1, pady=(20, 0), sticky="n")
+            text="Configuración de Equipos",
+            font=tk.CTkFont(size=18, weight="bold"),
+        ).grid(row=0, column=0, columnspan=3, pady=(32, 8), sticky="n")
 
-        #body
+        fields = [
+            ("Pais",                    "paisInput",    "Pais"),
+            ("Abreviatura",             "abvInput",     "Abreviatura"),
+            ("Prefijo telefónico",      "prefixInput",  "Prefijo +000"),
+            ("Confederación",           "confInput",    "Ingrese la confederacion"),
+        ]
 
-        #aca estoy probando disposiciones nomas xd
-        tk.CTkLabel(self.frame_equipos,
-            text="Ingrese el Pais"
-            ).grid(row=2, column=0, padx=(80, 0))
-
-        self.paisInput = tk.CTkEntry(self.frame_equipos, placeholder_text="Pais", width=200)
-        self.paisInput.grid(row=2, column=1, pady= (20, 40))
-
-        #abreviatura
-        tk.CTkLabel(self.frame_equipos,
-            text="Ingrese la abreviatura"
-            ).grid(row=3, column=0, padx=(80, 0))
-
-        self.abvInput = tk.CTkEntry(self.frame_equipos, placeholder_text="Abreviatura", width=100)
-        self.abvInput.grid(row=3, column=1, pady= (20, 40))
-
-        #prefij
-        tk.CTkLabel(self.frame_equipos,
-            text="Ingrese el prefijo telefonico"
-            ).grid(row=4, column=0, padx=(80, 0))
-
-        self.prefixInput = tk.CTkEntry(self.frame_equipos, placeholder_text="Prefijo +000", width=100)
-        self.prefixInput.grid(row=4, column=1, pady= (20, 40))
-
-        #Confederacion
-        tk.CTkLabel(self.frame_equipos,
-            text="Ingrese la confederacion"
-            ).grid(row=5, column=0, padx=(80, 0))
-        #tengo entendido que esto debe ser un valor fijo para q no haya algo tipo Conmebol y conmebol pero equis
-        #lo ideal seria un combo box
-        self.confInput = tk.CTkEntry(self.frame_equipos, placeholder_text="Ingrese la confederacion", width=200)
-        self.confInput.grid(row=5, column=1, pady= (20, 40))
-
+        for i, (label_text, attr, placeholder) in enumerate(fields, start=1):
+            tk.CTkLabel(self.frame_equipos, text=label_text, anchor="e").grid(
+                row=i, column=0, padx=(40, 16), sticky="e"
+            )
+            entry = tk.CTkEntry(self.frame_equipos, placeholder_text=placeholder, width=280)
+            entry.grid(row=i, column=1, pady=10, sticky="ew", padx=(0, 20))
+            setattr(self, attr, entry)
 
         tk.CTkButton(
-            self.frame_equipos, text="Guardar Equipos", width=200,
+            self.frame_equipos, text="Guardar Equipo", width=200,
             fg_color="#29ABE2",
-            command=self.guardar_equipos
-        ).grid(row=6, column=1, pady=(20, 10))
+            command=self.guardar_equipos,
+        ).grid(row=len(fields) + 1, column=1, pady=(24, 10))
 
-        tk.CTkButton(
-            self.frame_equipos, text="Grupos ->", width=110,
-            fg_color="transparent", border_width=0,
-            command=self.go_to_grupos  # proxima vista
-        ).grid(row=6, column=2, padx=20, sticky="e")
-
-
+    # grupos ---------------------------------------------------------------------------------
     def vista3(self):
-        self.frame_grupos = tk.CTkFrame(self, fg_color="transparent")
-
-        # configurar grid interno para posicionamiento: columna 0 = zona izquierda,
-        # columna 1 = columna central (donde van los 4 comboBoxes), columna 2 = derecha
-        self.frame_grupos.grid_columnconfigure(0, weight=1)
-        self.frame_grupos.grid_columnconfigure(1, weight=3)
-        self.frame_grupos.grid_columnconfigure(2, weight=1)
-        for i in range(6):
-            self.frame_grupos.grid_rowconfigure(i, weight=1)
-
-        tk.CTkButton(
-            self.frame_grupos, text="<- Equipos", width=100,
-            fg_color="transparent", border_width=1,
-            command=self.go_to_equipos
-        ).grid(row=0, column=0, padx=20, pady=(20,0), sticky="nw")
+        self.frame_grupos = self._make_content_frame()
+        for r in range(7):
+            self.frame_grupos.grid_rowconfigure(r, weight=1)
 
         tk.CTkLabel(
             self.frame_grupos,
-            text="Configuracion de grupos"
-        ).grid(row=0, column=1, sticky="n", pady=(10,0))
+            text="Configuración de Grupos",
+            font=tk.CTkFont(size=18, weight="bold"),
+        ).grid(row=0, column=0, columnspan=3, pady=(32, 8), sticky="n")
 
+        tk.CTkLabel(self.frame_grupos, text="Seleccione el grupo:", anchor="e").grid(
+            row=1, column=0, padx=(40, 16), sticky="e"
+        )
 
-        tk.CTkLabel(
-            self.frame_grupos,
-            text="Seleccione el grupo:"
-        ).grid(row=1, column=0, padx=(20, 10), pady=(0, 4), sticky="s")
-
-        # el combo de grupos queda en la columna izquierda pero alineado hacia el centro (hacia la derecha)
         self.comboGrupo = tk.CTkComboBox(
             self.frame_grupos,
             values=["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
-            command=self.seleccionarGrupo
+            command=self.seleccionarGrupo,
+            width=120,
         )
-        self.comboGrupo.grid(row=2, column=0, padx=(20, 40), sticky="e")
+        self.comboGrupo.grid(row=1, column=1, padx=(0, 20), pady=8, sticky="w")
 
-        #  ComboBoxes en la columna central cargadas con los equipos disponibles (sin grupo)
         equipos = self.eqs or []
         team_values = [e["pais"] for e in equipos if e.get("grupo", "") in (None, "", "placeholder")]
 
-        self.combo_team1 = tk.CTkComboBox(self.frame_grupos, values=team_values)
-        self.combo_team1.grid(row=1, column=1, padx=10, pady=(0, 5), sticky="ew")
-        self.combo_team1.set("")
-
-        self.combo_team2 = tk.CTkComboBox(self.frame_grupos, values=team_values)
-        self.combo_team2.grid(row=2, column=1, padx=10, pady=5, sticky="ew")
-        self.combo_team2.set("")
-
-        self.combo_team3 = tk.CTkComboBox(self.frame_grupos, values=team_values)
-        self.combo_team3.grid(row=3, column=1, padx=10, pady=5, sticky="ew")
-        self.combo_team3.set("")
-
-        self.combo_team4 = tk.CTkComboBox(self.frame_grupos, values=team_values)
-        self.combo_team4.grid(row=4, column=1, padx=10, pady=5, sticky="ew")
-        self.combo_team4.set("")
+        for i, attr in enumerate(["combo_team1", "combo_team2", "combo_team3", "combo_team4"], start=2):
+            combo = tk.CTkComboBox(self.frame_grupos, values=team_values, width=280)
+            combo.grid(row=i, column=1, padx=(0, 20), pady=6, sticky="ew")
+            combo.set("")
+            setattr(self, attr, combo)
 
         tk.CTkButton(
             self.frame_grupos,
-            text="GuardarGrupo",
+            text="Guardar Grupo",
             fg_color="#29B6F6",
             hover_color="#0288D1",
             text_color="#01547a",
-            command=self.guardar_grupos
-        ).grid(row=5, column=1, padx=10, pady=(10, 0), sticky="ew")
+            width=200,
+            command=self.guardar_grupos,
+        ).grid(row=6, column=1, padx=(0, 20), pady=(20, 10))
 
-
-        tk.CTkButton(
-            self.frame_grupos, text="Partidos ->", width=110,
-            fg_color="transparent", border_width=0,
-            command=self.go_to_partidos
-        ).grid(row=5, column=2, padx=20, sticky="e")
-
-
-
+    # partidos ---------------------------------------------------------------------------------
     def vista4(self):
-        self.frame_partidos = tk.CTkFrame(self, fg_color="transparent")
-
-        self.frame_partidos.grid_columnconfigure(0, weight=1)
-        self.frame_partidos.grid_columnconfigure(1, weight=2)
-        self.frame_partidos.grid_columnconfigure(2, weight=1)
-        self.frame_partidos.grid_rowconfigure(0, weight=1)
-        self.frame_partidos.grid_rowconfigure(1, weight=1)
-        self.frame_partidos.grid_rowconfigure(2, weight=1)
-        self.frame_partidos.grid_rowconfigure(3, weight=1)
-        self.frame_partidos.grid_rowconfigure(4, weight=1)
-        self.frame_partidos.grid_rowconfigure(5, weight=1)
-
-        # --- Botón volver a Grupos ---
-        tk.CTkButton(
-            self.frame_partidos, text="<- Grupos", width=100,
-            fg_color="transparent", border_width=1,
-            command=self.go_to_grupos_from_partidos
-        ).grid(row=0, column=0, padx=20, pady=(20, 0), sticky="nw")
+        self.frame_partidos = self._make_content_frame()
+        for r in range(6):
+            self.frame_partidos.grid_rowconfigure(r, weight=1)
 
         tk.CTkLabel(
             self.frame_partidos,
-            text="Configuracion de Partidos"
-        ).grid(row=0, column=1, pady=(20, 0), sticky="n")
+            text="Configuración de Partidos",
+            font=tk.CTkFont(size=18, weight="bold"),
+        ).grid(row=0, column=0, columnspan=3, pady=(32, 8), sticky="n")
 
-        # fecha
-        tk.CTkLabel(self.frame_partidos,
-            text="Campo 1"
-        ).grid(row=2, column=0, padx=(80, 0))
+        fields = [
+            ("Fecha",   "input_partido1", "Fecha DD/MM/AAAA"),
+            ("Hora",    "input_partido2", "HH:MM"),
+            ("Lugar",   "input_partido3", "Estadio / Ciudad"),
+        ]
 
-        self.input_partido1 = tk.CTkEntry(self.frame_partidos, placeholder_text="fecha", width=200)
-        self.input_partido1.grid(row=2, column=1, pady=(20, 10))
+        for i, (label_text, attr, placeholder) in enumerate(fields, start=1):
+            tk.CTkLabel(self.frame_partidos, text=label_text, anchor="e").grid(
+                row=i, column=0, padx=(40, 16), sticky="e"
+            )
+            entry = tk.CTkEntry(self.frame_partidos, placeholder_text=placeholder, width=280)
+            entry.grid(row=i, column=1, pady=10, sticky="ew", padx=(0, 20))
+            setattr(self, attr, entry)
 
-        # hora
-        tk.CTkLabel(self.frame_partidos,
-            text="Campo 2"
-        ).grid(row=3, column=0, padx=(80, 0))
-
-        self.input_partido2 = tk.CTkEntry(self.frame_partidos, placeholder_text="hora", width=200)
-        self.input_partido2.grid(row=3, column=1, pady=10)
-
-        # lugar
-        tk.CTkLabel(self.frame_partidos,
-            text="Campo 3"
-        ).grid(row=4, column=0, padx=(80, 0))
-
-        self.input_partido3 = tk.CTkEntry(self.frame_partidos, placeholder_text="lugar", width=200)
-        self.input_partido3.grid(row=4, column=1, pady=10)
-
-        # guardar
         tk.CTkButton(
             self.frame_partidos, text="Guardar Partidos", width=200,
             fg_color="#29ABE2",
-            command=self.guardar_partidos
-        ).grid(row=5, column=1, pady=(20, 10))
+            command=self.guardar_partidos,
+        ).grid(row=len(fields) + 1, column=1, pady=(24, 10))
 
-        # cerrar config
-        tk.CTkButton(
-            self.frame_partidos, text="Cerrar Configuracion", width=180,
-            fg_color="#e05252", hover_color="#b33a3a",
-            command=self.cerrar_config
-        ).grid(row=5, column=2, padx=20, sticky="e")
-
-
+    # utility --------------------------------------------------------------------------------
     def cleanInputs(self, inputs):
-        for input in inputs:
-            input.delete(0, "end")
+        for inp in inputs:
+            inp.delete(0, "end")
