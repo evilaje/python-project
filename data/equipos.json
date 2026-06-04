@@ -174,5 +174,49 @@
         "puntos": 0,
         "fase": "grupos",
         "posicion": null
+    },
+    {
+        "id": "E1",
+        "pais": "Teto",
+        "abreviatura": "T",
+        "prefijo": "+111",
+        "confederacion": "Utau",
+        "grupo": "E",
+        "puntos": 0,
+        "fase": "grupos",
+        "posicion": null
+    },
+    {
+        "id": "E2",
+        "pais": "Neru",
+        "abreviatura": "NIGG",
+        "prefijo": "+1212",
+        "confederacion": "Floid",
+        "grupo": "E",
+        "puntos": 0,
+        "fase": "grupos",
+        "posicion": null
+    },
+    {
+        "id": "E3",
+        "pais": "Miku",
+        "abreviatura": "MIK",
+        "prefijo": "+012489",
+        "confederacion": "Voc",
+        "grupo": "E",
+        "puntos": 0,
+        "fase": "grupos",
+        "posicion": null
+    },
+    {
+        "id": "E4",
+        "pais": "Gumi",
+        "abreviatura": "GUM",
+        "prefijo": "+86537426",
+        "confederacion": "Voc",
+        "grupo": "E",
+        "puntos": 0,
+        "fase": "grupos",
+        "posicion": null
     }
 ]

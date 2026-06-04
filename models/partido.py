@@ -56,6 +56,31 @@ class Partido:
                     partidos = json.load(file)
 
         partidos.append(self.toDict())
+
+        from datetime import datetime
+        try:
+            partidos.sort(key=lambda partido: datetime.strptime(
+                f"{partido.get('fecha', '').strip()} {partido.get('hora', '').strip()}",
+                "%d/%m/%Y %H:%M"
+            ))
+        except Exception:
+            pass
+
+        for index, partido in enumerate(partidos, start=1):
+            partido["id"] = index
+            if (partido.get("fecha") == self.fecha and
+                partido.get("hora") == self.hora and
+                partido.get("lugar") == self.lugar and
+                partido.get("idEquipo1") == self.idEquipo1 and
+                partido.get("idEquipo2") == self.idEquipo2 and
+                partido.get("golesT1") == self.golesT1 and
+                partido.get("golesT2") == self.golesT2 and
+                partido.get("penalesT1") == self.penalesT1 and
+                partido.get("penalesT2") == self.penalesT2 and
+                partido.get("fase") == self.fase and
+                partido.get("jugado") == self.jugado):
+                self.id = index
+
         with open(filename, "w") as file:
             json.dump(partidos, file, indent=4)
 

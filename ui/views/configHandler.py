@@ -234,6 +234,14 @@ class TorneoConfigFrame(tk.CTkFrame):
             self.combo_team4.get().strip(),
         ]
 
+        # validar que las selecciones provengan de las opciones actuales
+        equipos = self.eqs or []
+        team_values = [e["pais"] for e in equipos if e.get("grupo", "") in (None, "", "placeholder")]
+        for p in paises:
+            if not p or p not in team_values:
+                CTkMessagebox(title="Error", message="Seleccione países válidos desde la lista desplegable.", icon="warning")
+                return
+
         resultado = guardarGrupo(grupo, paises)
         valido, mensaje, grupo_equipos = resultado
 
@@ -273,7 +281,16 @@ class TorneoConfigFrame(tk.CTkFrame):
             CTkMessagebox(title="Error", message="Todos los campos son obligatorios", icon="cancel")
             return
 
-        cargarPartido(fecha, hora, lugar)
+        resultado = cargarPartido(fecha, hora, lugar)
+        if isinstance(resultado, tuple):
+            ok, msg = resultado
+        else:
+            ok, msg = (True, "Exito")
+
+        if not ok:
+            CTkMessagebox(title="Error", message=msg, icon="cancel")
+            return
+
         CTkMessagebox(title="Exito", message="Partidos guardados correctamente", icon="check")
 
     def seleccionarGrupo(self, value=None):

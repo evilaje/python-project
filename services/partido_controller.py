@@ -4,11 +4,17 @@ import models.equipo as equipo
 
 
 def cargarPartido(fecha:str, hora:str, lugar:str):
+    # validar que no se superen los 104 partidos
+    partidos = Partido.getAllPartidos() or []
+    if len(partidos) >= 104:
+        return False, "Ya hay 104 partidos cargados. No se pueden agregar más."
+
     #validaciones hechas en los controllers/front, por eso aca na de na
     t = torneo.getTorneo(1)
 
     partido:Partido = Partido(fecha, hora, lugar)
     partido.savePartido()
+    return True, "Exito"
 
 def guardarResultado(id: int, g1: int, g2: int, gp1: int, gp2: int):
     partido = Partido(None, None, None)
@@ -233,3 +239,53 @@ def getSiguientePartido(equipo_nombre: str):
     # Usar la fase tal como está registrada en el partido (partidos.json)
 
     return partido_info
+
+
+    def getSiguienteGeneral():
+        """Retorna el próximo partido (sin filtrar por equipo).
+        Devuelve None si no hay próximos partidos.
+        """
+        partidos = Partido.getAllPartidos() or []
+        proximos = []
+        from datetime import datetime
+        ahora = datetime.now()
+
+        for p in partidos:
+            fecha = p.get("fecha")
+            hora = p.get("hora", "00:00")
+            if not fecha:
+                continue
+            try:
+                dt = datetime.strptime(f"{fecha} {hora}", "%d/%m/%Y %H:%M")
+            except Exception:
+                continue
+
+            if dt <= ahora:
+                continue
+
+            proximos.append((dt, p))
+
+        if not proximos:
+            return None
+
+        proximos.sort(key=lambda item: item[0])
+        proximo = proximos[0][1]
+
+        torneo_obj = torneo.getTorneo(1)
+        torneo_nombre = torneo_obj.get("nombre") if torneo_obj else "Torneo"
+
+        eq1 = equipo.getEquipo(proximo.get("idEquipo1"))
+        eq2 = equipo.getEquipo(proximo.get("idEquipo2"))
+        local_nombre = eq1.get("pais") if eq1 else proximo.get("idEquipo1") or "Por definir"
+        visitante_nombre = eq2.get("pais") if eq2 else proximo.get("idEquipo2") or "Por definir"
+
+        return {
+            "partido": proximo,
+            "torneo": torneo_nombre,
+            "fecha": proximo.get("fecha"),
+            "hora": proximo.get("hora", ""),
+            "local": local_nombre,
+            "visitante": visitante_nombre,
+            "lugar": proximo.get("lugar", ""),
+            "fase": proximo.get("fase", "")
+        }
