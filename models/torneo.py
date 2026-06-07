@@ -107,12 +107,19 @@ def avanzarFase(filename:str = None):
 				arr = json.load(file)
 
 				mejoresEquipos = equipo.getMejoresEquiposGrupo(filename)
+				clasificados = {}
+				if mejoresEquipos:
+					clasificados = {mej["id"]: mej for mej in mejoresEquipos}
+
 				for eq in arr:
-					for mejorEq in mejoresEquipos:
-						if eq["id"] == mejorEq["id"]:
-							eq["fase"] = "Clasificado a 16avos de Final"
-							eq["posicion"] = mejorEq["posicion"]
-							break
+					if eq.get("id") in clasificados:
+						mejorEq = clasificados[eq["id"]]
+						eq["fase"] = "Clasificado a 16avos de Final"
+						eq["posicion"] = mejorEq.get("posicion")
+					else:
+						eq["fase"] = "Eliminado de la fase de grupos"
+						eq["posicion"] = None
+
 				with open(filename, "w") as file:
 					json.dump(arr, file, indent=4)
 
@@ -122,7 +129,7 @@ def avanzarFase(filename:str = None):
 			if not is_file_empty(PATH):
 				torneos = json.load(tf)
 				if torneos and len(torneos) > 0:
-					# se asume un único torneo activo; actualizar el primero
+					# se asume un solo torneo activo, actualizar el primero
 					torneos[0]["fase"] = "16avos de Final"
 					with open(PATH, "w") as tfw:
 						json.dump(torneos, tfw, indent=4)

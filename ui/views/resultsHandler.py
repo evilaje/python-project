@@ -148,7 +148,7 @@ class TorneoResultFrame(tk.CTkFrame):
         ])
 
     # ══════════════════════════════════════════════════════════════════════════
-    #  PANEL DERECHO
+    #  panel de la derecha
     # ══════════════════════════════════════════════════════════════════════════
 
     def _build_panel_derecho(self):
@@ -277,7 +277,7 @@ class TorneoResultFrame(tk.CTkFrame):
         self.label_eq2.configure(text=nombre_eq2)
 
     # ══════════════════════════════════════════════════════════════════════════
-    #  LÓGICA DE NEGOCIO (sin cambios)
+    #  cambios en los archivos/get data
     # ══════════════════════════════════════════════════════════════════════════
 
     def _get_partidos_pendientes(self):
@@ -326,7 +326,7 @@ class TorneoResultFrame(tk.CTkFrame):
         return all(p.get("idEquipo1") and p.get("idEquipo2") for p in fase_matches)
 
     def _avanzar_fase_si_corresponde(self):
-        print("Se ha llamado a la funcion avanzar si corresponde")
+        print("avanzar si corresponde")
         partidos = Partido.getAllPartidos() or []
         current_phase = self._get_fase_actual()
 

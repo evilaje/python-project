@@ -1,4 +1,5 @@
 from models.partido import *
+from models.partido import _get_ganador_partido, _get_perdedor_partido
 import models.partido as partido
 import models.torneo as torneo
 import models.equipo as equipo
@@ -33,9 +34,11 @@ def guardarResultado(id: int, g1: int, g2: int, gp1: int, gp2: int):
             p = getPartido(id)
             if p:
                 fase = p.get("fase")
+                print(f"DEBUG: Actualizando fases para partido {id} en fase '{fase}'")
                 # obtener ganador y perdedor
-                ganador = partido._get_ganador_partido(partidos, id)
-                perdedor = partido._get_perdedor_partido(partidos, id)
+                ganador = _get_ganador_partido(partidos, id)
+                perdedor = _get_perdedor_partido(partidos, id)
+                print(f"DEBUG: Ganador: {ganador}, Perdedor: {perdedor}")
 
                 # Mapeo de avance para rondas de eliminatoria (estado legible)
                 next_phase_map = {
@@ -44,40 +47,56 @@ def guardarResultado(id: int, g1: int, g2: int, gp1: int, gp2: int):
                     "Cuartos de Final": "Clasificado a Semifinales",
                 }
 
+                eliminacion_map = {
+                    "16avos de Final": "Eliminado en 16avos de Final",
+                    "Octavos de Final": "Eliminado en Octavos de Final",
+                    "Cuartos de Final": "Eliminado en Cuartos de Final",
+                }
+
                 if fase in next_phase_map:
                     if ganador:
-                        equipo.setEquipoFase(ganador, next_phase_map[fase])
+                        new_fase = next_phase_map[fase]
+                        equipo.setEquipoFase(ganador, new_fase)
+                        print(f"DEBUG: {ganador} actualizado a '{new_fase}'")
                     if perdedor:
-                        equipo.setEquipoFase(perdedor, "Eliminado")
+                        new_fase_elim = eliminacion_map[fase]
+                        equipo.setEquipoFase(perdedor, new_fase_elim)
+                        print(f"DEBUG: {perdedor} actualizado a '{new_fase}'")
 
                 elif fase == "Semifinal":
                     # Ganador -> Finalista, perdedor -> Partido por el 3er puesto
                     if ganador:
                         equipo.setEquipoFase(ganador, "Finalista")
+                        print(f"DEBUG: {ganador} actualizado a 'Finalista'")
                     if perdedor:
                         equipo.setEquipoFase(perdedor, "Partido por el 3er puesto")
+                        print(f"DEBUG: {perdedor} actualizado a 'Partido por el 3er puesto'")
 
                 elif fase == "Tercer Puesto":
                     # Ganador -> Tercer Puesto, Perdedor -> Cuarto Puesto
                     if ganador:
                         equipo.setEquipoFase(ganador, "Tercer Puesto")
+                        print(f"DEBUG: {ganador} actualizado a 'Tercer Puesto'")
                     if perdedor:
                         equipo.setEquipoFase(perdedor, "Cuarto Puesto")
+                        print(f"DEBUG: {perdedor} actualizado a 'Cuarto Puesto'")
 
                 elif fase == "Final":
                     # Ganador -> Primer Puesto, Perdedor -> Segundo Puesto
                     if ganador:
                         equipo.setEquipoFase(ganador, "Primer Puesto")
+                        print(f"DEBUG: {ganador} actualizado a 'Primer Puesto'")
                     if perdedor:
                         equipo.setEquipoFase(perdedor, "Segundo Puesto")
-        except Exception:
+                        print(f"DEBUG: {perdedor} actualizado a 'Segundo Puesto'")
+        except Exception as e:
             # no bloquear la respuesta si algo falla al actualizar equipos
+            print(f"DEBUG: Error al actualizar fases: {e}")
             pass
 
         return [True, "Exito"]
 
-    # true, mensaje
-    return [True, "Cagada"]
+    return [False, "No se pudo guardar el resultado"]
     
 def getPartidoPorFecha(fecha:str):
     # fecha expected format: "DD/MM/AAAA" (exact match)
@@ -289,51 +308,51 @@ def getSiguientePartido(equipo_nombre: str):
     return partido_info
 
 
-    def getSiguienteGeneral():
-        """Retorna el próximo partido (sin filtrar por equipo).
-        Devuelve None si no hay próximos partidos.
-        """
-        partidos = Partido.getAllPartidos() or []
-        proximos = []
-        from datetime import datetime
-        ahora = datetime.now()
+def getSiguienteGeneral():
+    """Retorna el próximo partido (sin filtrar por equipo).
+    Devuelve None si no hay próximos partidos.
+    """
+    partidos = Partido.getAllPartidos() or []
+    proximos = []
+    from datetime import datetime
+    ahora = datetime.now()
 
-        for p in partidos:
-            fecha = p.get("fecha")
-            hora = p.get("hora", "00:00")
-            if not fecha:
-                continue
-            try:
-                dt = datetime.strptime(f"{fecha} {hora}", "%d/%m/%Y %H:%M")
-            except Exception:
-                continue
+    for p in partidos:
+        fecha = p.get("fecha")
+        hora = p.get("hora", "00:00")
+        if not fecha:
+            continue
+        try:
+            dt = datetime.strptime(f"{fecha} {hora}", "%d/%m/%Y %H:%M")
+        except Exception:
+            continue
 
-            if dt <= ahora:
-                continue
+        if dt <= ahora:
+            continue
 
-            proximos.append((dt, p))
+        proximos.append((dt, p))
 
-        if not proximos:
-            return None
+    if not proximos:
+        return None
 
-        proximos.sort(key=lambda item: item[0])
-        proximo = proximos[0][1]
+    proximos.sort(key=lambda item: item[0])
+    proximo = proximos[0][1]
 
-        torneo_obj = torneo.getTorneo(1)
-        torneo_nombre = torneo_obj.get("nombre") if torneo_obj else "Torneo"
+    torneo_obj = torneo.getTorneo(1)
+    torneo_nombre = torneo_obj.get("nombre") if torneo_obj else "Torneo"
 
-        eq1 = equipo.getEquipo(proximo.get("idEquipo1"))
-        eq2 = equipo.getEquipo(proximo.get("idEquipo2"))
-        local_nombre = eq1.get("pais") if eq1 else proximo.get("idEquipo1") or "Por definir"
-        visitante_nombre = eq2.get("pais") if eq2 else proximo.get("idEquipo2") or "Por definir"
+    eq1 = equipo.getEquipo(proximo.get("idEquipo1"))
+    eq2 = equipo.getEquipo(proximo.get("idEquipo2"))
+    local_nombre = eq1.get("pais") if eq1 else proximo.get("idEquipo1") or "Por definir"
+    visitante_nombre = eq2.get("pais") if eq2 else proximo.get("idEquipo2") or "Por definir"
 
-        return {
-            "partido": proximo,
-            "torneo": torneo_nombre,
-            "fecha": proximo.get("fecha"),
-            "hora": proximo.get("hora", ""),
-            "local": local_nombre,
-            "visitante": visitante_nombre,
-            "lugar": proximo.get("lugar", ""),
-            "fase": proximo.get("fase", "")
-        }
+    return {
+        "partido": proximo,
+        "torneo": torneo_nombre,
+        "fecha": proximo.get("fecha"),
+        "hora": proximo.get("hora", ""),
+        "local": local_nombre,
+        "visitante": visitante_nombre,
+        "lugar": proximo.get("lugar", ""),
+        "fase": proximo.get("fase", "")
+    }

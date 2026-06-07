@@ -6,9 +6,9 @@
         "prefijo": "+54",
         "confederacion": "CONMEBOL",
         "grupo": "A",
-        "puntos": 23,
-        "fase": "eliminatorias",
-        "posicion": 2
+        "puntos": 0,
+        "fase": "Clasificado a 16avos de Final",
+        "posicion": 1
     },
     {
         "id": "A2",
@@ -17,9 +17,9 @@
         "prefijo": "+55",
         "confederacion": "CONMEBOL",
         "grupo": "A",
-        "puntos": 21,
-        "fase": "eliminatorias",
-        "posicion": 3
+        "puntos": 3,
+        "fase": "Clasificado a Octavos de Final",
+        "posicion": 2
     },
     {
         "id": "A3",
@@ -28,9 +28,9 @@
         "prefijo": "+598",
         "confederacion": "CONMEBOL",
         "grupo": "A",
-        "puntos": 0,
-        "fase": "grupos",
-        "posicion": null
+        "puntos": 3,
+        "fase": "Clasificado a 16avos de Final",
+        "posicion": 3
     },
     {
         "id": "A4",
@@ -39,9 +39,9 @@
         "prefijo": "+57",
         "confederacion": "CONMEBOL",
         "grupo": "A",
-        "puntos": 12,
-        "fase": "eliminatorias",
-        "posicion": 1
+        "puntos": 0,
+        "fase": "Eliminado de la fase de grupos",
+        "posicion": null
     },
     {
         "id": "B1",
@@ -50,9 +50,9 @@
         "prefijo": "+56",
         "confederacion": "CONMEBOL",
         "grupo": "B",
-        "puntos": 3,
-        "fase": "eliminatorias",
-        "posicion": 2
+        "puntos": 0,
+        "fase": "Clasificado a 16avos de Final",
+        "posicion": 1
     },
     {
         "id": "B2",
@@ -61,9 +61,9 @@
         "prefijo": "+593",
         "confederacion": "CONMEBOL",
         "grupo": "B",
-        "puntos": 0,
-        "fase": "grupos",
-        "posicion": null
+        "puntos": 3,
+        "fase": "Eliminado en 16avos de Final",
+        "posicion": 2
     },
     {
         "id": "B3",
@@ -72,9 +72,9 @@
         "prefijo": "+595",
         "confederacion": "CONMEBOL",
         "grupo": "B",
-        "puntos": 46,
-        "fase": "eliminatorias",
-        "posicion": 1
+        "puntos": 3,
+        "fase": "Clasificado a 16avos de Final",
+        "posicion": 3
     },
     {
         "id": "B4",
@@ -83,19 +83,19 @@
         "prefijo": "+58",
         "confederacion": "CONMEBOL",
         "grupo": "B",
-        "puntos": 1,
-        "fase": "eliminatorias",
-        "posicion": 3
+        "puntos": 0,
+        "fase": "Eliminado de la fase de grupos",
+        "posicion": null
     },
     {
         "id": "C1",
-        "pais": "Per\u00c3\u00ba",
+        "pais": "Per\u00c3\u0192\u00c2\u00ba",
         "abreviatura": "PER",
         "prefijo": "+51",
         "confederacion": "CONMEBOL",
         "grupo": "C",
-        "puntos": 6,
-        "fase": "eliminatorias",
+        "puntos": 3,
+        "fase": "Clasificado a 16avos de Final",
         "posicion": 1
     },
     {
@@ -106,19 +106,19 @@
         "confederacion": "CONMEBOL",
         "grupo": "C",
         "puntos": 0,
-        "fase": "grupos",
-        "posicion": null
+        "fase": "Clasificado a 16avos de Final",
+        "posicion": 2
     },
     {
         "id": "C3",
-        "pais": "Espa\u00c3\u00b1a",
+        "pais": "Espa\u00c3\u0192\u00c2\u00b1a",
         "abreviatura": "ESP",
         "prefijo": "+34",
         "confederacion": "UEFA",
         "grupo": "C",
-        "puntos": 1,
-        "fase": "eliminatorias",
-        "posicion": 2
+        "puntos": 3,
+        "fase": "Clasificado a 16avos de Final",
+        "posicion": 3
     },
     {
         "id": "C4",
@@ -127,9 +127,9 @@
         "prefijo": "+33",
         "confederacion": "UEFA",
         "grupo": "C",
-        "puntos": 1,
-        "fase": "eliminatorias",
-        "posicion": 3
+        "puntos": 0,
+        "fase": "Eliminado de la fase de grupos",
+        "posicion": null
     },
     {
         "id": "D1",
@@ -138,8 +138,8 @@
         "prefijo": "+49",
         "confederacion": "UEFA",
         "grupo": "D",
-        "puntos": 4,
-        "fase": "eliminatorias",
+        "puntos": 0,
+        "fase": "Clasificado a 16avos de Final",
         "posicion": 1
     },
     {
@@ -149,8 +149,8 @@
         "prefijo": "+44",
         "confederacion": "UEFA",
         "grupo": "D",
-        "puntos": 4,
-        "fase": "eliminatorias",
+        "puntos": 0,
+        "fase": "Clasificado a 16avos de Final",
         "posicion": 2
     },
     {
@@ -160,8 +160,8 @@
         "prefijo": "+351",
         "confederacion": "UEFA",
         "grupo": "D",
-        "puntos": 1,
-        "fase": "eliminatorias",
+        "puntos": 3,
+        "fase": "Clasificado a 16avos de Final",
         "posicion": 3
     },
     {
@@ -172,30 +172,30 @@
         "confederacion": "UEFA",
         "grupo": "D",
         "puntos": 0,
-        "fase": "grupos",
+        "fase": "Eliminado de la fase de grupos",
         "posicion": null
     },
     {
         "id": "E1",
-        "pais": "Pa\u00c3\u00adses Bajos",
+        "pais": "Pa\u00c3\u0192\u00c2\u00adses Bajos",
         "abreviatura": "NED",
         "prefijo": "+31",
         "confederacion": "UEFA",
         "grupo": "E",
-        "puntos": 2,
-        "fase": "eliminatorias",
-        "posicion": 2
+        "puntos": 3,
+        "fase": "Clasificado a 16avos de Final",
+        "posicion": 1
     },
     {
         "id": "E2",
-        "pais": "B\u00c3\u00a9lgica",
+        "pais": "B\u00c3\u0192\u00c2\u00a9lgica",
         "abreviatura": "BEL",
         "prefijo": "+32",
         "confederacion": "UEFA",
         "grupo": "E",
-        "puntos": 4,
-        "fase": "eliminatorias",
-        "posicion": 3
+        "puntos": 0,
+        "fase": "Clasificado a 16avos de Final",
+        "posicion": 2
     },
     {
         "id": "E3",
@@ -204,9 +204,9 @@
         "prefijo": "+385",
         "confederacion": "UEFA",
         "grupo": "E",
-        "puntos": 3,
-        "fase": "eliminatorias",
-        "posicion": 1
+        "puntos": 0,
+        "fase": "Clasificado a 16avos de Final",
+        "posicion": 3
     },
     {
         "id": "E4",
@@ -216,7 +216,7 @@
         "confederacion": "UEFA",
         "grupo": "E",
         "puntos": 0,
-        "fase": "grupos",
+        "fase": "Eliminado de la fase de grupos",
         "posicion": null
     },
     {
@@ -226,8 +226,8 @@
         "prefijo": "+45",
         "confederacion": "UEFA",
         "grupo": "F",
-        "puntos": 6,
-        "fase": "eliminatorias",
+        "puntos": 3,
+        "fase": "Clasificado a 16avos de Final",
         "posicion": 1
     },
     {
@@ -238,7 +238,7 @@
         "confederacion": "UEFA",
         "grupo": "F",
         "puntos": 0,
-        "fase": "eliminatorias",
+        "fase": "Clasificado a 16avos de Final",
         "posicion": 2
     },
     {
@@ -249,8 +249,8 @@
         "confederacion": "UEFA",
         "grupo": "F",
         "puntos": 0,
-        "fase": "eliminatorias",
-        "posicion": 3
+        "fase": "Eliminado de la fase de grupos",
+        "posicion": null
     },
     {
         "id": "F4",
@@ -260,7 +260,7 @@
         "confederacion": "UEFA",
         "grupo": "F",
         "puntos": 0,
-        "fase": "grupos",
+        "fase": "Eliminado de la fase de grupos",
         "posicion": null
     },
     {
@@ -270,19 +270,19 @@
         "prefijo": "+380",
         "confederacion": "UEFA",
         "grupo": "G",
-        "puntos": 4,
-        "fase": "eliminatorias",
+        "puntos": 0,
+        "fase": "Clasificado a 16avos de Final",
         "posicion": 1
     },
     {
         "id": "G2",
-        "pais": "Turqu\u00c3\u00ada",
+        "pais": "Turqu\u00c3\u0192\u00c2\u00ada",
         "abreviatura": "TUR",
         "prefijo": "+90",
         "confederacion": "UEFA",
         "grupo": "G",
-        "puntos": 0,
-        "fase": "eliminatorias",
+        "puntos": 3,
+        "fase": "Clasificado a 16avos de Final",
         "posicion": 2
     },
     {
@@ -292,31 +292,31 @@
         "prefijo": "+1",
         "confederacion": "CONCACAF",
         "grupo": "G",
-        "puntos": 6,
-        "fase": "eliminatorias",
+        "puntos": 3,
+        "fase": "Clasificado a 16avos de Final",
         "posicion": 3
     },
     {
         "id": "G4",
-        "pais": "M\u00c3\u00a9xico",
+        "pais": "M\u00c3\u0192\u00c2\u00a9xico",
         "abreviatura": "MEX",
         "prefijo": "+52",
         "confederacion": "CONCACAF",
         "grupo": "G",
         "puntos": 0,
-        "fase": "grupos",
+        "fase": "Eliminado de la fase de grupos",
         "posicion": null
     },
     {
         "id": "H1",
-        "pais": "Canad\u00c3\u00a1",
+        "pais": "Canad\u00c3\u0192\u00c2\u00a1",
         "abreviatura": "CAN",
         "prefijo": "+1",
         "confederacion": "CONCACAF",
         "grupo": "H",
-        "puntos": 0,
-        "fase": "eliminatorias",
-        "posicion": 2
+        "puntos": 3,
+        "fase": "Clasificado a 16avos de Final",
+        "posicion": 1
     },
     {
         "id": "H2",
@@ -325,19 +325,19 @@
         "prefijo": "+506",
         "confederacion": "CONCACAF",
         "grupo": "H",
-        "puntos": 4,
-        "fase": "eliminatorias",
-        "posicion": 1
+        "puntos": 0,
+        "fase": "Clasificado a 16avos de Final",
+        "posicion": 2
     },
     {
         "id": "H3",
-        "pais": "Panam\u00c3\u00a1",
+        "pais": "Panam\u00c3\u0192\u00c2\u00a1",
         "abreviatura": "PAN",
         "prefijo": "+507",
         "confederacion": "CONCACAF",
         "grupo": "H",
         "puntos": 0,
-        "fase": "grupos",
+        "fase": "Eliminado de la fase de grupos",
         "posicion": null
     },
     {
@@ -348,7 +348,7 @@
         "confederacion": "CONCACAF",
         "grupo": "H",
         "puntos": 0,
-        "fase": "grupos",
+        "fase": "Eliminado de la fase de grupos",
         "posicion": null
     },
     {
@@ -358,9 +358,9 @@
         "prefijo": "+212",
         "confederacion": "CAF",
         "grupo": "I",
-        "puntos": 4,
-        "fase": "eliminatorias",
-        "posicion": 2
+        "puntos": 0,
+        "fase": "Clasificado a 16avos de Final",
+        "posicion": 1
     },
     {
         "id": "I2",
@@ -370,8 +370,8 @@
         "confederacion": "CAF",
         "grupo": "I",
         "puntos": 3,
-        "fase": "eliminatorias",
-        "posicion": 1
+        "fase": "Clasificado a 16avos de Final",
+        "posicion": 2
     },
     {
         "id": "I3",
@@ -381,7 +381,7 @@
         "confederacion": "CAF",
         "grupo": "I",
         "puntos": 0,
-        "fase": "grupos",
+        "fase": "Eliminado de la fase de grupos",
         "posicion": null
     },
     {
@@ -392,7 +392,7 @@
         "confederacion": "CAF",
         "grupo": "I",
         "puntos": 0,
-        "fase": "grupos",
+        "fase": "Eliminado de la fase de grupos",
         "posicion": null
     },
     {
@@ -402,19 +402,19 @@
         "prefijo": "+225",
         "confederacion": "CAF",
         "grupo": "J",
-        "puntos": 7,
-        "fase": "eliminatorias",
+        "puntos": 3,
+        "fase": "Clasificado a 16avos de Final",
         "posicion": 1
     },
     {
         "id": "J2",
-        "pais": "Camer\u00c3\u00ban",
+        "pais": "Camer\u00c3\u0192\u00c2\u00ban",
         "abreviatura": "CMR",
         "prefijo": "+237",
         "confederacion": "CAF",
         "grupo": "J",
-        "puntos": 4,
-        "fase": "eliminatorias",
+        "puntos": 0,
+        "fase": "Clasificado a 16avos de Final",
         "posicion": 2
     },
     {
@@ -424,19 +424,19 @@
         "prefijo": "+20",
         "confederacion": "CAF",
         "grupo": "J",
-        "puntos": 1,
-        "fase": "eliminatorias",
+        "puntos": 0,
+        "fase": "Clasificado a 16avos de Final",
         "posicion": 3
     },
     {
         "id": "J4",
-        "pais": "T\u00c3\u00banez",
+        "pais": "T\u00c3\u0192\u00c2\u00banez",
         "abreviatura": "TUN",
         "prefijo": "+216",
         "confederacion": "CAF",
         "grupo": "J",
         "puntos": 0,
-        "fase": "grupos",
+        "fase": "Eliminado de la fase de grupos",
         "posicion": null
     },
     {
@@ -446,19 +446,19 @@
         "prefijo": "+213",
         "confederacion": "CAF",
         "grupo": "K",
-        "puntos": 1,
-        "fase": "eliminatorias",
-        "posicion": 2
+        "puntos": 0,
+        "fase": "Eliminado de la fase de grupos",
+        "posicion": null
     },
     {
         "id": "K2",
-        "pais": "Jap\u00c3\u00b3n",
+        "pais": "Jap\u00c3\u0192\u00c2\u00b3n",
         "abreviatura": "JPN",
         "prefijo": "+81",
         "confederacion": "AFC",
         "grupo": "K",
-        "puntos": 4,
-        "fase": "eliminatorias",
+        "puntos": 6,
+        "fase": "Clasificado a 16avos de Final",
         "posicion": 1
     },
     {
@@ -468,9 +468,9 @@
         "prefijo": "+82",
         "confederacion": "AFC",
         "grupo": "K",
-        "puntos": 0,
-        "fase": "grupos",
-        "posicion": null
+        "puntos": 6,
+        "fase": "Clasificado a 16avos de Final",
+        "posicion": 2
     },
     {
         "id": "K4",
@@ -480,7 +480,7 @@
         "confederacion": "AFC",
         "grupo": "K",
         "puntos": 0,
-        "fase": "grupos",
+        "fase": "Eliminado de la fase de grupos",
         "posicion": null
     },
     {
@@ -490,20 +490,20 @@
         "prefijo": "+61",
         "confederacion": "AFC",
         "grupo": "L",
-        "puntos": 1,
-        "fase": "eliminatorias",
+        "puntos": 3,
+        "fase": "Clasificado a 16avos de Final",
         "posicion": 3
     },
     {
         "id": "L2",
-        "pais": "Ir\u00c3\u00a1n",
+        "pais": "Ir\u00c3\u0192\u00c2\u00a1n",
         "abreviatura": "IRN",
         "prefijo": "+98",
         "confederacion": "AFC",
         "grupo": "L",
-        "puntos": 55,
-        "fase": "eliminatorias",
-        "posicion": 1
+        "puntos": 3,
+        "fase": "Clasificado a 16avos de Final",
+        "posicion": 2
     },
     {
         "id": "L3",
@@ -512,19 +512,19 @@
         "prefijo": "+974",
         "confederacion": "AFC",
         "grupo": "L",
-        "puntos": 4,
-        "fase": "eliminatorias",
-        "posicion": 2
+        "puntos": 12,
+        "fase": "Clasificado a 16avos de Final",
+        "posicion": 1
     },
     {
         "id": "L4",
-        "pais": "Uzbekist\u00c3\u00a1n",
-        "abreviatura": "UZB",
-        "prefijo": "+998",
-        "confederacion": "AFC",
+        "pais": "Test",
+        "abreviatura": "TEST",
+        "prefijo": "+21234",
+        "confederacion": "Si",
         "grupo": "L",
         "puntos": 0,
-        "fase": "grupos",
+        "fase": "Eliminado de la fase de grupos",
         "posicion": null
     }
 ]
