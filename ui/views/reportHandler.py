@@ -341,25 +341,33 @@ class TorneoReportFrame(tk.CTkFrame):
         equipo_obj = next(
             (e for e in equipos_all if e.get("pais", "").strip().lower() == equipo.strip().lower()), None
         )
+        # Preferir la fase almacenada en el equipo (legible). Si no existe, usar la clasificación calculada.
         estado_fase = None
         if equipo_obj:
-            fase_val = (equipo_obj.get("fase") or "").strip().lower()
-            if "grup" in fase_val or fase_val in ("grupos", "fase de grupos"):
-                estado_fase = "En fase de Grupos"
-            elif "16" in fase_val:
-                estado_fase = "Clasificado a 16avos de Final"
-            elif "octav" in fase_val:
-                estado_fase = "Clasificado a Octavos de Final"
-            elif "cuart" in fase_val:
-                estado_fase = "Clasificado a Cuartos de Final"
-            elif "semif" in fase_val:
-                estado_fase = "Clasificado a Semifinal"
-            elif "tercer" in fase_val:
-                estado_fase = "Clasificado a Tercer Puesto"
-            elif "final" in fase_val and "16" not in fase_val:
-                estado_fase = "Clasificado a Final"
-            elif "elimin" in fase_val:
-                estado_fase = "Clasificado a Eliminatorias"
+            estado_fase = equipo_obj.get("fase") or None
+
+        # Normalizaciones simples para casos históricos/varios formatos
+        if estado_fase:
+            f = estado_fase.strip().lower()
+            if "grup" in f:
+                estado_fase = "Fase de Grupos"
+            elif "clasificado" in f:
+                # Mantener la forma 'Clasificado a ...' tal cual
+                # capitalizar la primera letra si viene en minúsculas
+                estado_fase = estado_fase[0].upper() + estado_fase[1:]
+            elif "finalista" in f:
+                estado_fase = "Finalista"
+            elif "partido por el 3er" in f or "tercer" in f and "puesto" not in f:
+                estado_fase = "Partido por el 3er puesto"
+            elif "tercer" in f and "puesto" in f:
+                estado_fase = "Tercer Puesto"
+            elif "cuarto" in f:
+                estado_fase = "Cuarto Puesto"
+            elif "primer" in f:
+                estado_fase = "Primer Puesto"
+            elif "segundo" in f:
+                estado_fase = "Segundo Puesto"
+            # else: mantener la cadena tal cual
 
         self._render_informe_equipo(partidos, estado_fase or clasificacion)
 

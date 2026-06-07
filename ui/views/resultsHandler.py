@@ -21,6 +21,7 @@ class TorneoResultFrame(tk.CTkFrame):
         self.grid_columnconfigure(1, weight=1)   # panel derecho
         self.grid_rowconfigure(0, weight=1)
 
+        self._avanzar_fase_si_corresponde()
         self._build_sidebar()
         self._build_panel_derecho()
 
@@ -315,48 +316,68 @@ class TorneoResultFrame(tk.CTkFrame):
         return fase_partido == fase_actual
 
     def _fase_completada(self, partidos, fase, total):
-        #no esta funcionando
         fase_matches = [p for p in partidos if (p.get("fase") == fase and p.get("jugado") == True)]
         return len(fase_matches) == total
+
+    def _fase_estan_asignados_los_equipos(self, partidos, fase, total):
+        fase_matches = [p for p in partidos if p.get("fase") == fase]
+        if len(fase_matches) != total:
+            return False
+        return all(p.get("idEquipo1") and p.get("idEquipo2") for p in fase_matches)
 
     def _avanzar_fase_si_corresponde(self):
         print("Se ha llamado a la funcion avanzar si corresponde")
         partidos = Partido.getAllPartidos() or []
+        current_phase = self._get_fase_actual()
 
         if self._fase_completada(partidos, "Fase de Grupos", 72):
-            if not any(p.get("fase") == "16avos de Final" for p in partidos):
-                if avanzarFase() and setEliminatorias():
-                    print("Se avanzo a 16avos de final")
+            equipos_ya_asignados = self._fase_estan_asignados_los_equipos(partidos, "16avos de Final", 16)
+            if not equipos_ya_asignados:
+                # Solo ejecutar si realmente necesitamos asignar los equipos
+                avanzarFase()
+                setEliminatorias()
+                if current_phase != "16avos de Final":
                     setFaseTorneo("16avos de Final")
-                    CTkMessagebox(title="Info", message="Dieciseisavos de Final configurados.", icon="check")
+                CTkMessagebox(title="Info", message="Dieciseisavos de Final configurados.", icon="check")
 
         if self._fase_completada(partidos, "16avos de Final", 16):
-            if not any(p.get("fase") == "Octavos de Final" for p in partidos):
-                if setOctavos():
-                    print("Se avanzo a octavos")
+            equipos_ya_asignados = self._fase_estan_asignados_los_equipos(partidos, "Octavos de Final", 8)
+            if not equipos_ya_asignados:
+                setOctavos()
+                if current_phase != "Octavos de Final":
                     setFaseTorneo("Octavos de Final")
-                    CTkMessagebox(title="Info", message="Octavos de Final configurados.", icon="check")
+                CTkMessagebox(title="Info", message="Octavos de Final configurados.", icon="check")
 
         if self._fase_completada(partidos, "Octavos de Final", 8):
-            if not any(p.get("fase") == "Cuartos de Final" for p in partidos):
-                if setCuartos():
-                    print("Se avanzo a cuartos")
+            equipos_ya_asignados = self._fase_estan_asignados_los_equipos(partidos, "Cuartos de Final", 4)
+            if not equipos_ya_asignados:
+                setCuartos()
+                if current_phase != "Cuartos de Final":
                     setFaseTorneo("Cuartos de Final")
-                    CTkMessagebox(title="Info", message="Cuartos de Final configurados.", icon="check")
+                CTkMessagebox(title="Info", message="Cuartos de Final configurados.", icon="check")
 
         if self._fase_completada(partidos, "Cuartos de Final", 4):
-            if not any(p.get("fase") == "Semifinal" for p in partidos):
-                if setSemis():
-                    print("Se avanzo a semis")
+            equipos_ya_asignados = self._fase_estan_asignados_los_equipos(partidos, "Semifinal", 2)
+            if not equipos_ya_asignados:
+                setSemis()
+                if current_phase != "Semifinal":
                     setFaseTorneo("Semifinal")
-                    CTkMessagebox(title="Info", message="Semifinales configurados.", icon="check")
+                CTkMessagebox(title="Info", message="Semifinales configurados.", icon="check")
 
         if self._fase_completada(partidos, "Semifinal", 2):
-            if not any(p.get("fase") == "Final" for p in partidos):
-                if setFinal():
-                    print("La gran final!!")
-                    setFaseTorneo("Final")
-                    CTkMessagebox(title="Info", message="Partido por el tercer puesto y Final configurados.", icon="check")
+            equipos_ya_asignados_tercer = self._fase_estan_asignados_los_equipos(partidos, "Tercer Puesto", 1)
+            if not equipos_ya_asignados_tercer:
+                # Preparar ambos partidos: Tercer Puesto y Final
+                setFinal()
+                if current_phase != "Tercer Puesto":
+                    setFaseTorneo("Tercer Puesto")
+                CTkMessagebox(title="Info", message="Partido por el Tercer Puesto disponible.", icon="check")
+
+        if self._fase_completada(partidos, "Tercer Puesto", 1):
+            # Después del tercer puesto, siempre transicionar a la final
+            if current_phase != "Final":
+                setFaseTorneo("Final")
+            CTkMessagebox(title="Info", message="Final configurada.", icon="check")
 
     def _label_partido(self, partido):
         aux = Equipo("", None, None, None)
@@ -415,6 +436,10 @@ class TorneoResultFrame(tk.CTkFrame):
             self.label_eq1.configure(text="Equipo 1")
             self.label_eq2.configure(text="Equipo 2")
             self._cargar_lista_partidos()
+            self.cleanInputs([
+                self.input_goles_t1, self.input_goles_t2,
+                self.input_penales_t1, self.input_penales_t2,
+            ])
         else:
             CTkMessagebox(title="Error", message=resultado[1], icon="cancel")
 

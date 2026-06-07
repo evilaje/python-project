@@ -110,7 +110,7 @@ def avanzarFase(filename:str = None):
 				for eq in arr:
 					for mejorEq in mejoresEquipos:
 						if eq["id"] == mejorEq["id"]:
-							eq["fase"] = "eliminatorias"
+							eq["fase"] = "Clasificado a 16avos de Final"
 							eq["posicion"] = mejorEq["posicion"]
 							break
 				with open(filename, "w") as file:
@@ -126,7 +126,8 @@ def avanzarFase(filename:str = None):
 					torneos[0]["fase"] = "16avos de Final"
 					with open(PATH, "w") as tfw:
 						json.dump(torneos, tfw, indent=4)
-
+					return True
+	return False
 
 def setFaseTorneo(fase:str, filename:str = None):
 	if (filename is None):

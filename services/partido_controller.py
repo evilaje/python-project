@@ -1,4 +1,5 @@
 from models.partido import *
+import models.partido as partido
 import models.torneo as torneo
 import models.equipo as equipo
 
@@ -26,6 +27,53 @@ def guardarResultado(id: int, g1: int, g2: int, gp1: int, gp2: int):
 
 
     if partido.setGoles():
+        # Después de guardar el resultado, actualizar fases de equipos según la fase del partido
+        try:
+            partidos = Partido.getAllPartidos() or []
+            p = getPartido(id)
+            if p:
+                fase = p.get("fase")
+                # obtener ganador y perdedor
+                ganador = partido._get_ganador_partido(partidos, id)
+                perdedor = partido._get_perdedor_partido(partidos, id)
+
+                # Mapeo de avance para rondas de eliminatoria (estado legible)
+                next_phase_map = {
+                    "16avos de Final": "Clasificado a Octavos de Final",
+                    "Octavos de Final": "Clasificado a Cuartos de Final",
+                    "Cuartos de Final": "Clasificado a Semifinales",
+                }
+
+                if fase in next_phase_map:
+                    if ganador:
+                        equipo.setEquipoFase(ganador, next_phase_map[fase])
+                    if perdedor:
+                        equipo.setEquipoFase(perdedor, "Eliminado")
+
+                elif fase == "Semifinal":
+                    # Ganador -> Finalista, perdedor -> Partido por el 3er puesto
+                    if ganador:
+                        equipo.setEquipoFase(ganador, "Finalista")
+                    if perdedor:
+                        equipo.setEquipoFase(perdedor, "Partido por el 3er puesto")
+
+                elif fase == "Tercer Puesto":
+                    # Ganador -> Tercer Puesto, Perdedor -> Cuarto Puesto
+                    if ganador:
+                        equipo.setEquipoFase(ganador, "Tercer Puesto")
+                    if perdedor:
+                        equipo.setEquipoFase(perdedor, "Cuarto Puesto")
+
+                elif fase == "Final":
+                    # Ganador -> Primer Puesto, Perdedor -> Segundo Puesto
+                    if ganador:
+                        equipo.setEquipoFase(ganador, "Primer Puesto")
+                    if perdedor:
+                        equipo.setEquipoFase(perdedor, "Segundo Puesto")
+        except Exception:
+            # no bloquear la respuesta si algo falla al actualizar equipos
+            pass
+
         return [True, "Exito"]
 
     # true, mensaje

@@ -6,7 +6,7 @@
         "prefijo": "+54",
         "confederacion": "CONMEBOL",
         "grupo": "A",
-        "puntos": 2,
+        "puntos": 23,
         "fase": "eliminatorias",
         "posicion": 2
     },
@@ -17,7 +17,7 @@
         "prefijo": "+55",
         "confederacion": "CONMEBOL",
         "grupo": "A",
-        "puntos": 2,
+        "puntos": 21,
         "fase": "eliminatorias",
         "posicion": 3
     },
@@ -39,7 +39,7 @@
         "prefijo": "+57",
         "confederacion": "CONMEBOL",
         "grupo": "A",
-        "puntos": 3,
+        "puntos": 12,
         "fase": "eliminatorias",
         "posicion": 1
     },
@@ -52,7 +52,7 @@
         "grupo": "B",
         "puntos": 3,
         "fase": "eliminatorias",
-        "posicion": 1
+        "posicion": 2
     },
     {
         "id": "B2",
@@ -72,9 +72,9 @@
         "prefijo": "+595",
         "confederacion": "CONMEBOL",
         "grupo": "B",
-        "puntos": 1,
+        "puntos": 46,
         "fase": "eliminatorias",
-        "posicion": 2
+        "posicion": 1
     },
     {
         "id": "B4",
@@ -94,7 +94,7 @@
         "prefijo": "+51",
         "confederacion": "CONMEBOL",
         "grupo": "C",
-        "puntos": 3,
+        "puntos": 6,
         "fase": "eliminatorias",
         "posicion": 1
     },
@@ -138,7 +138,7 @@
         "prefijo": "+49",
         "confederacion": "UEFA",
         "grupo": "D",
-        "puntos": 3,
+        "puntos": 4,
         "fase": "eliminatorias",
         "posicion": 1
     },
@@ -149,7 +149,7 @@
         "prefijo": "+44",
         "confederacion": "UEFA",
         "grupo": "D",
-        "puntos": 0,
+        "puntos": 4,
         "fase": "eliminatorias",
         "posicion": 2
     },
@@ -160,7 +160,7 @@
         "prefijo": "+351",
         "confederacion": "UEFA",
         "grupo": "D",
-        "puntos": 0,
+        "puntos": 1,
         "fase": "eliminatorias",
         "posicion": 3
     },
@@ -182,9 +182,9 @@
         "prefijo": "+31",
         "confederacion": "UEFA",
         "grupo": "E",
-        "puntos": 1,
+        "puntos": 2,
         "fase": "eliminatorias",
-        "posicion": 1
+        "posicion": 2
     },
     {
         "id": "E2",
@@ -193,9 +193,9 @@
         "prefijo": "+32",
         "confederacion": "UEFA",
         "grupo": "E",
-        "puntos": 1,
+        "puntos": 4,
         "fase": "eliminatorias",
-        "posicion": 2
+        "posicion": 3
     },
     {
         "id": "E3",
@@ -204,9 +204,9 @@
         "prefijo": "+385",
         "confederacion": "UEFA",
         "grupo": "E",
-        "puntos": 0,
+        "puntos": 3,
         "fase": "eliminatorias",
-        "posicion": 3
+        "posicion": 1
     },
     {
         "id": "E4",
@@ -226,7 +226,7 @@
         "prefijo": "+45",
         "confederacion": "UEFA",
         "grupo": "F",
-        "puntos": 3,
+        "puntos": 6,
         "fase": "eliminatorias",
         "posicion": 1
     },
@@ -270,7 +270,7 @@
         "prefijo": "+380",
         "confederacion": "UEFA",
         "grupo": "G",
-        "puntos": 3,
+        "puntos": 4,
         "fase": "eliminatorias",
         "posicion": 1
     },
@@ -292,7 +292,7 @@
         "prefijo": "+1",
         "confederacion": "CONCACAF",
         "grupo": "G",
-        "puntos": 0,
+        "puntos": 6,
         "fase": "eliminatorias",
         "posicion": 3
     },
@@ -325,7 +325,7 @@
         "prefijo": "+506",
         "confederacion": "CONCACAF",
         "grupo": "H",
-        "puntos": 3,
+        "puntos": 4,
         "fase": "eliminatorias",
         "posicion": 1
     },
@@ -358,7 +358,7 @@
         "prefijo": "+212",
         "confederacion": "CAF",
         "grupo": "I",
-        "puntos": 0,
+        "puntos": 4,
         "fase": "eliminatorias",
         "posicion": 2
     },
@@ -402,7 +402,7 @@
         "prefijo": "+225",
         "confederacion": "CAF",
         "grupo": "J",
-        "puntos": 3,
+        "puntos": 7,
         "fase": "eliminatorias",
         "posicion": 1
     },
@@ -413,7 +413,7 @@
         "prefijo": "+237",
         "confederacion": "CAF",
         "grupo": "J",
-        "puntos": 0,
+        "puntos": 4,
         "fase": "eliminatorias",
         "posicion": 2
     },
@@ -424,7 +424,7 @@
         "prefijo": "+20",
         "confederacion": "CAF",
         "grupo": "J",
-        "puntos": 0,
+        "puntos": 1,
         "fase": "eliminatorias",
         "posicion": 3
     },
@@ -446,7 +446,7 @@
         "prefijo": "+213",
         "confederacion": "CAF",
         "grupo": "K",
-        "puntos": 0,
+        "puntos": 1,
         "fase": "eliminatorias",
         "posicion": 2
     },
@@ -457,7 +457,7 @@
         "prefijo": "+81",
         "confederacion": "AFC",
         "grupo": "K",
-        "puntos": 3,
+        "puntos": 4,
         "fase": "eliminatorias",
         "posicion": 1
     },
@@ -492,7 +492,7 @@
         "grupo": "L",
         "puntos": 1,
         "fase": "eliminatorias",
-        "posicion": 2
+        "posicion": 3
     },
     {
         "id": "L2",
@@ -501,7 +501,7 @@
         "prefijo": "+98",
         "confederacion": "AFC",
         "grupo": "L",
-        "puntos": 46,
+        "puntos": 55,
         "fase": "eliminatorias",
         "posicion": 1
     },
@@ -512,9 +512,9 @@
         "prefijo": "+974",
         "confederacion": "AFC",
         "grupo": "L",
-        "puntos": 0,
-        "fase": "grupos",
-        "posicion": null
+        "puntos": 4,
+        "fase": "eliminatorias",
+        "posicion": 2
     },
     {
         "id": "L4",

@@ -1,3 +1,4 @@
+import json
 from utils.files_utils import *
 import utils.json_utils as json_utils
 # path tiene la ruta del json donde se guardan los equipos
@@ -12,7 +13,8 @@ class Equipo:
         self.confederacion = conf
         self.grupo = "placeholder"
         self.puntos = puntos
-        self.fase = "grupos"
+        # fase legible para mostrar en reportes
+        self.fase = "Fase de Grupos"
         self.posicion = None # para cuando aavance de fase, tipo que diga puesto 1 o una mierda asi
 
         self.setId()
@@ -268,6 +270,37 @@ def getEquipo(id, filename:str = None):
     for obj in arr:
         if (id == obj["id"]): return obj
     return None
+
+
+def setEquipoFase(equipo_id: str, fase: str, filename: str = None):
+    """Actualiza el campo 'fase' de un equipo identificado por su id.
+    Retorna True si se actualizó, False si no se encontró o hubo error.
+    """
+    if filename is None:
+        filename = PATH
+
+    if not file_exists(filename):
+        return False
+
+    with open(filename, "r", encoding="utf-8") as f:
+        if is_file_empty(filename):
+            return False
+        equipos = json.load(f)
+
+    updated = False
+    for eq in equipos:
+        if eq.get("id") == equipo_id:
+            eq["fase"] = fase
+            updated = True
+            break
+
+    if not updated:
+        return False
+
+    with open(filename, "w", encoding="utf-8") as f:
+        json.dump(equipos, f, indent=4)
+
+    return True
 
 # funcion de mierda para conseguir los equipo que pasan la puta fase de grupos
 # que muchas validaciones mierdon

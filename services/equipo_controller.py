@@ -84,6 +84,10 @@ def getTablaDeGrupo(grupo: str):
         id2 = p.get("idEquipo2")
 
         # solo nos interesan partidos donde ambos equipos pertenezcan al grupo
+        # Además: considerar exclusivamente los 72 partidos de fase de grupos
+        partido_id = p.get("id", 0) or 0
+        if partido_id > 72:
+            continue
         if id1 not in tabla and id2 not in tabla:
             continue
 
