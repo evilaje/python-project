@@ -12,8 +12,8 @@ class TorneoReportFrame(tk.CTkFrame):
         self.main_frame = main_frame
 
         # sidebar
-        self.grid_columnconfigure(0, weight=0)   
-        self.grid_columnconfigure(1, weight=1)   
+        self.grid_columnconfigure(0, weight=0)
+        self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
         self._build_sidebar()
@@ -33,7 +33,7 @@ class TorneoReportFrame(tk.CTkFrame):
         # vista inicial
         self._show_frame(self.frame_fecha, "fecha")
 
-    
+
     # seidebar --------------------------------------------------------------------------------
     def _build_sidebar(self):
         sidebar = tk.CTkFrame(self, width=200, corner_radius=0, fg_color=("gray15", "gray10"))
@@ -526,7 +526,7 @@ class TorneoReportFrame(tk.CTkFrame):
                 continue
 
             cols = ["Grupo " + grupo, "PJ", "G", "E", "P", "GF", "GC", "DG", "Pts"]
-            
+
             header_row = tk.CTkFrame(self.scroll_all_grupos,
                                      fg_color=("gray80", "gray30"), corner_radius=4)
             header_row.pack(fill="x", padx=5, pady=(4, 0))

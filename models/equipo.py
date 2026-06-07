@@ -91,7 +91,7 @@ class Equipo:
         with open(filename, "w") as file:
             json.dump(equipos, file, indent=4)
         return True
-    
+
 
     # esto es para el autoincrement
     def obtenerId(self, filename=None):
@@ -119,7 +119,7 @@ class Equipo:
                     arr = json.load(file)
                     return arr if len(arr) > 0 else None
         return None #importante verificar siempre el None
-    
+
 
     def getAbreviatura(self, filename: str = None):
         if (filename is None):
@@ -134,17 +134,17 @@ class Equipo:
                 for equipo in equipos:
                     if equipo["id"] == self.id:
                         return equipo["abreviatura"]
-        
+
         return None
 
-    
+
 
 # funcion para setear grupo en la vista 3 de configHandler
 def setGrupo(pais: str, grupo: str, filename = PATH):
 
     if not file_exists(filename):
         return 1
-    
+
     equipos = []
 
     with open(filename, "r") as file:
@@ -165,11 +165,11 @@ def setGrupo(pais: str, grupo: str, filename = PATH):
                     eq["grupo"] = grupo
                     eq["id"] = equipo.id
                     break
-                    
+
 
     with open(filename, "w") as file:
         json.dump(equipos, file, indent=4)
-    
+
     return None
 
 

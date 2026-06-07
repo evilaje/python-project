@@ -16,7 +16,7 @@ def file_exists(filename:str):
 	return os.path.exists(filename)
 
 def is_file_empty(filename:str) -> bool:
-	with open(filename, "r") as file:
+	with open(filename, "r", encoding="utf-8") as file:
 		var = file.read().strip()
 		#print(var)
 		if not var: print(f"El archivo {filename} esta vacio!" )

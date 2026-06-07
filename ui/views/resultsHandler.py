@@ -72,6 +72,7 @@ class TorneoResultFrame(tk.CTkFrame):
         self._partidos_pendientes = self._get_partidos_pendientes()
 
         if not self._partidos_pendientes:
+            print("NO se han encontrao partidos")
             tk.CTkLabel(
                 self.scroll_partidos,
                 text="Sin partidos\npendientes",
@@ -292,7 +293,8 @@ class TorneoResultFrame(tk.CTkFrame):
                 dt_partido = datetime.strptime(
                     f"{p['fecha']} {p['hora']}", "%d/%m/%Y %H:%M"
                 )
-                cargable = dt_partido < ahora
+                #descomenta esta linea papu cargable = dt_partido < ahora y comenta la sgte xd
+                cargable = True
             except (ValueError, KeyError):
                 cargable = False
             if pendiente_por_jugar and cargable:
@@ -313,39 +315,46 @@ class TorneoResultFrame(tk.CTkFrame):
         return fase_partido == fase_actual
 
     def _fase_completada(self, partidos, fase, total):
-        fase_matches = [p for p in partidos if p.get("fase") == fase]
-        return len(fase_matches) == total and all(p.get("jugado", False) for p in fase_matches)
+        #no esta funcionando
+        fase_matches = [p for p in partidos if (p.get("fase") == fase and p.get("jugado") == True)]
+        return len(fase_matches) == total
 
     def _avanzar_fase_si_corresponde(self):
+        print("Se ha llamado a la funcion avanzar si corresponde")
         partidos = Partido.getAllPartidos() or []
 
         if self._fase_completada(partidos, "Fase de Grupos", 72):
             if not any(p.get("fase") == "16avos de Final" for p in partidos):
                 if avanzarFase() and setEliminatorias():
+                    print("Se avanzo a 16avos de final")
                     setFaseTorneo("16avos de Final")
                     CTkMessagebox(title="Info", message="Dieciseisavos de Final configurados.", icon="check")
 
         if self._fase_completada(partidos, "16avos de Final", 16):
             if not any(p.get("fase") == "Octavos de Final" for p in partidos):
                 if setOctavos():
+                    print("Se avanzo a octavos")
                     setFaseTorneo("Octavos de Final")
                     CTkMessagebox(title="Info", message="Octavos de Final configurados.", icon="check")
 
         if self._fase_completada(partidos, "Octavos de Final", 8):
             if not any(p.get("fase") == "Cuartos de Final" for p in partidos):
                 if setCuartos():
+                    print("Se avanzo a cuartos")
                     setFaseTorneo("Cuartos de Final")
                     CTkMessagebox(title="Info", message="Cuartos de Final configurados.", icon="check")
 
         if self._fase_completada(partidos, "Cuartos de Final", 4):
             if not any(p.get("fase") == "Semifinal" for p in partidos):
                 if setSemis():
+                    print("Se avanzo a semis")
                     setFaseTorneo("Semifinal")
                     CTkMessagebox(title="Info", message="Semifinales configurados.", icon="check")
 
         if self._fase_completada(partidos, "Semifinal", 2):
             if not any(p.get("fase") == "Final" for p in partidos):
                 if setFinal():
+                    print("La gran final!!")
                     setFaseTorneo("Final")
                     CTkMessagebox(title="Info", message="Partido por el tercer puesto y Final configurados.", icon="check")
 

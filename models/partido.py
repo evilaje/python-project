@@ -128,7 +128,7 @@ class Partido:
                 partidos = json.load(file) #json load carga el contenido del archivo a la variable, en este caso como vector
                 return len(partidos) + 1 if len(partidos) != 0 else 1
         return 1
-    
+
     # esto tengo pensado mas que nada para las eliminatorias
     # porque hay que dejar los placeholders y despues meterle la data
     def setPartidoEquipos(self, idT1, idT2, filename:str = None):
@@ -147,7 +147,7 @@ class Partido:
 
             with open(filename, "w") as file:
                 json.dump(arr, file, indent=4)
-        
+
         return None
 
 
@@ -158,10 +158,11 @@ class Partido:
             filename = PATH
         arr = []
         if (file_exists(filename)):
-            with open(filename, "r") as file:
+            with open(filename, "r", encoding="utf-8") as file:
                 if not is_file_empty(filename):
                     arr = json.load(file)
                     return arr if len(arr) > 0 else None
+        print("No se ha leido ningun partido papi")
         return None
 
     @staticmethod
@@ -171,7 +172,7 @@ class Partido:
         if not file_exists(filename):
             return False
 
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf-8") as file:
             if is_file_empty(filename):
                 return False
             partidos = json.load(file)
@@ -197,20 +198,20 @@ class Partido:
             json.dump(partidos, file, indent=4)
 
         return True
-    
+
     # a partir del partido 73 ya deberia ser todo puesto automaticamente
     # tipo ganador de grupo x vs ganador de grupo y
     def setPostGrupos(self, filename:str = None):
         if (filename is None):
             filename = PATH
         partidos = []
-        
+
         pass
 
     def setGoles(self, filename: str = None):
         if (filename is None):
             filename = PATH
-        
+
         partidos = []
 
         if (file_exists(filename)):
@@ -233,7 +234,7 @@ class Partido:
                         json.dump(partidos, file, indent=4)
 
                     # actualizar puntos de los equipos segun el resultado
-                    # solo si antes no tenia goles 
+                    # solo si antes no tenia goles
                     id_t1 = partido.get("idEquipo1")
                     id_t2 = partido.get("idEquipo2")
 
@@ -262,9 +263,9 @@ class Partido:
                                 json.dump(equipos, f_eq, indent=4)
 
                     return True
-            
+
         return None
-                    
+
 
 def getPartido(id, filename:str = None):
     if (filename is None):
@@ -337,7 +338,7 @@ def setEquiposFaseGrupos(filename:str = None):
                         if partido_index >= len(partidos) or partido_index >= 72:
                             break
 
-                        
+
                         partidos[partido_index]["idEquipo1"] = grupos[grupo][local1]["id"]
                         partidos[partido_index]["idEquipo2"] = grupos[grupo][local2]["id"]
                         partidos[partido_index]["fase"] = "Fase de Grupos"
@@ -345,7 +346,7 @@ def setEquiposFaseGrupos(filename:str = None):
 
                     if partido_index >= 72 or partido_index >= len(partidos):
                         break
-        
+
         # guardar cambios
         with open(filename, "w") as file:
             json.dump(partidos, file, indent=4)

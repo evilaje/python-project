@@ -16,7 +16,7 @@ class MainFrame(tk.CTkFrame):
 
         #DESACTIVAR
         '''descomentar sgte linea para habilitar todos los botones ni bollo'''
-        boton_activo, config_abierto = "normal", "normal"
+        #boton_activo, config_abierto = "normal", "normal"
 
         self.btn1 = tk.CTkButton(self, text="Configuración del Torneo", height=50, command=self.ir_a_config)
         self.btn1.configure(state=config_abierto) #lo contrario al resto
@@ -61,6 +61,7 @@ class MainFrame(tk.CTkFrame):
         self.root.show_frame(self, report_frame)
 
     def ir_a_result(self):
+        print("Cambiando a anotacion de partidos")
         result_frame = TorneoResultFrame(self.root, self)
         self.root.show_frame(self, result_frame)
 
