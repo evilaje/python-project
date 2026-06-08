@@ -164,6 +164,19 @@ class Partido:
                     return arr if len(arr) > 0 else None
         print("No se ha leido ningun partido papi")
         return None
+    
+    def getPartidosPendientes(filename: str = None):
+        if filename is None:
+            filename = PATH
+        if file_exists(filename):
+            with open(filename, "r", encoding="utf-8") as file:
+                if not is_file_empty(filename):
+                    arr = json.load(file)
+                    pendientes = [p for p in arr if p.get("jugado") == False]
+                    return pendientes if len(pendientes) > 0 else None
+        print("No se ha leido ningun partido papi")
+        return None
+
 
     @staticmethod
     def ordenar_partidos_por_fecha_y_reasignar_ids(filename:str = None):

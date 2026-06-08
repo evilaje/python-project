@@ -4,7 +4,7 @@
         "nombre": "FIFA WORLD CUP SPEED'S VERSION",
         "inicio": "13/06/2026",
         "fin": "15/07/2026",
-        "estaActivo": true,
+        "estaActivo": false,
         "fase": "16avos de Final"
     }
 ]

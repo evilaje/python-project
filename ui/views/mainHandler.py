@@ -72,7 +72,7 @@ class MainFrame(tk.CTkFrame):
 
     def update_next_match(self):
         # Busca partido actualmente en curso (inicio <= ahora <= inicio+2h) o siguiente si no hay ninguno
-        partidos = Partido.getAllPartidos() or []
+        partidos = Partido.getPartidosPendientes() or []
         ahora = datetime.now()
         current = None
         upcoming = None
