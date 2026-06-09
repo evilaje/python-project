@@ -1029,12 +1029,12 @@
         "lugar": "LEVI'S STADIUM - SAN FRANCISCO",
         "idEquipo1": "E1",
         "idEquipo2": "E3",
-        "golesT1": 0,
-        "golesT2": 0,
+        "golesT1": 3,
+        "golesT2": 1,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "16avos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 75,
@@ -1043,12 +1043,12 @@
         "lugar": "BC PLACE - VANCOUVER",
         "idEquipo1": "F1",
         "idEquipo2": "C2",
-        "golesT1": 0,
-        "golesT2": 0,
+        "golesT1": 2,
+        "golesT2": 4,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "16avos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 76,
@@ -1057,12 +1057,12 @@
         "lugar": "ESTADIO AZTECA - CIUDAD DE M\u00c9XICO",
         "idEquipo1": "C1",
         "idEquipo2": "F2",
-        "golesT1": 0,
-        "golesT2": 0,
-        "penalesT1": 0,
-        "penalesT2": 0,
+        "golesT1": 1,
+        "golesT2": 1,
+        "penalesT1": 3,
+        "penalesT2": 4,
         "fase": "16avos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 77,
@@ -1071,12 +1071,12 @@
         "lugar": "METLIFE STADIUM - NUEVA YORK",
         "idEquipo1": "I1",
         "idEquipo2": "G3",
-        "golesT1": 0,
-        "golesT2": 0,
-        "penalesT1": 0,
+        "golesT1": 5,
+        "golesT2": 5,
+        "penalesT1": 1,
         "penalesT2": 0,
         "fase": "16avos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 78,
@@ -1085,12 +1085,12 @@
         "lugar": "ESTADIO AKRON - GUADALAJARA",
         "idEquipo1": "E2",
         "idEquipo2": "I2",
-        "golesT1": 0,
+        "golesT1": 1,
         "golesT2": 0,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "16avos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 79,
@@ -1100,11 +1100,11 @@
         "idEquipo1": "A1",
         "idEquipo2": "B3",
         "golesT1": 0,
-        "golesT2": 0,
+        "golesT2": 2,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "16avos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 80,
@@ -1113,12 +1113,12 @@
         "lugar": "AT&T STADIUM - DALLAS",
         "idEquipo1": "L3",
         "idEquipo2": "C3",
-        "golesT1": 0,
-        "golesT2": 0,
+        "golesT1": 3,
+        "golesT2": 1,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "16avos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 81,
@@ -1127,12 +1127,12 @@
         "lugar": "LEVI'S STADIUM - SAN FRANCISCO",
         "idEquipo1": "D1",
         "idEquipo2": "A3",
-        "golesT1": 0,
-        "golesT2": 0,
+        "golesT1": 2,
+        "golesT2": 4,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "16avos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 82,
@@ -1141,12 +1141,12 @@
         "lugar": "BC PLACE - VANCOUVER",
         "idEquipo1": "G1",
         "idEquipo2": "D3",
-        "golesT1": 0,
-        "golesT2": 0,
-        "penalesT1": 0,
-        "penalesT2": 0,
+        "golesT1": 3,
+        "golesT2": 3,
+        "penalesT1": 1,
+        "penalesT2": 2,
         "fase": "16avos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 83,
@@ -1155,12 +1155,12 @@
         "lugar": "ESTADIO AZTECA - CIUDAD DE M\u00c9XICO",
         "idEquipo1": "K3",
         "idEquipo2": "L2",
-        "golesT1": 0,
-        "golesT2": 0,
-        "penalesT1": 0,
-        "penalesT2": 0,
+        "golesT1": 2,
+        "golesT2": 2,
+        "penalesT1": 2,
+        "penalesT2": 1,
         "fase": "16avos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 84,
@@ -1169,12 +1169,12 @@
         "lugar": "METLIFE STADIUM - NUEVA YORK",
         "idEquipo1": "H1",
         "idEquipo2": "J2",
-        "golesT1": 0,
+        "golesT1": 2,
         "golesT2": 0,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "16avos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 85,
@@ -1183,12 +1183,12 @@
         "lugar": "ESTADIO AKRON - GUADALAJARA",
         "idEquipo1": "B1",
         "idEquipo2": "L1",
-        "golesT1": 0,
-        "golesT2": 0,
-        "penalesT1": 0,
+        "golesT1": 1,
+        "golesT2": 1,
+        "penalesT1": 2,
         "penalesT2": 0,
         "fase": "16avos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 86,
@@ -1198,11 +1198,11 @@
         "idEquipo1": "J1",
         "idEquipo2": "H2",
         "golesT1": 0,
-        "golesT2": 0,
+        "golesT2": 3,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "16avos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 87,
@@ -1211,12 +1211,12 @@
         "lugar": "AT&T STADIUM - DALLAS",
         "idEquipo1": "K2",
         "idEquipo2": "J3",
-        "golesT1": 0,
-        "golesT2": 0,
+        "golesT1": 4,
+        "golesT2": 2,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "16avos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 88,
@@ -1225,235 +1225,235 @@
         "lugar": "LEVI'S STADIUM - SAN FRANCISCO",
         "idEquipo1": "D2",
         "idEquipo2": "G2",
-        "golesT1": 0,
-        "golesT2": 0,
+        "golesT1": 2,
+        "golesT2": 5,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "16avos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 89,
         "fecha": "10/07/2026",
         "hora": "12:00",
         "lugar": "BC PLACE - VANCOUVER",
-        "idEquipo1": null,
-        "idEquipo2": null,
-        "golesT1": 0,
+        "idEquipo1": "E1",
+        "idEquipo2": "I1",
+        "golesT1": 2,
         "golesT2": 0,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "Octavos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 90,
         "fecha": "10/07/2026",
         "hora": "18:00",
         "lugar": "ESTADIO AZTECA - CIUDAD DE M\u00c9XICO",
-        "idEquipo1": null,
-        "idEquipo2": null,
-        "golesT1": 0,
+        "idEquipo1": "A2",
+        "idEquipo2": "C2",
+        "golesT1": 4,
         "golesT2": 0,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "Octavos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 91,
         "fecha": "11/07/2026",
         "hora": "12:00",
         "lugar": "METLIFE STADIUM - NUEVA YORK",
-        "idEquipo1": null,
-        "idEquipo2": null,
-        "golesT1": 0,
-        "golesT2": 0,
+        "idEquipo1": "F2",
+        "idEquipo2": "E2",
+        "golesT1": 2,
+        "golesT2": 3,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "Octavos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 92,
         "fecha": "11/07/2026",
         "hora": "18:00",
         "lugar": "ESTADIO AKRON - GUADALAJARA",
-        "idEquipo1": null,
-        "idEquipo2": null,
-        "golesT1": 0,
-        "golesT2": 0,
+        "idEquipo1": "B3",
+        "idEquipo2": "L3",
+        "golesT1": 3,
+        "golesT2": 1,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "Octavos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 93,
         "fecha": "12/07/2026",
         "hora": "12:00",
         "lugar": "ESTADIO ROSE BOWL - LOS \u00c1NGELES",
-        "idEquipo1": null,
-        "idEquipo2": null,
-        "golesT1": 0,
-        "golesT2": 0,
+        "idEquipo1": "K3",
+        "idEquipo2": "H1",
+        "golesT1": 3,
+        "golesT2": 2,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "Octavos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 94,
         "fecha": "12/07/2026",
         "hora": "18:00",
         "lugar": "AT&T STADIUM - DALLAS",
-        "idEquipo1": null,
-        "idEquipo2": null,
-        "golesT1": 0,
-        "golesT2": 0,
+        "idEquipo1": "A3",
+        "idEquipo2": "D3",
+        "golesT1": 4,
+        "golesT2": 5,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "Octavos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 95,
         "fecha": "13/07/2026",
         "hora": "12:00",
         "lugar": "LEVI'S STADIUM - SAN FRANCISCO",
-        "idEquipo1": null,
-        "idEquipo2": null,
-        "golesT1": 0,
-        "golesT2": 0,
-        "penalesT1": 0,
-        "penalesT2": 0,
+        "idEquipo1": "H2",
+        "idEquipo2": "G2",
+        "golesT1": 2,
+        "golesT2": 2,
+        "penalesT1": 4,
+        "penalesT2": 1,
         "fase": "Octavos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 96,
         "fecha": "13/07/2026",
         "hora": "18:00",
         "lugar": "BC PLACE - VANCOUVER",
-        "idEquipo1": null,
-        "idEquipo2": null,
-        "golesT1": 0,
-        "golesT2": 0,
+        "idEquipo1": "B1",
+        "idEquipo2": "K2",
+        "golesT1": 2,
+        "golesT2": 3,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "Octavos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 97,
         "fecha": "13/07/2026",
         "hora": "21:00",
         "lugar": "ESTADIO AZTECA - CIUDAD DE M\u00c9XICO",
-        "idEquipo1": null,
-        "idEquipo2": null,
-        "golesT1": 0,
-        "golesT2": 0,
+        "idEquipo1": "E1",
+        "idEquipo2": "A2",
+        "golesT1": 3,
+        "golesT2": 1,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "Cuartos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 98,
         "fecha": "14/07/2026",
         "hora": "12:00",
         "lugar": "METLIFE STADIUM - NUEVA YORK",
-        "idEquipo1": null,
-        "idEquipo2": null,
-        "golesT1": 0,
+        "idEquipo1": "K3",
+        "idEquipo2": "D3",
+        "golesT1": 4,
         "golesT2": 0,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "Cuartos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 99,
         "fecha": "14/07/2026",
         "hora": "18:00",
         "lugar": "ESTADIO AKRON - GUADALAJARA",
-        "idEquipo1": null,
-        "idEquipo2": null,
-        "golesT1": 0,
-        "golesT2": 0,
+        "idEquipo1": "E2",
+        "idEquipo2": "B3",
+        "golesT1": 1,
+        "golesT2": 3,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "Cuartos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 100,
         "fecha": "14/07/2026",
         "hora": "21:00",
         "lugar": "ESTADIO ROSE BOWL - LOS \u00c1NGELES",
-        "idEquipo1": null,
-        "idEquipo2": null,
-        "golesT1": 0,
-        "golesT2": 0,
+        "idEquipo1": "H2",
+        "idEquipo2": "K2",
+        "golesT1": 2,
+        "golesT2": 3,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "Cuartos de Final",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 101,
         "fecha": "14/07/2026",
         "hora": "23:59",
         "lugar": "AT&T STADIUM - DALLAS",
-        "idEquipo1": null,
-        "idEquipo2": null,
-        "golesT1": 0,
-        "golesT2": 0,
+        "idEquipo1": "E1",
+        "idEquipo2": "K3",
+        "golesT1": 2,
+        "golesT2": 5,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "Semifinal",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 102,
         "fecha": "15/07/2026",
         "hora": "12:00",
         "lugar": "LEVI'S STADIUM - SAN FRANCISCO",
-        "idEquipo1": null,
-        "idEquipo2": null,
-        "golesT1": 0,
-        "golesT2": 0,
+        "idEquipo1": "B3",
+        "idEquipo2": "K2",
+        "golesT1": 5,
+        "golesT2": 1,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "Semifinal",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 103,
         "fecha": "15/07/2026",
         "hora": "12:00",
         "lugar": "LA NUEVA OLLA - ASUNCION",
-        "idEquipo1": null,
-        "idEquipo2": null,
-        "golesT1": 0,
-        "golesT2": 0,
+        "idEquipo1": "E1",
+        "idEquipo2": "K2",
+        "golesT1": 1,
+        "golesT2": 2,
         "penalesT1": 0,
         "penalesT2": 0,
         "fase": "Tercer Puesto",
-        "jugado": false
+        "jugado": true
     },
     {
         "id": 104,
         "fecha": "15/07/2026",
         "hora": "16:00",
         "lugar": "TESTEITO - SWAGINO",
-        "idEquipo1": null,
-        "idEquipo2": null,
-        "golesT1": 0,
-        "golesT2": 0,
-        "penalesT1": 0,
-        "penalesT2": 0,
+        "idEquipo1": "K3",
+        "idEquipo2": "B3",
+        "golesT1": 5,
+        "golesT2": 5,
+        "penalesT1": 3,
+        "penalesT2": 5,
         "fase": "Final",
-        "jugado": false
+        "jugado": true
     }
 ]

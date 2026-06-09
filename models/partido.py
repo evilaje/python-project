@@ -687,3 +687,22 @@ def setFinal(filename: str = None):
         json.dump(partidos, file, indent=4)
 
     return True
+
+def getAllPartidos(filename = None):
+    if (filename is None):
+        filename = PATH
+    arr = []
+    if (file_exists(filename)):
+        with open(filename, "r") as file:
+            if not is_file_empty(filename):
+                arr = json.load(file)
+    return arr if len(arr) != 0 else None
+
+def getPartidosPorFecha(str_fecha:str):
+    partidos = getAllPartidos()
+    partidos_retorno = []
+    if partidos:
+        for p in partidos:
+            if p["fecha"] == str_fecha:
+                partidos_retorno.append(p)
+    return partidos_retorno

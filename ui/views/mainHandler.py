@@ -5,7 +5,8 @@ from ui.views.configHandler import *
 from models.partido import Partido
 import models.equipo as equipo
 from datetime import datetime, timedelta
-
+from tkcalendar import DateEntry
+from utils.fecha_utils import *
 class MainFrame(tk.CTkFrame):
     def __init__(self, root):
         super().__init__(root)
@@ -17,6 +18,8 @@ class MainFrame(tk.CTkFrame):
         #DESACTIVAR
         '''descomentar sgte linea para habilitar todos los botones ni bollo'''
         #boton_activo, config_abierto = "normal", "normal"
+
+        #prueba datepicker
 
         self.btn1 = tk.CTkButton(self, text="Configuración del Torneo", height=50, command=self.ir_a_config)
         self.btn1.configure(state=config_abierto) #lo contrario al resto
