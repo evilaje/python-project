@@ -404,7 +404,7 @@ class TorneoConfigFrame(tk.CTkFrame):
     # torneo ---------------------------------------------------------------------------------
     def vista1(self):
         if hasattr(self, "frame_torneo"):
-            self.frame_torneo.destroy()
+            self.frame_torneo.grid_remove()
 
         self.frame_torneo = self._make_content_frame()
         for r in range(5):

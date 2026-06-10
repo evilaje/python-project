@@ -81,6 +81,7 @@ class TorneoResultFrame(tk.CTkFrame):
                 anchor="w",
                 justify="left",
             ).grid(row=0, column=0, padx=16, pady=16, sticky="w")
+            self._mostrar_placeholder_vacio()
             return
 
         # ancho disponible dentro del scroll (sidebar 220 - padx 8*2 - scrollbar ~16)
@@ -123,6 +124,49 @@ class TorneoResultFrame(tk.CTkFrame):
                        lambda e, f=item_frame:
                        None if (self._item_activo and f is self._item_activo[0])
                        else f.configure(fg_color="transparent"))
+
+        # Seleccionar automáticamente el partido más próximo
+        self.after(50, self._seleccionar_partido_proximo)
+
+    def _seleccionar_partido_proximo(self):
+        """Selecciona y resalta el partido más próximo en la lista."""
+        if not self._partidos_pendientes:
+            return
+
+        partido_proximo = self._get_partido_mas_proximo(self._partidos_pendientes)
+        if partido_proximo is None:
+            partido_proximo = self._partidos_pendientes[0]
+
+        # Buscar el índice en la lista para encontrar el frame/label correspondiente
+        idx = self._partidos_pendientes.index(partido_proximo)
+        items = list(self.scroll_partidos.winfo_children())
+
+        # Los items son CTkFrame, uno por partido
+        if idx < len(items):
+            item_frame = items[idx]
+            # El label es el primer hijo del frame
+            children = item_frame.winfo_children()
+            if children:
+                item_label = children[0]
+                self._on_partido_click(partido_proximo, item_frame, item_label)
+
+    def _get_partido_mas_proximo(self, partidos):
+        """Devuelve el partido con fecha/hora más próxima a ahora (o el primero si no hay fechas)."""
+        ahora = datetime.now()
+        mejor = None
+        menor_diff = None
+
+        for p in partidos:
+            try:
+                dt = datetime.strptime(f"{p['fecha']} {p['hora']}", "%d/%m/%Y %H:%M")
+                diff = abs((dt - ahora).total_seconds())
+                if menor_diff is None or diff < menor_diff:
+                    menor_diff = diff
+                    mejor = p
+            except (ValueError, KeyError):
+                continue
+
+        return mejor if mejor is not None else (partidos[0] if partidos else None)
 
     def _on_partido_click(self, partido, frame, lbl):
         # Desresaltar el anterior
@@ -221,6 +265,19 @@ class TorneoResultFrame(tk.CTkFrame):
         self.input_penales_t2 = tk.CTkEntry(panel, placeholder_text="0", width=140)
         self.input_penales_t2.grid(row=8, column=1, padx=(0, 32), pady=(4, 16), sticky="w")
 
+        # Guardar referencia al panel para poder manipular el placeholder
+        self._panel_derecho = panel
+
+        # Label de "no hay partidos", oculto por defecto
+        self._label_no_partidos = tk.CTkLabel(
+            panel,
+            text="No hay partidos disponibles",
+            font=tk.CTkFont(size=16),
+            text_color=("gray55", "gray45"),
+            anchor="center",
+            justify="center",
+        )
+
         tk.CTkButton(
             panel,
             text="Guardar Resultado",
@@ -231,13 +288,38 @@ class TorneoResultFrame(tk.CTkFrame):
             command=self.guardar_resultado,
         ).grid(row=10, column=0, padx=32, pady=(0, 24), sticky="w")
 
+    def _mostrar_placeholder_vacio(self):
+        """Oculta el contenido normal del panel derecho y muestra el mensaje de sin partidos."""
+        # Ocultar widgets de contenido
+        self.label_nombre_partido.grid_remove()
+        self.label_eq1.grid_remove()
+        self.label_eq2.grid_remove()
+
+        # Mostrar el label centrado ocupando todo el espacio disponible
+        self._label_no_partidos.grid(
+            row=0, column=0, columnspan=2,
+            padx=32, pady=32,
+            sticky="nsew",
+        )
+        self._panel_derecho.grid_rowconfigure(0, weight=1)
+
+    def _ocultar_placeholder_vacio(self):
+        """Restaura el contenido normal del panel derecho."""
+        self._label_no_partidos.grid_remove()
+        self._panel_derecho.grid_rowconfigure(0, weight=0)
+        self.label_nombre_partido.grid()
+        self.label_eq1.grid()
+        self.label_eq2.grid()
+
     def _on_panel_resize(self, event):
         # Descuenta los padx=32 de cada lado
         wrap = max(100, event.width - 64)
         self.label_nombre_partido.configure(wraplength=wrap)
 
-
     def _mostrar_partido(self, partido):
+        # Asegurarse de que el placeholder esté oculto
+        self._ocultar_placeholder_vacio()
+
         equipo1 = getEquipo(partido.get("idEquipo1")) if partido.get("idEquipo1") else None
         equipo2 = getEquipo(partido.get("idEquipo2")) if partido.get("idEquipo2") else None
 
@@ -333,7 +415,6 @@ class TorneoResultFrame(tk.CTkFrame):
         if self._fase_completada(partidos, "Fase de Grupos", 72):
             equipos_ya_asignados = self._fase_estan_asignados_los_equipos(partidos, "16avos de Final", 16)
             if not equipos_ya_asignados:
-                # Solo ejecutar si realmente necesitamos asignar los equipos
                 avanzarFase()
                 setEliminatorias()
                 if current_phase != "16avos de Final":
@@ -367,14 +448,12 @@ class TorneoResultFrame(tk.CTkFrame):
         if self._fase_completada(partidos, "Semifinal", 2):
             equipos_ya_asignados_tercer = self._fase_estan_asignados_los_equipos(partidos, "Tercer Puesto", 1)
             if not equipos_ya_asignados_tercer:
-                # Preparar ambos partidos: Tercer Puesto y Final
                 setFinal()
                 if current_phase != "Tercer Puesto":
                     setFaseTorneo("Tercer Puesto")
                 CTkMessagebox(title="Info", message="Partido por el Tercer Puesto disponible.", icon="check")
 
         if self._fase_completada(partidos, "Tercer Puesto", 1):
-            # Después del tercer puesto, siempre transicionar a la final
             if current_phase != "Final":
                 setFaseTorneo("Final")
             CTkMessagebox(title="Info", message="Final configurada.", icon="check")
@@ -429,12 +508,6 @@ class TorneoResultFrame(tk.CTkFrame):
             CTkMessagebox(title="Exito", message=resultado[1], icon="check")
             self._avanzar_fase_si_corresponde()
             self._partido_seleccionado = None
-            self.label_nombre_partido.configure(
-                text="Selecciona un partido",
-                text_color=("gray60", "gray50"),
-            )
-            self.label_eq1.configure(text="Equipo 1")
-            self.label_eq2.configure(text="Equipo 2")
             self._cargar_lista_partidos()
             self.cleanInputs([
                 self.input_goles_t1, self.input_goles_t2,

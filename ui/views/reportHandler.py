@@ -32,6 +32,10 @@ class TorneoReportFrame(tk.CTkFrame):
         # vista inicial
         self._show_frame(self.frame_fecha, "fecha")
 
+        # Pre-construir la tabla de todos los grupos en segundo plano
+        # para que esté lista cuando el usuario navegue a esa vista
+        self.after(100, self._prebuild_all_grupos)
+
 
     # seidebar --------------------------------------------------------------------------------
     def _build_sidebar(self):
@@ -126,7 +130,8 @@ class TorneoReportFrame(tk.CTkFrame):
             self.label_fecha_all_grupos.configure(
                 text=f"Fecha de emisión del Informe: {datetime.today().strftime('%d/%m/%Y')}"
             )
-            self._render_all_grupos()
+            if not self._all_grupos_built:
+                self._render_all_grupos()
             self._show_frame(self.frame_all_grupos, "all_grupos")
 
     # bs para moverse entre los reportes
@@ -161,11 +166,6 @@ class TorneoReportFrame(tk.CTkFrame):
         rango = getRangoFechaTorneo()
         self.fecha = datePickerConRango(input_row, rango, 20)
         self.fecha.pack(side="left", padx=(0, 10))
-
-        '''
-        tk.CTkLabel(input_row, text="Fecha:").pack(side="left")
-        self.input_fecha = tk.CTkEntry(input_row, placeholder_text="DD/MM/AAAA", width=150)
-        self.input_fecha.pack(side="left", padx=10)'''
 
         tk.CTkButton(input_row, text="Buscar", width=80,
                      command=self.buscar_partidos_por_fecha).pack(side="left")
@@ -289,6 +289,7 @@ class TorneoReportFrame(tk.CTkFrame):
 
     def _build_frame_all_grupos(self):
         self.frame_all_grupos = self._make_content_frame()
+        self._all_grupos_built = False  # flag: tabla ya construida?
 
         tk.CTkLabel(
             self.frame_all_grupos,
@@ -517,32 +518,57 @@ class TorneoReportFrame(tk.CTkFrame):
         tk.CTkLabel(mid_row, text=partido.get("hora", ""),
                     font=("Arial", 26, "bold")).pack(side="right", padx=10)
 
+    def _prebuild_all_grupos(self):
+        """Construye la tabla de todos los grupos en segundo plano al iniciar."""
+        self._render_all_grupos()
+
     def _render_all_grupos(self):
-        for widget in self.scroll_all_grupos.winfo_children():
+        scroll = self.scroll_all_grupos
+
+        # Limpiar widgets existentes
+        for widget in scroll.winfo_children():
             widget.destroy()
 
         grupos = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
         col_widths  = [220, 40, 40, 40, 40, 40, 40, 40, 50]
-        col_anchors = ["w", "center","center","center","center","center","center","center","center"]
+        stats_keys  = ["pj", "g", "e", "p", "gf", "gc", "dg", "pts"]
+
+        # Traer todos los datos de una sola vez antes de tocar la UI
+        datos_grupos = {g: getTablaDeGrupo(g) or [] for g in grupos}
+
+        # Construir toda la tabla en un solo bloque
+        # Usar un único CTkFrame contenedor para minimizar reflows del scrollable
+        contenedor = tk.CTkFrame(scroll, fg_color="transparent")
+        contenedor.pack(fill="x", padx=5)
+        contenedor.grid_columnconfigure(0, weight=1)
+
+        fila_idx = 0
+        font_normal = ("Arial", 12)
+        font_bold   = ("Arial", 12, "bold")
+        font_header = ("Arial", 11, "bold")
 
         for grupo in grupos:
-            equipos = getTablaDeGrupo(grupo) or []
+            equipos = datos_grupos[grupo]
             if not equipos:
                 continue
 
             cols = ["Grupo " + grupo, "PJ", "G", "E", "P", "GF", "GC", "DG", "Pts"]
 
-            header_row = tk.CTkFrame(self.scroll_all_grupos,
-                                     fg_color=("gray80", "gray30"), corner_radius=4)
-            header_row.pack(fill="x", padx=5, pady=(4, 0))
+            # Header del grupo
+            header_row = tk.CTkFrame(contenedor, fg_color=("gray80", "gray30"), corner_radius=4)
+            header_row.grid(row=fila_idx, column=0, sticky="ew", pady=(8, 0))
+            fila_idx += 1
 
-            for col, width, anchor in zip(cols, col_widths, col_anchors):
-                tk.CTkLabel(header_row, text=col, width=width, anchor=anchor,
-                            font=("Arial", 11, "bold")).pack(side="left", padx=2, pady=4)
+            for col, width in zip(cols, col_widths):
+                tk.CTkLabel(header_row, text=col, width=width,
+                            anchor="w" if col == cols[0] else "center",
+                            font=font_header).pack(side="left", padx=2, pady=4)
 
+            # Filas de equipos
             for eq in equipos:
-                fila = tk.CTkFrame(self.scroll_all_grupos, corner_radius=4)
-                fila.pack(fill="x", padx=5, pady=2)
+                fila = tk.CTkFrame(contenedor, corner_radius=4)
+                fila.grid(row=fila_idx, column=0, sticky="ew", pady=2)
+                fila_idx += 1
 
                 nombre_frame = tk.CTkFrame(fila, fg_color="transparent", height=24, width=220)
                 nombre_frame.pack(side="left", padx=2)
@@ -553,14 +579,12 @@ class TorneoReportFrame(tk.CTkFrame):
                 tk.CTkLabel(nombre_frame, text=eq.get("pais", ""),
                             anchor="w").pack(side="left", padx=(4, 0))
 
-                stats = ["pj", "g", "e", "p", "gf", "gc", "dg", "pts"]
-                for key, width in zip(stats, col_widths[1:]):
-                    es_pts = key == "pts"
+                for key, width in zip(stats_keys, col_widths[1:]):
                     tk.CTkLabel(fila, text=str(eq.get(key, 0)), width=width, anchor="center",
-                                font=("Arial", 12, "bold") if es_pts else ("Arial", 12)
+                                font=font_bold if key == "pts" else font_normal,
                                 ).pack(side="left", padx=2, pady=6)
 
-
+        self._all_grupos_built = True
 
     def volver(self):
         self.root.back_to_main(self)
