@@ -40,13 +40,13 @@ class TorneoConfigFrame(tk.CTkFrame):
         self.vista3()   # Grupos
         self.vista4()   # Partidos
 
-        # vista inicial -> la del torneo o si ya esta cargado el torneo muestra la de equipos 
+        # vista inicial -> la del torneo o si ya esta cargado el torneo muestra la de equipos
         if canSkipTorneoVista():
             self._show_frame(self.frame_equipos, "equipos")
         else:
             self._show_frame(self.frame_torneo, "torneo")
 
-    
+
     # sidebar -----------------------------------------------------------------------------
     def _build_sidebar(self):
         sidebar = tk.CTkFrame(self, width=200, corner_radius=0, fg_color=("gray15", "gray10"))
@@ -133,7 +133,7 @@ class TorneoConfigFrame(tk.CTkFrame):
                     font=tk.CTkFont(size=14, weight="normal"),
                 )
 
-    
+
     # nav ---------------------------------------------------------------------------------
     def _show_frame(self, frame, key):
         """Oculta todos los frames de contenido y muestra el que llamas"""
@@ -177,13 +177,13 @@ class TorneoConfigFrame(tk.CTkFrame):
     def go_to_grupos_from_partidos(self):
         self.go_to_grupos()
 
-    
+
 
     # gaurdado de data ---------------------------------------------------------------------------------
     def guardar_data_torneo(self):
         nombre = self.input_nombre.get().strip()
         fecha_inicio = self.input_fecha_inicio.get()   # ya viene como "DD/MM/YYYY"
-        fecha_fin = self.input_fecha_fin.get()         
+        fecha_fin = self.input_fecha_fin.get()
 
         if not nombre or not fecha_inicio or not fecha_fin:
             CTkMessagebox(title="Error", message="Todos los campos son obligatorios", icon="cancel")
@@ -196,7 +196,7 @@ class TorneoConfigFrame(tk.CTkFrame):
             CTkMessagebox(title="Error", message="Formato de fecha invalido, usa DD/MM/AAAA", icon="cancel")
             return
 
-        if dt_inicio > dt_fin:
+        if dt_inicio >= dt_fin:
             CTkMessagebox(title="Error", message="La fecha de inicio no puede ser posterior a la fecha de fin", icon="cancel")
             return
 
@@ -263,7 +263,7 @@ class TorneoConfigFrame(tk.CTkFrame):
             pass
 
     def guardar_partidos(self):
-        fecha = self.input_partido1.get()  
+        fecha = self.input_partido1.get()
         hora = self.input_partido2.get().strip()
         lugar = self.input_partido3.get().strip()
 
@@ -368,7 +368,7 @@ class TorneoConfigFrame(tk.CTkFrame):
         if not Partido.ordenar_partidos_por_fecha_y_reasignar_ids():
             CTkMessagebox(title="Error", message="Error al ordenar y reasignar partidos.", icon="cancel")
             return
-        
+
         set_result = setEquiposFaseGrupos()
         if set_result is None:
             CTkMessagebox(title="Error", message="No se pudieron asignar los equipos de fase de grupos.", icon="cancel")
@@ -450,11 +450,11 @@ class TorneoConfigFrame(tk.CTkFrame):
             foreground="white",
             borderwidth=1,
             relief="flat",
-            state=estado_inputs,
         )
         if ini:
             from datetime import datetime as dt
             self.input_fecha_inicio.set_date(dt.strptime(ini, "%d/%m/%Y").date())
+            self.input_fecha_inicio.configure(state=estado_inputs)
         self.input_fecha_inicio.grid(row=2, column=1, pady=10, sticky="w", padx=20)
 
         # -- fecha fin (DateEntry) --
@@ -470,11 +470,12 @@ class TorneoConfigFrame(tk.CTkFrame):
             foreground="white",
             borderwidth=1,
             relief="flat",
-            state=estado_inputs,
+
         )
         if fin:
             from datetime import datetime as dt
             self.input_fecha_fin.set_date(dt.strptime(fin, "%d/%m/%Y").date())
+            self.input_fecha_fin.configure(state=estado_inputs)
         self.input_fecha_fin.grid(row=3, column=1, pady=10, sticky="w", padx=20)
 
         tk.CTkButton(
