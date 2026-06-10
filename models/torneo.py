@@ -31,7 +31,7 @@ class Torneo:
 
 		torneos = []
 		if (file_exists(filename)):
-			with open(filename, "r") as file:
+			with open(filename, "r", encoding="utf-8") as file:
 				if not is_file_empty(filename):
 					torneos = json.load(file)
 
@@ -44,7 +44,7 @@ class Torneo:
 
 		torneos.append(self.toDict())
 
-		with open(filename, "w") as file:
+		with open(filename, "w", encoding="utf-8") as file:
 			json.dump(torneos, file, indent=4)
 
 	#tdv no hice nada con esto xd, solo evitar 	q se modifique si el torneo ya emppezo
@@ -66,7 +66,7 @@ class Torneo:
 		if not file_exists(filename):
 			return 1
 
-		with open(filename, "r") as file:
+		with open(filename, "r", encoding="utf-8") as file:
 			if not is_file_empty(filename):
 				torneos = json.load(file)
 				return len(torneos) + 1 if len(torneos) != 0 else 1
@@ -79,7 +79,7 @@ class Torneo:
 			filename = PATH
 		arr = []
 		if (file_exists(filename)):
-			with open(filename, "r") as file:
+			with open(filename, "r", encoding="utf-8") as file:
 				if not is_file_empty(filename):
 					arr = json.load(file)
 					return arr if len(arr) > 0 else None
@@ -90,7 +90,7 @@ def getTorneo(id, filename:str = None):
 		filename = PATH
 	arr = []
 	if (file_exists(filename)):
-		with open(filename, "r") as file:
+		with open(filename, "r", encoding="utf-8") as file:
 			if not is_file_empty(filename):
 				arr = json.load(file)
 	for obj in arr:
@@ -102,7 +102,7 @@ def avanzarFase(filename:str = None):
 	if (filename is None):
 		filename = equipo.PATH
 	if (file_exists(filename)):
-		with open(filename, "r") as file:
+		with open(filename, "r", encoding="utf-8") as file:
 			if not is_file_empty(filename):
 				arr = json.load(file)
 
@@ -120,18 +120,18 @@ def avanzarFase(filename:str = None):
 						eq["fase"] = "Eliminado de la fase de grupos"
 						eq["posicion"] = None
 
-				with open(filename, "w") as file:
+				with open(filename, "w", encoding="utf-8") as file:
 					json.dump(arr, file, indent=4)
 
 	# actualizar la fase del torneo en el archivo de torneos
 	if file_exists(PATH):
-		with open(PATH, "r") as tf:
+		with open(PATH, "r", encoding="utf-8") as tf:
 			if not is_file_empty(PATH):
 				torneos = json.load(tf)
 				if torneos and len(torneos) > 0:
 					# se asume un solo torneo activo, actualizar el primero
 					torneos[0]["fase"] = "16avos de Final"
-					with open(PATH, "w") as tfw:
+					with open(PATH, "w", encoding="utf-8") as tfw:
 						json.dump(torneos, tfw, indent=4)
 					return True
 	return False
@@ -141,14 +141,14 @@ def setFaseTorneo(fase:str, filename:str = None):
 		filename = PATH
 	if not file_exists(filename):
 		return False
-	with open(filename, "r") as file:
+	with open(filename, "r", encoding="utf-8") as file:
 		if is_file_empty(filename):
 			return False
 		torneos = json.load(file)
 	if not torneos:
 		return False
 	torneos[0]["fase"] = fase
-	with open(filename, "w") as file:
+	with open(filename, "w", encoding="utf-8") as file:
 		json.dump(torneos, file, indent=4)
 	return True
 

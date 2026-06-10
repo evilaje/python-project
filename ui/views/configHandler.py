@@ -6,7 +6,7 @@ from services.partido_controller import *
 from models.equipo import Equipo
 from models.partido import Partido, setEquiposFaseGrupos, asignar_fases_por_orden
 from CTkMessagebox import CTkMessagebox
-
+from tkcalendar import DateEntry
 
 class TorneoConfigFrame(tk.CTkFrame):
     def __init__(self, root, main_frame):
@@ -182,8 +182,8 @@ class TorneoConfigFrame(tk.CTkFrame):
     # gaurdado de data ---------------------------------------------------------------------------------
     def guardar_data_torneo(self):
         nombre = self.input_nombre.get().strip()
-        fecha_inicio = self.input_fecha_inicio.get().strip()
-        fecha_fin = self.input_fecha_fin.get().strip()
+        fecha_inicio = self.input_fecha_inicio.get()   # ya viene como "DD/MM/YYYY"
+        fecha_fin = self.input_fecha_fin.get()         
 
         if not nombre or not fecha_inicio or not fecha_fin:
             CTkMessagebox(title="Error", message="Todos los campos son obligatorios", icon="cancel")
@@ -263,9 +263,10 @@ class TorneoConfigFrame(tk.CTkFrame):
             pass
 
     def guardar_partidos(self):
-        fecha = self.input_partido1.get().strip()
+        fecha = self.input_partido1.get()  
         hora = self.input_partido2.get().strip()
         lugar = self.input_partido3.get().strip()
+
 
         torneo_ini, torneo_fin = getRangoTorneo()[0], getRangoTorneo()[1]
         if not (torneo_ini is None or torneo_fin is None):
@@ -367,6 +368,11 @@ class TorneoConfigFrame(tk.CTkFrame):
         if not Partido.ordenar_partidos_por_fecha_y_reasignar_ids():
             CTkMessagebox(title="Error", message="Error al ordenar y reasignar partidos.", icon="cancel")
             return
+        
+        set_result = setEquiposFaseGrupos()
+        if set_result is None:
+            CTkMessagebox(title="Error", message="No se pudieron asignar los equipos de fase de grupos.", icon="cancel")
+            return
 
         if not asignar_fases_por_orden():
             CTkMessagebox(title="Error", message="Error al asignar fases a los partidos.", icon="cancel")
@@ -374,11 +380,6 @@ class TorneoConfigFrame(tk.CTkFrame):
 
         if not activarTorneo():
             CTkMessagebox(title="Error", message="No se pudo activar el torneo.", icon="cancel")
-            return
-
-        set_result = setEquiposFaseGrupos()
-        if set_result is None:
-            CTkMessagebox(title="Error", message="No se pudieron asignar los equipos de fase de grupos.", icon="cancel")
             return
 
         CTkMessagebox(title="Exito", message="Configuracion cerrada", icon="check")
@@ -409,7 +410,6 @@ class TorneoConfigFrame(tk.CTkFrame):
         for r in range(5):
             self.frame_torneo.grid_rowconfigure(r, weight=1)
 
-        # title
         tk.CTkLabel(
             self.frame_torneo,
             text="Configuración del Torneo",
@@ -428,6 +428,7 @@ class TorneoConfigFrame(tk.CTkFrame):
             fin = t["fin"]
             estado_inputs = "disabled"
 
+        # -- nombre (igual que antes) --
         self.input_nombre = tk.CTkEntry(self.frame_torneo, placeholder_text="Nombre del Torneo", width=280)
         if nombre:
             self.input_nombre.configure(state="normal")
@@ -435,19 +436,46 @@ class TorneoConfigFrame(tk.CTkFrame):
             self.input_nombre.configure(state=estado_inputs)
         self.input_nombre.grid(row=1, column=1, pady=10, sticky="ew", padx=20)
 
-        self.input_fecha_inicio = tk.CTkEntry(self.frame_torneo, placeholder_text="Fecha de Inicio DD/MM/AAAA", width=280)
+        # -- fecha inicio (DateEntry) --
+        tk.CTkLabel(self.frame_torneo, text="Fecha de Inicio", anchor="e").grid(
+            row=2, column=0, padx=(40, 16), sticky="e"
+        )
+        rango = getRangoTorneo() if torneoExits() else None
+        self.input_fecha_inicio = DateEntry(
+            self.frame_torneo,
+            width=20,
+            date_pattern="dd/mm/yyyy",
+            font=("Segoe UI", 11),
+            background="#1f538d",
+            foreground="white",
+            borderwidth=1,
+            relief="flat",
+            state=estado_inputs,
+        )
         if ini:
-            self.input_fecha_inicio.configure(state="normal")
-            self.input_fecha_inicio.insert(0, ini)
-            self.input_fecha_inicio.configure(state=estado_inputs)
-        self.input_fecha_inicio.grid(row=2, column=1, pady=10, sticky="ew", padx=20)
+            from datetime import datetime as dt
+            self.input_fecha_inicio.set_date(dt.strptime(ini, "%d/%m/%Y").date())
+        self.input_fecha_inicio.grid(row=2, column=1, pady=10, sticky="w", padx=20)
 
-        self.input_fecha_fin = tk.CTkEntry(self.frame_torneo, placeholder_text="Fecha de Final DD/MM/AAAA", width=280)
+        # -- fecha fin (DateEntry) --
+        tk.CTkLabel(self.frame_torneo, text="Fecha de Fin", anchor="e").grid(
+            row=3, column=0, padx=(40, 16), sticky="e"
+        )
+        self.input_fecha_fin = DateEntry(
+            self.frame_torneo,
+            width=20,
+            date_pattern="dd/mm/yyyy",
+            font=("Segoe UI", 11),
+            background="#1f538d",
+            foreground="white",
+            borderwidth=1,
+            relief="flat",
+            state=estado_inputs,
+        )
         if fin:
-            self.input_fecha_fin.configure(state="normal")
-            self.input_fecha_fin.insert(0, fin)
-            self.input_fecha_fin.configure(state=estado_inputs)
-        self.input_fecha_fin.grid(row=3, column=1, pady=10, sticky="ew", padx=20)
+            from datetime import datetime as dt
+            self.input_fecha_fin.set_date(dt.strptime(fin, "%d/%m/%Y").date())
+        self.input_fecha_fin.grid(row=3, column=1, pady=10, sticky="w", padx=20)
 
         tk.CTkButton(
             self.frame_torneo, text="Guardar Torneo", width=200,
@@ -543,13 +571,29 @@ class TorneoConfigFrame(tk.CTkFrame):
             font=tk.CTkFont(size=18, weight="bold"),
         ).grid(row=0, column=0, columnspan=3, pady=(32, 8), sticky="n")
 
+        # -- fecha (DateEntry) --
+        tk.CTkLabel(self.frame_partidos, text="Fecha", anchor="e").grid(
+            row=1, column=0, padx=(40, 16), sticky="e"
+        )
+        self.input_partido1 = DateEntry(
+            self.frame_partidos,
+            width=20,
+            date_pattern="dd/mm/yyyy",
+            font=("Segoe UI", 11),
+            background="#1f538d",
+            foreground="white",
+            borderwidth=1,
+            relief="flat",
+        )
+        self.input_partido1.grid(row=1, column=1, pady=10, sticky="w", padx=20)
+
+        # -- hora y lugar siguen siendo CTkEntry --
         fields = [
-            ("Fecha",   "input_partido1", "Fecha DD/MM/AAAA"),
             ("Hora",    "input_partido2", "HH:MM"),
             ("Lugar",   "input_partido3", "Estadio / Ciudad"),
         ]
 
-        for i, (label_text, attr, placeholder) in enumerate(fields, start=1):
+        for i, (label_text, attr, placeholder) in enumerate(fields, start=2):
             tk.CTkLabel(self.frame_partidos, text=label_text, anchor="e").grid(
                 row=i, column=0, padx=(40, 16), sticky="e"
             )
@@ -561,7 +605,7 @@ class TorneoConfigFrame(tk.CTkFrame):
             self.frame_partidos, text="Guardar Partidos", width=200,
             fg_color="#29ABE2",
             command=self.guardar_partidos,
-        ).grid(row=len(fields) + 1, column=1, pady=(24, 10))
+        ).grid(row=len(fields) + 2, column=1, pady=(24, 10))
 
     # utility --------------------------------------------------------------------------------
     def cleanInputs(self, inputs):

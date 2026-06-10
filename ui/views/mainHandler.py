@@ -2,9 +2,12 @@ import customtkinter as tk
 from ui.views.reportHandler import *
 from ui.views.resultsHandler import *
 from ui.views.configHandler import *
-from models.partido import Partido
+from models.partido import Partido as PartidoModel
+
 import models.equipo as equipo
 from datetime import datetime, timedelta
+from tkcalendar import DateEntry
+from utils.fecha_utils import *
 
 class MainFrame(tk.CTkFrame):
     def __init__(self, root):
@@ -17,6 +20,8 @@ class MainFrame(tk.CTkFrame):
         #DESACTIVAR
         '''descomentar sgte linea para habilitar todos los botones ni bollo'''
         #boton_activo, config_abierto = "normal", "normal"
+
+        #prueba datepicker
 
         self.btn1 = tk.CTkButton(self, text="Configuración del Torneo", height=50, command=self.ir_a_config)
         self.btn1.configure(state=config_abierto) #lo contrario al resto
@@ -72,8 +77,10 @@ class MainFrame(tk.CTkFrame):
 
     def update_next_match(self):
         # Busca partido actualmente en curso (inicio <= ahora <= inicio+2h) o siguiente si no hay ninguno
-        partidos = Partido.getPartidosPendientes() or []
+        partidos = PartidoModel.getPartidosPendientes() or []
+
         ahora = datetime.now()
+
         current = None
         upcoming = None
         futuros = []

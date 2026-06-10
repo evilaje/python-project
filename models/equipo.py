@@ -41,7 +41,7 @@ class Equipo:
 
         equipos = []
         if file_exists(filename):
-            with open(filename, "r") as file:
+            with open(filename, "r", encoding="utf-8") as file:
                 if not is_file_empty(filename):
                     equipos = json.load(file)
                 else:
@@ -66,7 +66,7 @@ class Equipo:
             filename = PATH
         equipos = []
         if file_exists(filename):
-            with open(filename, "r") as file:
+            with open(filename, "r", encoding="utf-8") as file:
                 if not is_file_empty(filename): #verifica que el archivo no este vacio
                     # tbs es para cargar un arreglo con los diccionarios que estan en el json
                     equipos = json.load(file)
@@ -90,7 +90,7 @@ class Equipo:
 
 
         # guarda el diccionario equipos en la direccion de file, con indentacion de 4 espacios (1 tab)
-        with open(filename, "w") as file:
+        with open(filename, "w", encoding="utf-8") as file:
             json.dump(equipos, file, indent=4)
         return True
 
@@ -103,7 +103,7 @@ class Equipo:
         if not file_exists(filename): #por si el archivo todavia no se creo
             return 1
 
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf-8") as file:
             if not is_file_empty(filename):
                 equipos = json.load(file) #json load carga el contenido del archivo a la variable, en este caso como vector
                 return len(equipos) + 1 if len(equipos) != 0 else 1
@@ -116,7 +116,7 @@ class Equipo:
             filename = PATH
         arr = []
         if (file_exists(filename)):
-            with open(filename, "r") as file:
+            with open(filename, "r", encoding="utf-8") as file:
                 if not is_file_empty(filename):
                     arr = json.load(file)
                     return arr if len(arr) > 0 else None
@@ -130,7 +130,7 @@ class Equipo:
         equipos = []
 
         if (file_exists(filename)):
-            with open(filename, "r") as file:
+            with open(filename, "r", encoding="utf-8") as file:
                 equipos = json.load(file)
 
                 for equipo in equipos:
@@ -149,7 +149,7 @@ def setGrupo(pais: str, grupo: str, filename = PATH):
 
     equipos = []
 
-    with open(filename, "r") as file:
+    with open(filename, "r", encoding="utf-8") as file:
         if not is_file_empty(filename):
             equipos = json.load(file)
             for eq in equipos:
@@ -169,7 +169,7 @@ def setGrupo(pais: str, grupo: str, filename = PATH):
                     break
 
 
-    with open(filename, "w") as file:
+    with open(filename, "w", encoding="utf-8") as file:
         json.dump(equipos, file, indent=4)
 
     return None
@@ -181,7 +181,7 @@ def getGoles(id, filename:str = get_path("data", "partidos.json")):
     if not file_exists(filename):
         return 1
 
-    with open(filename, "r") as file:
+    with open(filename, "r", encoding="utf-8") as file:
         if not is_file_empty(filename):
             partidos = json.load(file)
             goles = 0
@@ -199,7 +199,7 @@ def getDiferenciaGoles(id, filename:str = get_path("data", "partidos.json")):
     if not file_exists(filename):
         return 1
 
-    with open(filename, "r") as file:
+    with open(filename, "r", encoding="utf-8") as file:
         if not is_file_empty(filename):
             partidos = json.load(file)
             mejorDiferencia = None
@@ -245,7 +245,7 @@ def getPosicionGrupo(pos, grupo, filename:str = None):
         filename = PATH
     arr = []
     if (file_exists(filename)):
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf-8") as file:
             if not is_file_empty(filename):
                 arr = json.load(file)
                 equiposGrupo = []
@@ -262,7 +262,7 @@ def getEquipo(id, filename:str = None):
         filename = PATH
     arr = []
     if (file_exists(filename)):
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf-8") as file:
             if not is_file_empty(filename):
                 arr = json.load(file)
             else: #si el archivo esta vacio no obtenemos nada
@@ -270,37 +270,6 @@ def getEquipo(id, filename:str = None):
     for obj in arr:
         if (id == obj["id"]): return obj
     return None
-
-
-def setEquipoFase(equipo_id: str, fase: str, filename: str = None):
-    """Actualiza el campo 'fase' de un equipo identificado por su id.
-    Retorna True si se actualizó, False si no se encontró o hubo error.
-    """
-    if filename is None:
-        filename = PATH
-
-    if not file_exists(filename):
-        return False
-
-    with open(filename, "r", encoding="utf-8") as f:
-        if is_file_empty(filename):
-            return False
-        equipos = json.load(f)
-
-    updated = False
-    for eq in equipos:
-        if eq.get("id") == equipo_id:
-            eq["fase"] = fase
-            updated = True
-            break
-
-    if not updated:
-        return False
-
-    with open(filename, "w", encoding="utf-8") as f:
-        json.dump(equipos, f, indent=4)
-
-    return True
 
 # funcion de mierda para conseguir los equipo que pasan la puta fase de grupos
 # que muchas validaciones mierdon
@@ -310,7 +279,7 @@ def getMejoresEquiposGrupo(filename:str = None):
         filename = PATH
     arr = []
     if (file_exists(filename)):
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf-8") as file:
             if not is_file_empty(filename):
                 arr = json.load(file)
                 mejoresEquipos = []
@@ -341,7 +310,7 @@ def getCantidadEquiposPorGrupo(grupo:str, filename = PATH):
     count = 0
     equipos = []
     if file_exists(filename):
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf-8") as file:
             if not is_file_empty(filename):
                 equipos = json.load(file)
                 for eq in equipos:
@@ -355,7 +324,7 @@ def getCantidadAllEquipos(filename = PATH):
     count = 0
     equipos = []
     if file_exists(filename):
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf-8") as file:
             if not is_file_empty(filename):
                 equipos = json.load(file)
                 count = len(equipos)

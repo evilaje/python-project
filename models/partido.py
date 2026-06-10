@@ -51,7 +51,7 @@ class Partido:
         partidos = []
 
         if file_exists(filename):
-            with open(filename, "r") as file:
+            with open(filename, "r", encoding="utf-8") as file:
                 if not is_file_empty(filename):
                     partidos = json.load(file)
 
@@ -81,12 +81,12 @@ class Partido:
                 partido.get("jugado") == self.jugado):
                 self.id = index
 
-        with open(filename, "w") as file:
+        with open(filename, "w", encoding="utf-8") as file:
             json.dump(partidos, file, indent=4)
 
         # aumentar los puntos de los equipos segun el resultado
         equipos = []
-        with open(get_path("data", "equipos.json"), "r") as file:
+        with open(get_path("data", "equipos.json"), "r", encoding="utf-8") as file:
             if not is_file_empty(get_path("data", "equipos.json")):
                 equipos = json.load(file)
 
@@ -111,7 +111,7 @@ class Partido:
                     if eq["id"] == self.idEquipo2:
                         eq["puntos"] += 1
 
-            with open(get_path("data", "equipos.json"), "w") as file:
+            with open(get_path("data", "equipos.json"), "w", encoding="utf-8") as file:
                 json.dump(equipos, file, indent=4)
 
 
@@ -123,7 +123,7 @@ class Partido:
         if not file_exists(filename): #por si el archivo todavia no se creo
             return 1
 
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf-8") as file:
             if not is_file_empty(filename):
                 partidos = json.load(file) #json load carga el contenido del archivo a la variable, en este caso como vector
                 return len(partidos) + 1 if len(partidos) != 0 else 1
@@ -136,7 +136,7 @@ class Partido:
             filename = PATH
 
         if (file_exists(filename)):
-            with open(filename, "r") as file:
+            with open(filename, "r", encoding="utf-8") as file:
                 arr = json.load(file)
                 for reg in arr:
                     if self.id == reg["id"]:
@@ -145,7 +145,7 @@ class Partido:
                         reg["idEquipo1"] = self.idEquipo1
                         reg["idEquipo2"] = self.idEquipo2
 
-            with open(filename, "w") as file:
+            with open(filename, "w", encoding="utf-8") as file:
                 json.dump(arr, file, indent=4)
 
         return None
@@ -165,6 +165,7 @@ class Partido:
         print("No se ha leido ningun partido papi")
         return None
     
+    @staticmethod
     def getPartidosPendientes(filename: str = None):
         if filename is None:
             filename = PATH
@@ -207,7 +208,7 @@ class Partido:
         for index, partido in enumerate(partidos, start=1):
             partido["id"] = index
 
-        with open(filename, "w") as file:
+        with open(filename, "w", encoding="utf-8") as file:
             json.dump(partidos, file, indent=4)
 
         return True
@@ -228,7 +229,7 @@ class Partido:
         partidos = []
 
         if (file_exists(filename)):
-            with open(filename, "r") as file:
+            with open(filename, "r", encoding="utf-8") as file:
                 partidos = json.load(file)
 
             for partido in partidos:
@@ -243,7 +244,7 @@ class Partido:
                     partido["penalesT2"] = self.penalesT2
                     partido["jugado"] = True
 
-                    with open(filename, "w") as file:
+                    with open(filename, "w", encoding="utf-8") as file:
                         json.dump(partidos, file, indent=4)
 
                     # actualizar puntos de los equipos segun el resultado
@@ -255,7 +256,7 @@ class Partido:
                         equipos = []
                         equipos_file = get_path("data", "equipos.json")
                         if file_exists(equipos_file):
-                            with open(equipos_file, "r") as f_eq:
+                            with open(equipos_file, "r", encoding="utf-8") as f_eq:
                                 if not is_file_empty(equipos_file):
                                     equipos = json.load(f_eq)
 
@@ -272,7 +273,7 @@ class Partido:
                                     if eq["id"] == id_t1 or eq["id"] == id_t2:
                                         eq["puntos"] += 1
 
-                            with open(equipos_file, "w") as f_eq:
+                            with open(equipos_file, "w", encoding="utf-8") as f_eq:
                                 json.dump(equipos, f_eq, indent=4)
 
                     return True
@@ -285,7 +286,7 @@ def getPartido(id, filename:str = None):
         filename = PATH
     arr = []
     if (file_exists(filename)):
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf-8") as file:
             if not is_file_empty(filename):
                 arr = json.load(file)
     for obj in arr:
@@ -297,72 +298,80 @@ def getPartido(id, filename:str = None):
 # vamos a suponer que esta validado en el front que solo pueden haber 24 partidos por jornada
 # porque no pienso hacer aca eso
 
-def setEquiposFaseGrupos(filename:str = None):
-    # esto es basicamente el SELECT * FROM equipos pero con pasos extra
-    if (filename is None):
+def setEquiposFaseGrupos(filename: str = None):
+    if filename is None:
         filename = PATH
 
-    # esto tiene todos los registros de equipos en forma de diccionario
-    # arreglo de diccionarios
     equipos = equipo.Equipo.getAllEquipos()
     if equipos is None:
         return None
-    # fin del select
 
-    # esta parte crea un diccionario que es tipo
-    # "A": [equipo1, equipo2, equipo3, equipo4], "B": [equipo5, ...]
-    # lo valores del arreglo son del tipo Equipo
-    # eso es para asignar los id de los equipos
+    # Organizar equipos por grupo ordenados por id (A1 < A2 < A3 < A4)
     grupos = {}
     for eq in equipos:
         grupos.setdefault(eq["grupo"], []).append(eq)
 
-    # esto en teoria itera sobre la key del diccionario
-    # es para ordenar por id el array que esta como value
     for grupo in grupos:
         grupos[grupo].sort(key=lambda x: x["id"])
 
-    # esto es basicamente el como se pueden enfrentar los equipos por grupo
-    # el index 0 contra el 1 (equipo1 vs equipo2) y asi
+    # Verificar que todos los grupos tienen exactamente 4 equipos
+    for g in ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]:
+        if len(grupos.get(g, [])) != 4:
+            return None
+
+    # Índice de acceso rápido: (grupo, posición) -> id del equipo
+    # Posición 1 = primer equipo del grupo (A1), 2 = A2, etc.
+    idx = {}
+    for grupo, lista in grupos.items():
+        for pos, eq in enumerate(lista, start=1):
+            idx[(grupo, pos)] = eq["id"]
+
+    # Secuencia oficial del fixture del Mundial 2026 — orden cronológico de los 72 partidos
+    # Cada tupla: (grupo, posicion_equipo1, posicion_equipo2)
     fixture = [
-        (0, 1),
-        (2, 3),
-        (0, 2),
-        (1, 3),
-        (0, 3),
-        (1, 2)
+        # Jornada 1
+        ('A', 1, 2), ('A', 3, 4),                            # Jun 11
+        ('B', 1, 2), ('D', 1, 2),                            # Jun 12
+        ('B', 3, 4), ('C', 1, 2), ('C', 3, 4), ('D', 3, 4), # Jun 13
+        ('E', 1, 2), ('F', 1, 2), ('E', 3, 4), ('F', 3, 4), # Jun 14
+        ('H', 1, 2), ('G', 1, 2), ('H', 3, 4), ('G', 3, 4), # Jun 15
+        ('I', 1, 2), ('I', 3, 4), ('J', 1, 2), ('J', 3, 4), # Jun 16
+        ('K', 1, 2), ('L', 1, 2), ('L', 3, 4), ('K', 3, 4),# Jun 17
+        # j2
+        ('A', 4, 2), ('B', 4, 2), ('B', 1, 3), ('A', 1, 3),# Jun 18
+        ('D', 1, 3), ('C', 4, 2), ('C', 1, 3), ('D', 4, 2), # Jun 19
+        ('F', 1, 3), ('E', 1, 3), ('E', 4, 2), ('F', 4, 2), # Jun 20
+        ('H', 1, 3), ('G', 1, 3), ('H', 4, 2), ('G', 4, 2), # Jun 21
+        ('J', 1, 3), ('I', 1, 3), ('I', 4, 2), ('J', 4, 2), # Jun 22
+        ('K', 1, 3), ('L', 1, 3), ('L', 4, 2), ('K', 4, 2), # Jun 23
+        ('B', 4, 1), ('B', 2, 3), ('C', 4, 1), ('C', 2, 3), # Jun 24
+        ('A', 4, 1), ('A', 2, 3),
+        ('E', 2, 3), ('E', 4, 1), ('F', 2, 3), ('F', 4, 1), # Jun 25
+        ('D', 4, 1), ('D', 2, 3),
+        ('I', 4, 1), ('I', 2, 3), ('H', 2, 3), ('H', 4, 1), # Jun 26
+        ('G', 2, 3), ('G', 4, 1),
+        ('L', 4, 1), ('L', 2, 3), ('K', 4, 1), ('K', 2, 3), # Jun 27
+        ('J', 2, 3), ('J', 4, 1),
     ]
 
-    if (file_exists(filename)):
-        with open(filename, "r") as file:
-            if not is_file_empty(filename):
-                partidos = json.load(file)
+    if not file_exists(filename):
+        return None
 
-                partido_index = 0
-                grupos_ordenados = sorted(grupos.keys())
+    with open(filename, "r", encoding="utf-8") as file:
+        if is_file_empty(filename):
+            return None
+        partidos = json.load(file)
 
-                for local1, local2 in fixture:
-                    for grupo in grupos_ordenados:
-                        # verificar que existan 4 equipos
-                        if len(grupos[grupo]) != 4:
-                            continue
+    if len(partidos) < 72:
+        return None
 
-                        # verificar que existan suficientes partidos para cargar
-                        if partido_index >= len(partidos) or partido_index >= 72:
-                            break
+    for partido_index, (grupo, p1, p2) in enumerate(fixture):
+        partidos[partido_index]["idEquipo1"] = idx[(grupo, p1)]
+        partidos[partido_index]["idEquipo2"] = idx[(grupo, p2)]
+        partidos[partido_index]["fase"] = "Fase de Grupos"
 
-
-                        partidos[partido_index]["idEquipo1"] = grupos[grupo][local1]["id"]
-                        partidos[partido_index]["idEquipo2"] = grupos[grupo][local2]["id"]
-                        partidos[partido_index]["fase"] = "Fase de Grupos"
-                        partido_index += 1
-
-                    if partido_index >= 72 or partido_index >= len(partidos):
-                        break
-
-        # guardar cambios
-        with open(filename, "w") as file:
-            json.dump(partidos, file, indent=4)
+    with open(filename, "w", encoding="utf-8") as file:
+        json.dump(partidos, file, indent=4)
 
     return True
 
@@ -390,7 +399,7 @@ def asignar_fases_por_orden(filename: str = None):
     if not file_exists(filename):
         return False
 
-    with open(filename, "r") as file:
+    with open(filename, "r", encoding="utf-8") as file:
         if is_file_empty(filename):
             return False
         partidos = json.load(file)
@@ -401,14 +410,14 @@ def asignar_fases_por_orden(filename: str = None):
     for index, partido in enumerate(partidos):
         partido["fase"] = _fase_por_indice(index)
 
-    with open(filename, "w") as file:
+    with open(filename, "w", encoding="utf-8") as file:
         json.dump(partidos, file, indent=4)
 
     return True
 
 
 # Se carga una sola vez al importar el modulo; sin costo en cada llamada.
-with open(get_path("data", "tabla_anexo_c.json"), "r") as _f:
+with open(get_path("data", "tabla_anexo_c.json"), "r", encoding="utf-8") as _f:
     _TABLA_ANEXO_C: list[dict] = json.load(_f)
 
 # Índice preconstruido: frozenset de grupos -> orden de slots como lista.
@@ -515,7 +524,7 @@ def setEliminatorias(filename: str = None):
 
     partidos = []
     if file_exists(filename):
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf-8") as file:
             if not is_file_empty(filename):
                 partidos = json.load(file)
 
@@ -524,7 +533,7 @@ def setEliminatorias(filename: str = None):
         partidos[index]["idEquipo2"] = id2
         partidos[index]["fase"] = "16avos de Final"
 
-    with open(filename, "w") as file:
+    with open(filename, "w", encoding="utf-8") as file:
         json.dump(partidos, file, indent=4)
 
     return True
@@ -563,7 +572,7 @@ def setOctavos(filename: str = None):
 
     partidos = []
     if file_exists(filename):
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf-8") as file:
             if not is_file_empty(filename):
                 partidos = json.load(file)
 
@@ -581,7 +590,7 @@ def setOctavos(filename: str = None):
         partidos[index]["idEquipo2"] = g2
         partidos[index]["fase"] = "Octavos de Final"
 
-    with open(filename, "w") as file:
+    with open(filename, "w", encoding="utf-8") as file:
         json.dump(partidos, file, indent=4)
     return True
 
@@ -592,7 +601,7 @@ def setCuartos(filename: str = None):
 
     partidos = []
     if file_exists(filename):
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf-8") as file:
             if not is_file_empty(filename):
                 partidos = json.load(file)
 
@@ -609,7 +618,7 @@ def setCuartos(filename: str = None):
         partidos[index]["idEquipo2"] = g2
         partidos[index]["fase"] = "Cuartos de Final"
 
-    with open(filename, "w") as file:
+    with open(filename, "w", encoding="utf-8") as file:
         json.dump(partidos, file, indent=4)
     return True
 
@@ -620,7 +629,7 @@ def setSemis(filename: str = None):
 
     partidos = []
     if file_exists(filename):
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf-8") as file:
             if not is_file_empty(filename):
                 partidos = json.load(file)
 
@@ -637,7 +646,7 @@ def setSemis(filename: str = None):
         partidos[index]["idEquipo2"] = g2
         partidos[index]["fase"] = "Semifinal"
 
-    with open(filename, "w") as file:
+    with open(filename, "w", encoding="utf-8") as file:
         json.dump(partidos, file, indent=4)
     return True
 
@@ -648,7 +657,7 @@ def setFinal(filename: str = None):
 
     partidos = []
     if file_exists(filename):
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf-8") as file:
             if not is_file_empty(filename):
                 partidos = json.load(file)
 
@@ -696,7 +705,26 @@ def setFinal(filename: str = None):
     partidos[103]["idEquipo2"] = ganador_sf2
     partidos[103]["fase"] = "Final"
 
-    with open(filename, "w") as file:
+    with open(filename, "w", encoding="utf-8") as file:
         json.dump(partidos, file, indent=4)
 
     return True
+
+def getAllPartidos(filename = None):
+    if (filename is None):
+        filename = PATH
+    arr = []
+    if (file_exists(filename)):
+        with open(filename, "r", encoding="utf-8") as file:
+            if not is_file_empty(filename):
+                arr = json.load(file)
+    return arr if len(arr) != 0 else None
+
+def getPartidosPorFecha(str_fecha:str):
+    partidos = getAllPartidos()
+    partidos_retorno = []
+    if partidos:
+        for p in partidos:
+            if p["fecha"] == str_fecha:
+                partidos_retorno.append(p)
+    return partidos_retorno
