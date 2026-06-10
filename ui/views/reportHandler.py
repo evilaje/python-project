@@ -23,13 +23,16 @@ def _get_flag(abreviatura: str, size=(24, 16)):
     return _flag_cache[key]
 
 def _flag_label(parent, abreviatura, size=(24, 16)):
-    """Devuelve un CTkLabel con la bandera, o un rectángulo gris si no existe."""
     img = _get_flag(abreviatura, size)
     if img:
-        return tk.CTkLabel(parent, text="", image=img, width=size[0], height=size[1])
+        lbl = tk.CTkLabel(parent, text="", image=img,
+                          width=size[0], height=size[1])
+        return lbl
     else:
-        return tk.CTkFrame(parent, width=size[0], height=size[1],
-                           corner_radius=2, fg_color=("gray70", "gray40"))
+        f = tk.CTkFrame(parent, width=size[0], height=size[1],
+                        corner_radius=2, fg_color=("gray70", "gray40"))
+        f.pack_propagate(False)
+        return f
 
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -458,6 +461,7 @@ class TorneoReportFrame(tk.CTkFrame):
             widget.destroy()
 
         equipos_all = Equipo.getAllEquipos() or []
+        # el map este es para mostrar las banderas porque los archivos se llaman como la abv
         abrev_map = {e["pais"]: e.get("abreviatura", "") for e in equipos_all}
 
         fecha_actual = None
@@ -468,31 +472,36 @@ class TorneoReportFrame(tk.CTkFrame):
                             fg_color=("gray85", "gray25"), corner_radius=4,
                             anchor="w").pack(fill="x", pady=(10, 2), padx=5)
 
-            card = tk.CTkFrame(self.scroll_fecha, corner_radius=6)
-            card.pack(fill="x", pady=(0, 8), padx=5)
+
+            card = tk.CTkFrame(self.scroll_fecha, corner_radius=6,
+                   fg_color=("gray80", "gray22"))
+            card.pack(fill="x", pady=(0, 2), padx=5)
+            card.grid_columnconfigure(0, weight=1)
 
             fila = tk.CTkFrame(card, fg_color="transparent")
-            fila.pack(pady=(8, 2))
+            fila.grid(row=0, column=0, pady=(4, 0))
 
-            # Local (alineado a la derecha: nombre → bandera)
             local_frame = tk.CTkFrame(fila, fg_color="transparent", width=160)
             local_frame.pack(side="left")
             local_frame.pack_propagate(False)
-            tk.CTkLabel(local_frame, text=p["local"], anchor="e").pack(side="left", expand=True, fill="x")
+            tk.CTkLabel(local_frame, text=p["local"], anchor="e",
+                        pady=0).pack(side="left", expand=True, fill="x")
             _flag_label(local_frame, abrev_map.get(p["local"], "")).pack(side="left", padx=(4, 0))
 
             tk.CTkLabel(fila, text=p["hora"], width=60,
-                        font=("Arial", 14, "bold")).pack(side="left", padx=6)
+                        font=("Arial", 14, "bold"), pady=0).pack(side="left", padx=6)
 
-            # Visitante (bandera → nombre)
             visit_frame = tk.CTkFrame(fila, fg_color="transparent", width=160)
             visit_frame.pack(side="left")
             visit_frame.pack_propagate(False)
             _flag_label(visit_frame, abrev_map.get(p["visitante"], "")).pack(side="left", padx=(0, 4))
-            tk.CTkLabel(visit_frame, text=p["visitante"], anchor="w").pack(side="left")
+            tk.CTkLabel(visit_frame, text=p["visitante"], anchor="w",
+                        pady=0).pack(side="left")
 
             tk.CTkLabel(card, text=f'{p["fase"]}  ·  {p["lugar"]}',
-                        text_color="gray", font=("Arial", 11)).pack(pady=(0, 6))
+                        text_color="gray", font=("Arial", 11),
+                        pady=0).grid(row=1, column=0, pady=(2, 4))
+            
 
     def _render_informe_equipo(self, partidos, clasificacion=None):
         for widget in self.scroll_equipo.winfo_children():
