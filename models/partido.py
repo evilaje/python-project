@@ -234,9 +234,8 @@ class Partido:
 
             for partido in partidos:
                 if partido["id"] == self.id:
-                    # conservar goles previos para evitar doble conteo
-                    prev_g1 = partido.get("golesT1", 0)
-                    prev_g2 = partido.get("golesT2", 0)
+                    # conservar estado previo para evitar doble conteo
+                    prev_jugado = partido.get("jugado", False)
 
                     partido["golesT1"] = self.golesT1
                     partido["golesT2"] = self.golesT2
@@ -248,11 +247,11 @@ class Partido:
                         json.dump(partidos, file, indent=4)
 
                     # actualizar puntos de los equipos segun el resultado
-                    # solo si antes no tenia goles
+                    # solo si el partido no estaba jugado antes
                     id_t1 = partido.get("idEquipo1")
                     id_t2 = partido.get("idEquipo2")
 
-                    if prev_g1 == 0 and prev_g2 == 0 and id_t1 and id_t2:
+                    if not prev_jugado and id_t1 and id_t2:
                         equipos = []
                         equipos_file = get_path("data", "equipos.json")
                         if file_exists(equipos_file):
@@ -468,29 +467,48 @@ def setEliminatorias(filename: str = None):
         return None
 
     tercero_por_grupo = {eq["grupo"].upper(): eq for eq in mejores_terceros}
-    iter_terceros = iter(orden_grupos)
+
+    # orden_grupos[i] es el grupo del tercero que enfrenta al ganador del slot i
+    # Slots fijos segun la tabla del Anexo C:
+    # indice 0 -> rival de 1A
+    # indice 1 -> rival de 1B
+    # indice 2 -> rival de 1D
+    # indice 3 -> rival de 1E
+    # indice 4 -> rival de 1G
+    # indice 5 -> rival de 1I
+    # indice 6 -> rival de 1K
+    # indice 7 -> rival de 1L
+    tercero_vs = {
+        '1A': tercero_por_grupo.get(orden_grupos[0]),
+        '1B': tercero_por_grupo.get(orden_grupos[1]),
+        '1D': tercero_por_grupo.get(orden_grupos[2]),
+        '1E': tercero_por_grupo.get(orden_grupos[3]),
+        '1G': tercero_por_grupo.get(orden_grupos[4]),
+        '1I': tercero_por_grupo.get(orden_grupos[5]),
+        '1K': tercero_por_grupo.get(orden_grupos[6]),
+        '1L': tercero_por_grupo.get(orden_grupos[7]),
+    }
 
     sequence = [
         ('2A', '2B'),
-        ('1E', ('best_third', ['A', 'B', 'C', 'D', 'F'])),
+        ('1E', '1A'),   # 1E vs 3F, 1A vs 3E -> se resuelven via tercero_vs
         ('1F', '2C'),
         ('1C', '2F'),
-        ('1I', ('best_third', ['C', 'D', 'F', 'G', 'H'])),
+        ('1I', '1D'),
         ('2E', '2I'),
-        ('1A', ('best_third', ['C', 'E', 'F', 'H', 'I'])),
-        ('1L', ('best_third', ['E', 'H', 'I', 'J', 'K'])),
-        ('1D', ('best_third', ['B', 'E', 'F', 'I', 'J'])),
-        ('1G', ('best_third', ['A', 'E', 'H', 'I', 'J'])),
+        ('1A', '1B'),
+        ('1L', '1K'),
+        ('1D', '1G'),
+        ('1G', '1I'),
         ('2K', '2L'),
         ('1H', '2J'),
-        ('1B', ('best_third', ['E', 'F', 'G', 'I', 'J'])),
+        ('1B', '1E'),
         ('1J', '2H'),
-        ('1K', ('best_third', ['D', 'E', 'I', 'J', 'L'])),
+        ('1K', '1L'),
         ('2D', '2G'),
     ]
 
-    def pick_by_label(label: str):
-        """Traduce '1A' -> ganador del grupo A, '2B' -> subcampeon del grupo B."""
+    def pick(label: str):
         if not label or len(label) < 2:
             return None
         lab = label.strip().upper()
@@ -502,24 +520,32 @@ def setEliminatorias(filename: str = None):
             return next((s for s in subcampeones if s['grupo'].upper() == grp), None)
         return None
 
+    # Reconstruir sequence correctamente:
+    # Los partidos de 16avos donde un ganador enfrenta a un tercero
+    # se arman directamente desde tercero_vs
+    sequence_final = [
+        (pick('2A'),  pick('2B')),
+        (pick('1E'),  tercero_vs['1E']),
+        (pick('1F'),  pick('2C')),
+        (pick('1C'),  pick('2F')),
+        (pick('1I'),  tercero_vs['1I']),
+        (pick('2E'),  pick('2I')),
+        (pick('1A'),  tercero_vs['1A']),
+        (pick('1L'),  tercero_vs['1L']),
+        (pick('1D'),  tercero_vs['1D']),
+        (pick('1G'),  tercero_vs['1G']),
+        (pick('2K'),  pick('2L')),
+        (pick('1H'),  pick('2J')),
+        (pick('1B'),  tercero_vs['1B']),
+        (pick('1J'),  pick('2H')),
+        (pick('1K'),  tercero_vs['1K']),
+        (pick('2D'),  pick('2G')),
+    ]
+
     matches = []
-
-    for l, r in sequence:
-        if isinstance(l, tuple) and l[0] == 'best_third':
-            grupo_asignado = next(iter_terceros, None)
-            equipo1 = tercero_por_grupo.get(grupo_asignado) if grupo_asignado else None
-        else:
-            equipo1 = pick_by_label(l)
-
-        if isinstance(r, tuple) and r[0] == 'best_third':
-            grupo_asignado = next(iter_terceros, None)
-            equipo2 = tercero_por_grupo.get(grupo_asignado) if grupo_asignado else None
-        else:
-            equipo2 = pick_by_label(r)
-
+    for equipo1, equipo2 in sequence_final:
         if equipo1 is None or equipo2 is None:
             return None
-
         matches.append((equipo1['id'], equipo2['id']))
 
     partidos = []

@@ -59,6 +59,7 @@ def getTablaDeGrupo(grupo: str):
         tabla[eq["id"]] = {
             "id": eq["id"],
             "pais": eq.get("pais", ""),
+            "abreviatura": eq.get("abreviatura", ""),
             "pj": 0,
             "g": 0,
             "e": 0,
@@ -91,13 +92,16 @@ def getTablaDeGrupo(grupo: str):
         if id1 not in tabla and id2 not in tabla:
             continue
 
-        # ignorar partidos sin datos (goles y penales todos 0)
-        g1 = p.get("golesT1", 0)
-        g2 = p.get("golesT2", 0)
-        pen1 = p.get("penalesT1", 0)
-        pen2 = p.get("penalesT2", 0)
-        if g1 == 0 and g2 == 0 and pen1 == 0 and pen2 == 0:
+        # OJO: un 0-0 válido (golesT1=0 y golesT2=0) debe contar.
+        # Solo ignoramos si el partido NO está marcado como jugado.
+        if not p.get("jugado", False):
             continue
+
+        g1 = p.get("golesT1", 0) or 0
+        g2 = p.get("golesT2", 0) or 0
+        pen1 = p.get("penalesT1", 0) or 0
+        pen2 = p.get("penalesT2", 0) or 0
+
 
         # actualizar solo si el equipo participa en el grupo
         if id1 in tabla:
@@ -138,6 +142,7 @@ def getTablaDeGrupo(grupo: str):
         resultado.append({
             "posicion": 0,
             "pais": data["pais"],
+            "abreviatura": data["abreviatura"],
             "pj": data["pj"],
             "g": data["g"],
             "e": data["e"],

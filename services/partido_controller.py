@@ -290,8 +290,7 @@ def getSiguientePartido(equipo_nombre: str):
 
     eq1 = equipo.getEquipo(proximo.get("idEquipo1"))
     eq2 = equipo.getEquipo(proximo.get("idEquipo2"))
-    local_abrev = eq1.get("abreviatura") if eq1 and eq1.get("abreviatura") else eq1.get("pais") if eq1 else proximo.get("idEquipo1") or "Por definir"
-    visitante_abrev = eq2.get("abreviatura") if eq2 and eq2.get("abreviatura") else eq2.get("pais") if eq2 else proximo.get("idEquipo2") or "Por definir"
+    
 
     partido_info = {
         "torneo": torneo_nombre,
@@ -299,9 +298,12 @@ def getSiguientePartido(equipo_nombre: str):
         "lugar": proximo.get("lugar", ""),
         "fecha": fecha,
         "hora": hora,
-        "local": local_abrev,
-        "visitante": visitante_abrev
+        "local": eq1.get("pais") if eq1 else proximo.get("idEquipo1") or "Por definir",
+        "visitante": eq2.get("pais") if eq2 else proximo.get("idEquipo2") or "Por definir",
+        "local_abrev": eq1.get("abreviatura", "") if eq1 else "",
+        "visitante_abrev": eq2.get("abreviatura", "") if eq2 else "",
     }
+
 
     # Usar la fase tal como está registrada en el partido (partidos.json)
 

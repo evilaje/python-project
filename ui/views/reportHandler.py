@@ -4,6 +4,35 @@ from services.equipo_controller import getTablaDeGrupo
 from models.equipo import Equipo
 from datetime import datetime
 from utils.fecha_utils import *
+from PIL import Image
+import customtkinter as ctk
+import os
+
+# ── Flag cache ────────────────────────────────────────────────────────────────
+_flag_cache: dict = {}
+
+def _get_flag(abreviatura: str, size=(24, 16)):
+    key = (abreviatura, size)
+    if key not in _flag_cache:
+        path = os.path.join("assets", "banderas", f"{abreviatura}.png")
+        if os.path.exists(path):
+            img = Image.open(path).convert("RGBA").resize(size, Image.LANCZOS)
+            _flag_cache[key] = ctk.CTkImage(light_image=img, dark_image=img, size=size)
+        else:
+            _flag_cache[key] = None
+    return _flag_cache[key]
+
+def _flag_label(parent, abreviatura, size=(24, 16)):
+    """Devuelve un CTkLabel con la bandera, o un rectángulo gris si no existe."""
+    img = _get_flag(abreviatura, size)
+    if img:
+        return tk.CTkLabel(parent, text="", image=img, width=size[0], height=size[1])
+    else:
+        return tk.CTkFrame(parent, width=size[0], height=size[1],
+                           corner_radius=2, fg_color=("gray70", "gray40"))
+
+# ─────────────────────────────────────────────────────────────────────────────
+
 class TorneoReportFrame(tk.CTkFrame):
     def __init__(self, root, main_frame):
         super().__init__(root)
@@ -33,7 +62,6 @@ class TorneoReportFrame(tk.CTkFrame):
         self._show_frame(self.frame_fecha, "fecha")
 
         # Pre-construir la tabla de todos los grupos en segundo plano
-        # para que esté lista cuando el usuario navegue a esa vista
         self.after(100, self._prebuild_all_grupos)
 
 
@@ -75,10 +103,8 @@ class TorneoReportFrame(tk.CTkFrame):
             btn.grid(row=i, column=0, padx=16, pady=4, sticky="ew")
             self._nav_buttons[key] = btn
 
-        # separar lso botones
         sidebar.grid_rowconfigure(len(nav_items) + 1, weight=1)
 
-        # go back btn
         tk.CTkButton(
             sidebar,
             text="← Volver",
@@ -134,7 +160,6 @@ class TorneoReportFrame(tk.CTkFrame):
                 self._render_all_grupos()
             self._show_frame(self.frame_all_grupos, "all_grupos")
 
-    # bs para moverse entre los reportes
     def go_to_menu(self):                      self._navigate("fecha")
     def go_to_informe_por_fecha(self):         self._navigate("fecha")
     def go_to_informe_por_grupo(self):         self._navigate("grupo")
@@ -142,12 +167,21 @@ class TorneoReportFrame(tk.CTkFrame):
     def go_to_informe_siguiente_partido(self): self._navigate("siguiente")
     def go_to_informe_all_grupos(self):        self._navigate("all_grupos")
 
-    # hace el frame de la parte derecha
     def _make_content_frame(self):
         f = tk.CTkFrame(self.content_panel, fg_color="transparent")
         f.grid_columnconfigure(0, weight=1)
         f.grid_rowconfigure(0, weight=1)
         return f
+
+    # ── Helper: nombre de equipo con bandera ──────────────────────────────────
+    def _pack_equipo_con_bandera(self, parent, abreviatura, nombre, pos_text=""):
+        """Empaqueta [pos] [bandera] [nombre] en `parent`."""
+        if pos_text:
+            tk.CTkLabel(parent, text=str(pos_text),
+                        width=20, text_color="gray").pack(side="left")
+        lbl_flag = _flag_label(parent, abreviatura)
+        lbl_flag.pack(side="left", padx=(2, 4))
+        tk.CTkLabel(parent, text=nombre, anchor="w").pack(side="left")
 
     # frames de cada reporte --------------------------------------------------------------------------------
     def _build_frame_fecha(self):
@@ -175,7 +209,7 @@ class TorneoReportFrame(tk.CTkFrame):
 
         self.scroll_fecha = tk.CTkScrollableFrame(self.frame_fecha)
         self.scroll_fecha.pack(fill="both", expand=True, padx=24, pady=10)
-
+        self.scroll_fecha.grid_columnconfigure(0, weight=1)
 
     def _build_frame_grupo(self):
         self.frame_grupo = self._make_content_frame()
@@ -209,7 +243,6 @@ class TorneoReportFrame(tk.CTkFrame):
 
         self.scroll_grupo = tk.CTkScrollableFrame(self.frame_grupo)
         self.scroll_grupo.pack(fill="both", expand=True, padx=24, pady=10)
-
 
     def _build_frame_equipo(self):
         self.frame_equipo = self._make_content_frame()
@@ -248,7 +281,6 @@ class TorneoReportFrame(tk.CTkFrame):
         self.scroll_equipo = tk.CTkScrollableFrame(self.frame_equipo)
         self.scroll_equipo.pack(fill="both", expand=True, padx=24, pady=10)
 
-
     def _build_frame_siguiente(self):
         self.frame_siguiente = self._make_content_frame()
 
@@ -286,10 +318,9 @@ class TorneoReportFrame(tk.CTkFrame):
         self.container_siguiente = tk.CTkFrame(self.frame_siguiente, fg_color="transparent")
         self.container_siguiente.pack(fill="both", expand=True, padx=24, pady=10)
 
-
     def _build_frame_all_grupos(self):
         self.frame_all_grupos = self._make_content_frame()
-        self._all_grupos_built = False  # flag: tabla ya construida?
+        self._all_grupos_built = False
 
         tk.CTkLabel(
             self.frame_all_grupos,
@@ -379,7 +410,7 @@ class TorneoReportFrame(tk.CTkFrame):
         partido = getSiguientePartido(equipo)
         self._render_siguiente_partido(partido)
 
-    # renders de las tablas y eso --------------------------------------------------------------------------------
+    # renders --------------------------------------------------------------------------------
     def _render_tabla_grupo(self, grupo, equipos):
         for widget in self.scroll_grupo.winfo_children():
             widget.destroy()
@@ -389,40 +420,45 @@ class TorneoReportFrame(tk.CTkFrame):
                         text_color="gray").pack(pady=20)
             return
 
+        # La columna de nombre es más ancha para acomodar bandera (24) + gap (4)
+        COL_NOMBRE = 248
+        col_widths  = [COL_NOMBRE, 40, 40, 40, 40, 40, 40, 40, 50]
         cols        = ["Grupo " + grupo, "PJ", "G", "E", "P", "GF", "GC", "DG", "Pts"]
-        col_widths  = [220, 40, 40, 40, 40, 40, 40, 40, 50]
-        col_anchors = ["w", "center","center","center","center","center","center","center","center"]
 
         header_row = tk.CTkFrame(self.scroll_grupo, fg_color=("gray80", "gray30"), corner_radius=4)
         header_row.pack(fill="x", padx=5, pady=(4, 0))
-
-        for col, width, anchor in zip(cols, col_widths, col_anchors):
-            tk.CTkLabel(header_row, text=col, width=width, anchor=anchor,
+        for col, width in zip(cols, col_widths):
+            tk.CTkLabel(header_row, text=col, width=width,
+                        anchor="w" if col == cols[0] else "center",
                         font=("Arial", 11, "bold")).pack(side="left", padx=2, pady=4)
 
         for eq in equipos:
             fila = tk.CTkFrame(self.scroll_grupo, corner_radius=4)
             fila.pack(fill="x", padx=5, pady=2)
 
-            nombre_frame = tk.CTkFrame(fila, fg_color="transparent", height=24, width=220)
+            nombre_frame = tk.CTkFrame(fila, fg_color="transparent", height=28, width=COL_NOMBRE)
             nombre_frame.pack(side="left", padx=2)
             nombre_frame.pack_propagate(False)
 
-            tk.CTkLabel(nombre_frame, text=str(eq.get("posicion", "")),
-                        width=24, text_color="gray").pack(side="left")
-            tk.CTkLabel(nombre_frame, text=eq.get("pais", ""),
-                        anchor="w").pack(side="left", padx=(4, 0))
+            self._pack_equipo_con_bandera(
+                nombre_frame,
+                eq.get("abreviatura", ""),
+                eq.get("pais", ""),
+                pos_text=eq.get("posicion", ""),
+            )
 
             stats = ["pj", "g", "e", "p", "gf", "gc", "dg", "pts"]
             for key, width in zip(stats, col_widths[1:]):
-                es_pts = key == "pts"
                 tk.CTkLabel(fila, text=str(eq.get(key, 0)), width=width, anchor="center",
-                            font=("Arial", 12, "bold") if es_pts else ("Arial", 12)
+                            font=("Arial", 12, "bold") if key == "pts" else ("Arial", 12),
                             ).pack(side="left", padx=2, pady=6)
 
     def _render_partidos(self, partidos):
         for widget in self.scroll_fecha.winfo_children():
             widget.destroy()
+
+        equipos_all = Equipo.getAllEquipos() or []
+        abrev_map = {e["pais"]: e.get("abreviatura", "") for e in equipos_all}
 
         fecha_actual = None
         for p in partidos:
@@ -433,21 +469,37 @@ class TorneoReportFrame(tk.CTkFrame):
                             anchor="w").pack(fill="x", pady=(10, 2), padx=5)
 
             card = tk.CTkFrame(self.scroll_fecha, corner_radius=6)
-            card.pack(fill="x", pady=3, padx=5)
+            card.pack(fill="x", pady=(0, 8), padx=5)
 
             fila = tk.CTkFrame(card, fg_color="transparent")
             fila.pack(pady=(8, 2))
 
-            tk.CTkLabel(fila, text=p["local"],     width=150, anchor="e").pack(side="left")
-            tk.CTkLabel(fila, text=p["hora"],      width=60,  font=("Arial", 14, "bold")).pack(side="left")
-            tk.CTkLabel(fila, text=p["visitante"], width=150, anchor="w").pack(side="left")
+            # Local (alineado a la derecha: nombre → bandera)
+            local_frame = tk.CTkFrame(fila, fg_color="transparent", width=160)
+            local_frame.pack(side="left")
+            local_frame.pack_propagate(False)
+            tk.CTkLabel(local_frame, text=p["local"], anchor="e").pack(side="left", expand=True, fill="x")
+            _flag_label(local_frame, abrev_map.get(p["local"], "")).pack(side="left", padx=(4, 0))
+
+            tk.CTkLabel(fila, text=p["hora"], width=60,
+                        font=("Arial", 14, "bold")).pack(side="left", padx=6)
+
+            # Visitante (bandera → nombre)
+            visit_frame = tk.CTkFrame(fila, fg_color="transparent", width=160)
+            visit_frame.pack(side="left")
+            visit_frame.pack_propagate(False)
+            _flag_label(visit_frame, abrev_map.get(p["visitante"], "")).pack(side="left", padx=(0, 4))
+            tk.CTkLabel(visit_frame, text=p["visitante"], anchor="w").pack(side="left")
 
             tk.CTkLabel(card, text=f'{p["fase"]}  ·  {p["lugar"]}',
-                        text_color="gray", font=("Arial", 11)).pack(pady=(0, 8))
+                        text_color="gray", font=("Arial", 11)).pack(pady=(0, 6))
 
     def _render_informe_equipo(self, partidos, clasificacion=None):
         for widget in self.scroll_equipo.winfo_children():
             widget.destroy()
+
+        equipos_all = Equipo.getAllEquipos() or []
+        abrev_map = {e["pais"]: e.get("abreviatura", "") for e in equipos_all}
 
         if not partidos:
             tk.CTkLabel(self.scroll_equipo,
@@ -455,12 +507,22 @@ class TorneoReportFrame(tk.CTkFrame):
                         text_color="gray").pack(pady=20, anchor="w", padx=5)
         else:
             for p in partidos:
-                linea = (
-                    f"{p['fecha']}  -  {p['fase']}  -  "
-                    f"{p['local']} {p['golesLocal']} : {p['golesVisit']} {p['visitante']}"
-                )
-                tk.CTkLabel(self.scroll_equipo, text=linea, anchor="w",
-                            font=("Arial", 12)).pack(fill="x", padx=5, pady=2, anchor="w")
+                fila = tk.CTkFrame(self.scroll_equipo, fg_color="transparent")
+                fila.pack(fill="x", padx=5, pady=2, anchor="w")
+
+                # fecha y fase
+                tk.CTkLabel(fila, text=f"{p['fecha']}  -  {p['fase']}  - ",
+                            font=("Arial", 12), anchor="w").pack(side="left")
+
+                # local con bandera
+                _flag_label(fila, abrev_map.get(p["local"], "")).pack(side="left", padx=(0, 3))
+                tk.CTkLabel(fila, text=f"{p['local']} {p['golesLocal']} : {p['golesVisit']} ",
+                            font=("Arial", 12), anchor="w").pack(side="left")
+
+                # visitante con bandera
+                _flag_label(fila, abrev_map.get(p["visitante"], "")).pack(side="left", padx=(0, 3))
+                tk.CTkLabel(fila, text=p["visitante"],
+                            font=("Arial", 12), anchor="w").pack(side="left")
 
         if clasificacion:
             tk.CTkLabel(self.scroll_equipo, text=clasificacion, anchor="w",
@@ -475,6 +537,9 @@ class TorneoReportFrame(tk.CTkFrame):
                         text="No hay próximos partidos para este equipo.",
                         text_color="gray").pack(pady=40)
             return
+
+        equipos_all = Equipo.getAllEquipos() or []
+        abrev_map = {e["pais"]: e.get("abreviatura", "") for e in equipos_all}
 
         card = tk.CTkFrame(self.container_siguiente, corner_radius=8, border_width=1,
                            border_color=("gray75", "gray35"))
@@ -507,11 +572,13 @@ class TorneoReportFrame(tk.CTkFrame):
         equipos_col = tk.CTkFrame(mid_row, fg_color="transparent")
         equipos_col.pack(side="left", fill="y")
 
-        for nombre_equipo in [partido.get("local", ""), partido.get("visitante", "")]:
+        for nombre_equipo, abrev in [
+            (partido.get("local", ""),     partido.get("local_abrev", "")),
+            (partido.get("visitante", ""), partido.get("visitante_abrev", "")),
+        ]:
             fila_eq = tk.CTkFrame(equipos_col, fg_color="transparent")
             fila_eq.pack(anchor="w", pady=4)
-            tk.CTkFrame(fila_eq, width=24, height=16, corner_radius=2,
-                        fg_color=("gray70", "gray40")).pack(side="left", padx=(0, 8))
+            _flag_label(fila_eq, abrev, size=(32, 21)).pack(side="left", padx=(0, 8))
             tk.CTkLabel(fila_eq, text=nombre_equipo,
                         font=("Arial", 13, "bold"), anchor="w").pack(side="left")
 
@@ -519,30 +586,26 @@ class TorneoReportFrame(tk.CTkFrame):
                     font=("Arial", 26, "bold")).pack(side="right", padx=10)
 
     def _prebuild_all_grupos(self):
-        """Construye la tabla de todos los grupos en segundo plano al iniciar."""
         self._render_all_grupos()
 
     def _render_all_grupos(self):
         scroll = self.scroll_all_grupos
 
-        # Limpiar widgets existentes
         for widget in scroll.winfo_children():
             widget.destroy()
 
         grupos = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"]
-        col_widths  = [220, 40, 40, 40, 40, 40, 40, 40, 50]
+        COL_NOMBRE  = 248
+        col_widths  = [COL_NOMBRE, 40, 40, 40, 40, 40, 40, 40, 50]
         stats_keys  = ["pj", "g", "e", "p", "gf", "gc", "dg", "pts"]
 
-        # Traer todos los datos de una sola vez antes de tocar la UI
         datos_grupos = {g: getTablaDeGrupo(g) or [] for g in grupos}
 
-        # Construir toda la tabla en un solo bloque
-        # Usar un único CTkFrame contenedor para minimizar reflows del scrollable
         contenedor = tk.CTkFrame(scroll, fg_color="transparent")
         contenedor.pack(fill="x", padx=5)
         contenedor.grid_columnconfigure(0, weight=1)
 
-        fila_idx = 0
+        fila_idx    = 0
         font_normal = ("Arial", 12)
         font_bold   = ("Arial", 12, "bold")
         font_header = ("Arial", 11, "bold")
@@ -554,7 +617,6 @@ class TorneoReportFrame(tk.CTkFrame):
 
             cols = ["Grupo " + grupo, "PJ", "G", "E", "P", "GF", "GC", "DG", "Pts"]
 
-            # Header del grupo
             header_row = tk.CTkFrame(contenedor, fg_color=("gray80", "gray30"), corner_radius=4)
             header_row.grid(row=fila_idx, column=0, sticky="ew", pady=(8, 0))
             fila_idx += 1
@@ -564,20 +626,21 @@ class TorneoReportFrame(tk.CTkFrame):
                             anchor="w" if col == cols[0] else "center",
                             font=font_header).pack(side="left", padx=2, pady=4)
 
-            # Filas de equipos
             for eq in equipos:
                 fila = tk.CTkFrame(contenedor, corner_radius=4)
                 fila.grid(row=fila_idx, column=0, sticky="ew", pady=2)
                 fila_idx += 1
 
-                nombre_frame = tk.CTkFrame(fila, fg_color="transparent", height=24, width=220)
+                nombre_frame = tk.CTkFrame(fila, fg_color="transparent", height=28, width=COL_NOMBRE)
                 nombre_frame.pack(side="left", padx=2)
                 nombre_frame.pack_propagate(False)
 
-                tk.CTkLabel(nombre_frame, text=str(eq.get("posicion", "")),
-                            width=24, text_color="gray").pack(side="left")
-                tk.CTkLabel(nombre_frame, text=eq.get("pais", ""),
-                            anchor="w").pack(side="left", padx=(4, 0))
+                self._pack_equipo_con_bandera(
+                    nombre_frame,
+                    eq.get("abreviatura", ""),
+                    eq.get("pais", ""),
+                    pos_text=eq.get("posicion", ""),
+                )
 
                 for key, width in zip(stats_keys, col_widths[1:]):
                     tk.CTkLabel(fila, text=str(eq.get(key, 0)), width=width, anchor="center",

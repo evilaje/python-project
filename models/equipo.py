@@ -202,40 +202,24 @@ def getDiferenciaGoles(id, filename:str = get_path("data", "partidos.json")):
     with open(filename, "r", encoding="utf-8") as file:
         if not is_file_empty(filename):
             partidos = json.load(file)
-            mejorDiferencia = None
             golesFavor = 0
             golesContra = 0
             for p in partidos:
                 if p["idEquipo1"] == id:
-                    golesFavor = p["golesT1"]
-                    golesContra = p["golesT2"]
+                    golesFavor += p["golesT1"]
+                    golesContra += p["golesT2"]
                 elif p["idEquipo2"] == id:
-                    golesFavor = p["golesT2"]
-                    golesContra = p["golesT1"]
+                    golesFavor += p["golesT2"]
+                    golesContra += p["golesT1"]
 
-                if mejorDiferencia is None or golesFavor - golesContra > mejorDiferencia:
-                    mejorDiferencia = golesFavor - golesContra
-
-            return mejorDiferencia
+            return golesFavor - golesContra
         return None
 
 # ngl este yo estaba viendo la comparacion de los mejores terceros y copilot se altero y me dijo
 # escribi esto y yo le hice caso, voy a comentar lo que entiendo igual
 def ordenar_terceros(terceros):
-    # definir la funcion aca adentro es tipo hacer private funcion porque total no se usa en ningun otro lado xd
-    def key_eq(eq):
-        diferencia = getDiferenciaGoles(eq["id"])
-        goles = getGoles(eq["id"])
-        return (
-            eq.get("puntos", 0),
-            diferencia if diferencia is not None else -9999,
-            goles if goles is not None else -9999,
-            eq.get("prefijo", "")
-        )
-    # ok al parecer key=key_eq lo que hace es alterar el funcionamiento del sort
-    # le dice que ordene primero por puntos, despues por la mayor diferencia de goles en un partido
-    # (esa funcion hice esta en algun lado), despues goles totales (tambien otra funcion) y de ultimo compara los prefix
-    return sorted(terceros, key=key_eq, reverse=True)
+    return ordenar_equipos(terceros)
+
 
 """verificar validaciones despues"""
 # esta funcion retorna la id del equipo que quedo puesto pos en el grupo que se le mande
@@ -271,6 +255,28 @@ def getEquipo(id, filename:str = None):
         if (id == obj["id"]): return obj
     return None
 
+def ordenar_equipos(equipos):
+    """Ordena equipos con prioridad:
+    1) más puntos
+    2) mayor diferencia de goles
+    3) más goles marcados
+    Desempate final: prefijo.
+    """
+    def key_eq(eq):
+        puntos = eq.get("puntos", 0)
+        diferencia = getDiferenciaGoles(eq["id"])
+        goles = getGoles(eq["id"])
+
+        return (
+            puntos,
+            diferencia if diferencia is not None else -9999,
+            goles if goles is not None else -9999,
+            eq.get("prefijo", ""),
+        )
+
+    return sorted(equipos, key=key_eq, reverse=True)
+
+
 # funcion de mierda para conseguir los equipo que pasan la puta fase de grupos
 # que muchas validaciones mierdon
 """no se ni si funciona esto, verificar"""
@@ -291,7 +297,7 @@ def getMejoresEquiposGrupo(filename:str = None):
                     for eq in arr:
                         if eq["grupo"] == grupo:
                             equiposGrupo.append(eq)
-                    equiposGrupo.sort(key=lambda x: x["puntos"], reverse=True)
+                    equiposGrupo = ordenar_equipos(equiposGrupo)
                     i = 0
                     for eq in equiposGrupo:
                         eq["posicion"] = i+1
@@ -331,3 +337,54 @@ def getCantidadAllEquipos(filename = PATH):
             else:
                 return -1 #archivo vacio, no creo que se use
     return count
+
+
+def recalcularPuntos(filename: str = None):
+    if filename is None:
+        filename = PATH
+
+    equipos_file = get_path("data", "equipos.json")
+
+    if not file_exists(filename) or not file_exists(equipos_file):
+        return False
+
+    with open(filename, "r", encoding="utf-8") as f:
+        partidos = json.load(f)
+
+    with open(equipos_file, "r", encoding="utf-8") as f:
+        equipos = json.load(f)
+
+    # Resetear todos los puntos a 0
+    for eq in equipos:
+        eq["puntos"] = 0
+
+    # Recalcular desde todos los partidos jugados
+    for partido in partidos:
+        if not partido.get("jugado"):
+            continue
+
+        id_t1 = partido.get("idEquipo1")
+        id_t2 = partido.get("idEquipo2")
+        g1 = partido.get("golesT1", 0)
+        g2 = partido.get("golesT2", 0)
+
+        if not id_t1 or not id_t2:
+            continue
+
+        for eq in equipos:
+            eq.setdefault("puntos", 0)
+            if g1 > g2:
+                if eq["id"] == id_t1:
+                    eq["puntos"] += 3
+            elif g2 > g1:
+                if eq["id"] == id_t2:
+                    eq["puntos"] += 3
+            else:  # empate, incluyendo 0-0
+                if eq["id"] == id_t1 or eq["id"] == id_t2:
+                    eq["puntos"] += 1
+
+    with open(equipos_file, "w", encoding="utf-8") as f:
+        json.dump(equipos, f, indent=4)
+
+    return True
+

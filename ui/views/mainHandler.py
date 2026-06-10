@@ -4,6 +4,7 @@ from ui.views.resultsHandler import *
 from ui.views.configHandler import *
 from models.partido import Partido as PartidoModel
 
+from ui.views.reportHandler import _get_flag
 import models.equipo as equipo
 from datetime import datetime, timedelta
 from tkcalendar import DateEntry
@@ -167,15 +168,24 @@ class MainFrame(tk.CTkFrame):
 
         eq1 = equipo.getEquipo(partido.get("idEquipo1"))
         eq2 = equipo.getEquipo(partido.get("idEquipo2"))
-        local_nombre = eq1.get("pais") if eq1 else partido.get("idEquipo1") or "Por definir"
-        visitante_nombre = eq2.get("pais") if eq2 else partido.get("idEquipo2") or "Por definir"
 
-        for nombre_equipo in [local_nombre, visitante_nombre]:
+        for eq_obj, fallback_id in [(eq1, partido.get("idEquipo1")), (eq2, partido.get("idEquipo2"))]:
+            nombre = eq_obj.get("pais") if eq_obj else fallback_id or "Por definir"
+            abrev  = eq_obj.get("abreviatura", "") if eq_obj else ""
+
             fila_eq = tk.CTkFrame(equipos_col, fg_color="transparent")
             fila_eq.pack(anchor="w", pady=4)
-            tk.CTkFrame(fila_eq, width=24, height=16, corner_radius=2,
-                        fg_color=("gray70", "gray40")).pack(side="left", padx=(0, 8))
-            tk.CTkLabel(fila_eq, text=nombre_equipo,
+
+            # bandera
+            flag_img = _get_flag(abrev, size=(32, 21))
+            if flag_img:
+                tk.CTkLabel(fila_eq, text="", image=flag_img,
+                            width=32, height=21).pack(side="left", padx=(0, 8))
+            else:
+                tk.CTkFrame(fila_eq, width=32, height=21, corner_radius=2,
+                            fg_color=("gray70", "gray40")).pack(side="left", padx=(0, 8))
+
+            tk.CTkLabel(fila_eq, text=nombre,
                         font=("Arial", 13, "bold"), anchor="w").pack(side="left")
 
         tk.CTkLabel(mid_row, text=partido.get("hora", ""),
