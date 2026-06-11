@@ -15,28 +15,21 @@ class MainFrame(tk.CTkFrame):
         super().__init__(root)
         self.root = root
 
-        torneoAcivo = isTorneoActivo()
-        boton_activo, config_abierto = "normal" if torneoAcivo else "disabled", "normal" if not torneoAcivo else "disabled"
-
-        #DESACTIVAR
-        '''descomentar sgte linea para habilitar todos los botones ni bollo'''
-        #boton_activo, config_abierto = "normal", "normal"
-
-        #prueba datepicker
-
+        # crear los botones primero
         self.btn1 = tk.CTkButton(self, text="Configuración del Torneo", height=50, command=self.ir_a_config)
-        self.btn1.configure(state=config_abierto) #lo contrario al resto
         self.btn1.pack(pady=10, padx=10, fill="x")
 
         self.btn2 = tk.CTkButton(self, text="Registro de Resultados", height=50, command=self.ir_a_result)
-        self.btn2.configure(state=boton_activo)
         self.btn2.pack(pady=10, padx=10, fill="x")
 
         self.btn3 = tk.CTkButton(self, text="Emisión de Informes", height=50, command=self.ir_a_report)
-        self.btn3.configure(state=boton_activo)
         self.btn3.pack(pady=10, padx=10, fill="x")
 
         tk.CTkButton(self, text="Salir", height=50, command=root.destroy).pack(pady=10, padx=10, fill="x")
+
+        # aplicar estados correctos
+        self._actualizar_estado_botones()
+
 
         # Panel: siguiente partido global
         self.next_panel = tk.CTkFrame(self, corner_radius=6, border_width=1, fg_color=("gray20", "gray15"))
@@ -58,6 +51,24 @@ class MainFrame(tk.CTkFrame):
         self.update_next_match()
         #peque;a bromita
         #self.after(500, self._check_paraguay_ganador)
+
+    def _actualizar_estado_botones(self):
+        torneoActivo = isTorneoActivo()
+        boton_activo = "normal" if torneoActivo else "disabled"
+        config_abierto = "normal" if not torneoActivo else "disabled"
+
+        partidos = PartidoModel.getAllPartidos()
+        if partidos:
+            partido_final = next((p for p in partidos if p.get("id") == 104), None)
+            if partido_final and partido_final.get("jugado"):
+                boton_activo = "disabled"
+
+        self.btn1.configure(state=config_abierto)
+        self.btn2.configure(state=boton_activo)
+        self.btn3.configure(state="normal" if torneoActivo else "disabled")
+
+    def habilitar_botones(self):
+        self._actualizar_estado_botones()
 
     def ir_a_config(self):
         config_frame = TorneoConfigFrame(self.root, self)

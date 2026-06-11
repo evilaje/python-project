@@ -488,11 +488,11 @@ class TorneoResultFrame(tk.CTkFrame):
             return
 
         #verificar q en caso d empate los penales no se vayan vacios
-        if goles_t1 == goles_t2:
-            if penales_t1 == penales_t2 or (not penales_t1 and not penales_t2):
-                CTkMessagebox(title="Error", message="No se puede empatar en la tanda de penales", icon="cancel")
-                return
-
+        if self._partido_seleccionado.get("fase") != "Fase de Grupos":
+            if goles_t1 == goles_t2:
+                if penales_t1 == penales_t2 or (not penales_t1 and not penales_t2):
+                    CTkMessagebox(title="Error", message="No se puede empatar en la tanda de penales", icon="cancel")
+                    return
 
 
         if not penales_t1 and not penales_t2:

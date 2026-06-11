@@ -16,4 +16,5 @@ class App(tk.CTk):
 
     def back_to_main(self, frame_actual):
         frame_actual.pack_forget()
+        self.main_frame._actualizar_estado_botones()
         self.main_frame.pack(pady = 20, padx = 20, fill = "both", expand = True)

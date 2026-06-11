@@ -383,23 +383,7 @@ class TorneoReportFrame(tk.CTkFrame):
         )
         estado_fase = None
         if equipo_obj:
-            fase_val = (equipo_obj.get("fase") or "").strip().lower()
-            if "grup" in fase_val or fase_val in ("grupos", "fase de grupos"):
-                estado_fase = "En fase de Grupos"
-            elif "16" in fase_val:
-                estado_fase = "Clasificado a 16avos de Final"
-            elif "octav" in fase_val:
-                estado_fase = "Clasificado a Octavos de Final"
-            elif "cuart" in fase_val:
-                estado_fase = "Clasificado a Cuartos de Final"
-            elif "semif" in fase_val:
-                estado_fase = "Clasificado a Semifinal"
-            elif "tercer" in fase_val:
-                estado_fase = "Clasificado a Tercer Puesto"
-            elif "final" in fase_val and "16" not in fase_val:
-                estado_fase = "Clasificado a Final"
-            elif "elimin" in fase_val:
-                estado_fase = "Clasificado a Eliminatorias"
+            estado_fase = equipo_obj.get("fase")
 
         self._render_informe_equipo(partidos, estado_fase or clasificacion)
 
