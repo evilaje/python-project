@@ -5,6 +5,7 @@ from models.partido import *
 from models.equipo import Equipo, getEquipo
 from models.torneo import getTorneo, avanzarFase, setFaseTorneo
 from CTkMessagebox import CTkMessagebox
+from services.equipo_controller import isParaguayGanador
 
 
 class TorneoResultFrame(tk.CTkFrame):
@@ -486,6 +487,14 @@ class TorneoResultFrame(tk.CTkFrame):
             CTkMessagebox(title="Error", message="Completa ambos campos de penales o deja los dos vacíos", icon="cancel")
             return
 
+        #verificar q en caso d empate los penales no se vayan vacios
+        if goles_t1 == goles_t2:
+            if penales_t1 == penales_t2 or (not penales_t1 and not penales_t2):
+                CTkMessagebox(title="Error", message="No se puede empatar en la tanda de penales", icon="cancel")
+                return
+
+
+
         if not penales_t1 and not penales_t2:
             penales_t1 = "0"
             penales_t2 = "0"
@@ -517,8 +526,31 @@ class TorneoResultFrame(tk.CTkFrame):
             CTkMessagebox(title="Error", message=resultado[1], icon="cancel")
 
     def volver(self):
+        self._check_paraguay_ganador()
         self.root.back_to_main(self)
 
     def cleanInputs(self, inputs):
         for entry in inputs:
             entry.delete(0, "end")
+
+    def _check_paraguay_ganador(self):
+        if isParaguayGanador():
+            self._mostrar_video_ganador()
+
+    def _mostrar_video_ganador(self):
+        import  os
+
+        ventana = tk.CTkToplevel(self.root)
+        ventana.title("PARAGUAY CAMPEOON!!!!!1")
+        ventana.geometry("640x400")
+        ventana.grab_set()  # bloquea la ventana principal hasta cerrar esta
+
+        label = tk.CTkLabel(ventana, text="🇵🇾 ¡PARAGUAY GANO EL TORNEO PAPAAAA! 🇵🇾",
+                            font=tk.CTkFont(size=22, weight="bold"))
+        label.pack(pady=20)
+        rutaVid = get_path("assets", "py_campeon.mp4")
+
+        if os.path.exists(rutaVid):
+            os.startfile(rutaVid)
+        else:
+            print("NO SE PUDO REPRODUCIR EL VIDEO")

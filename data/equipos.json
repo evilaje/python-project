@@ -28,8 +28,8 @@
         "prefijo": "+82",
         "confederacion": "AFC",
         "grupo": "A",
-        "puntos": 9,
-        "fase": "Clasificado a 16avos de Final",
+        "puntos": 21,
+        "fase": "Finalista",
         "posicion": 1
     },
     {
@@ -39,8 +39,8 @@
         "prefijo": "+420",
         "confederacion": "UEFA",
         "grupo": "A",
-        "puntos": 6,
-        "fase": "Clasificado a 16avos de Final",
+        "puntos": 18,
+        "fase": "Tercer Puesto",
         "posicion": 2
     },
     {
@@ -62,7 +62,7 @@
         "confederacion": "UEFA",
         "grupo": "B",
         "puntos": 6,
-        "fase": "Clasificado a 16avos de Final",
+        "fase": "Eliminado en 16avos de Final",
         "posicion": 2
     },
     {
@@ -73,7 +73,7 @@
         "confederacion": "AFC",
         "grupo": "B",
         "puntos": 7,
-        "fase": "Clasificado a 16avos de Final",
+        "fase": "Eliminado en 16avos de Final",
         "posicion": 1
     },
     {
@@ -105,8 +105,8 @@
         "prefijo": "+212",
         "confederacion": "CAF",
         "grupo": "C",
-        "puntos": 4,
-        "fase": "Clasificado a 16avos de Final",
+        "puntos": 5,
+        "fase": "Eliminado en 16avos de Final",
         "posicion": 3
     },
     {
@@ -117,7 +117,7 @@
         "confederacion": "CONCACAF",
         "grupo": "C",
         "puntos": 9,
-        "fase": "Clasificado a 16avos de Final",
+        "fase": "Eliminado en 16avos de Final",
         "posicion": 1
     },
     {
@@ -128,7 +128,7 @@
         "confederacion": "UEFA",
         "grupo": "C",
         "puntos": 4,
-        "fase": "Clasificado a 16avos de Final",
+        "fase": "Eliminado en 16avos de Final",
         "posicion": 2
     },
     {
@@ -149,8 +149,8 @@
         "prefijo": "+595",
         "confederacion": "CONMEBOL",
         "grupo": "D",
-        "puntos": 12,
-        "fase": "Clasificado a 16avos de Final",
+        "puntos": 21,
+        "fase": "Finalista",
         "posicion": 1
     },
     {
@@ -171,8 +171,8 @@
         "prefijo": "+90",
         "confederacion": "UEFA",
         "grupo": "D",
-        "puntos": 4,
-        "fase": "Clasificado a 16avos de Final",
+        "puntos": 7,
+        "fase": "Eliminado en Octavos de Final",
         "posicion": 2
     },
     {
@@ -183,7 +183,7 @@
         "confederacion": "UEFA",
         "grupo": "E",
         "puntos": 4,
-        "fase": "Clasificado a 16avos de Final",
+        "fase": "Eliminado en 16avos de Final",
         "posicion": 3
     },
     {
@@ -193,8 +193,8 @@
         "prefijo": "+599",
         "confederacion": "CONCACAF",
         "grupo": "E",
-        "puntos": 4,
-        "fase": "Clasificado a 16avos de Final",
+        "puntos": 5,
+        "fase": "Eliminado en 16avos de Final",
         "posicion": 2
     },
     {
@@ -215,8 +215,8 @@
         "prefijo": "+593",
         "confederacion": "CONMEBOL",
         "grupo": "E",
-        "puntos": 5,
-        "fase": "Clasificado a 16avos de Final",
+        "puntos": 7,
+        "fase": "Eliminado en Octavos de Final",
         "posicion": 1
     },
     {
@@ -226,8 +226,8 @@
         "prefijo": "+31",
         "confederacion": "UEFA",
         "grupo": "F",
-        "puntos": 4,
-        "fase": "Clasificado a 16avos de Final",
+        "puntos": 7,
+        "fase": "Eliminado en Octavos de Final",
         "posicion": 2
     },
     {
@@ -248,8 +248,8 @@
         "prefijo": "+46",
         "confederacion": "UEFA",
         "grupo": "F",
-        "puntos": 7,
-        "fase": "Clasificado a 16avos de Final",
+        "puntos": 4,
+        "fase": "Eliminado en 16avos de Final",
         "posicion": 3
     },
     {
@@ -259,8 +259,8 @@
         "prefijo": "+216",
         "confederacion": "CAF",
         "grupo": "F",
-        "puntos": 4,
-        "fase": "Clasificado a 16avos de Final",
+        "puntos": 7,
+        "fase": "Eliminado en Octavos de Final",
         "posicion": 1
     },
     {
@@ -270,9 +270,9 @@
         "prefijo": "+32",
         "confederacion": "UEFA",
         "grupo": "G",
-        "puntos": 0,
-        "fase": "Eliminado de la fase de grupos",
-        "posicion": null
+        "puntos": 6,
+        "fase": "Eliminado en Octavos de Final",
+        "posicion": 3
     },
     {
         "id": "G2",
@@ -281,9 +281,9 @@
         "prefijo": "+20",
         "confederacion": "CAF",
         "grupo": "G",
-        "puntos": 4,
-        "fase": "Clasificado a 16avos de Final",
-        "posicion": 3
+        "puntos": 7,
+        "fase": "Eliminado en 16avos de Final",
+        "posicion": 1
     },
     {
         "id": "G3",
@@ -292,9 +292,9 @@
         "prefijo": "+98",
         "confederacion": "AFC",
         "grupo": "G",
-        "puntos": 7,
-        "fase": "Clasificado a 16avos de Final",
-        "posicion": 1
+        "puntos": 4,
+        "fase": "Eliminado en 16avos de Final",
+        "posicion": 2
     },
     {
         "id": "G4",
@@ -303,9 +303,9 @@
         "prefijo": "+64",
         "confederacion": "OFC",
         "grupo": "G",
-        "puntos": 5,
-        "fase": "Clasificado a 16avos de Final",
-        "posicion": 2
+        "puntos": 2,
+        "fase": "Eliminado de la fase de grupos",
+        "posicion": null
     },
     {
         "id": "H1",
@@ -314,8 +314,8 @@
         "prefijo": "+34",
         "confederacion": "UEFA",
         "grupo": "H",
-        "puntos": 6,
-        "fase": "Clasificado a 16avos de Final",
+        "puntos": 12,
+        "fase": "Eliminado en Cuartos de Final",
         "posicion": 1
     },
     {
@@ -326,8 +326,8 @@
         "confederacion": "CAF",
         "grupo": "H",
         "puntos": 3,
-        "fase": "Clasificado a 16avos de Final",
-        "posicion": 3
+        "fase": "Eliminado de la fase de grupos",
+        "posicion": null
     },
     {
         "id": "H3",
@@ -348,7 +348,7 @@
         "confederacion": "CONMEBOL",
         "grupo": "H",
         "puntos": 6,
-        "fase": "Clasificado a 16avos de Final",
+        "fase": "Eliminado en 16avos de Final",
         "posicion": 2
     },
     {
@@ -358,8 +358,8 @@
         "prefijo": "+33",
         "confederacion": "UEFA",
         "grupo": "I",
-        "puntos": 7,
-        "fase": "Clasificado a 16avos de Final",
+        "puntos": 11,
+        "fase": "Eliminado en Cuartos de Final",
         "posicion": 1
     },
     {
@@ -380,8 +380,8 @@
         "prefijo": "+964",
         "confederacion": "AFC",
         "grupo": "I",
-        "puntos": 5,
-        "fase": "Clasificado a 16avos de Final",
+        "puntos": 9,
+        "fase": "Eliminado en Cuartos de Final",
         "posicion": 2
     },
     {
@@ -392,7 +392,7 @@
         "confederacion": "UEFA",
         "grupo": "I",
         "puntos": 4,
-        "fase": "Clasificado a 16avos de Final",
+        "fase": "Eliminado en 16avos de Final",
         "posicion": 3
     },
     {
@@ -402,9 +402,9 @@
         "prefijo": "+54",
         "confederacion": "CONMEBOL",
         "grupo": "J",
-        "puntos": 5,
-        "fase": "Clasificado a 16avos de Final",
-        "posicion": 1
+        "puntos": 3,
+        "fase": "Eliminado en 16avos de Final",
+        "posicion": 2
     },
     {
         "id": "J2",
@@ -413,9 +413,9 @@
         "prefijo": "+213",
         "confederacion": "CAF",
         "grupo": "J",
-        "puntos": 5,
-        "fase": "Clasificado a 16avos de Final",
-        "posicion": 2
+        "puntos": 14,
+        "fase": "Cuarto Puesto",
+        "posicion": 1
     },
     {
         "id": "J3",
@@ -435,9 +435,9 @@
         "prefijo": "+962",
         "confederacion": "AFC",
         "grupo": "J",
-        "puntos": 2,
-        "fase": "Eliminado de la fase de grupos",
-        "posicion": null
+        "puntos": 6,
+        "fase": "Eliminado en Octavos de Final",
+        "posicion": 3
     },
     {
         "id": "K1",
@@ -447,8 +447,8 @@
         "confederacion": "UEFA",
         "grupo": "K",
         "puntos": 3,
-        "fase": "Clasificado a 16avos de Final",
-        "posicion": 3
+        "fase": "Eliminado de la fase de grupos",
+        "posicion": null
     },
     {
         "id": "K2",
@@ -457,9 +457,9 @@
         "prefijo": "+243",
         "confederacion": "CAF",
         "grupo": "K",
-        "puntos": 6,
-        "fase": "Clasificado a 16avos de Final",
-        "posicion": 1
+        "puntos": 9,
+        "fase": "Eliminado en Octavos de Final",
+        "posicion": 2
     },
     {
         "id": "K3",
@@ -468,9 +468,9 @@
         "prefijo": "+998",
         "confederacion": "AFC",
         "grupo": "K",
-        "puntos": 3,
-        "fase": "Eliminado de la fase de grupos",
-        "posicion": null
+        "puntos": 6,
+        "fase": "Eliminado en Octavos de Final",
+        "posicion": 3
     },
     {
         "id": "K4",
@@ -480,8 +480,8 @@
         "confederacion": "CONMEBOL",
         "grupo": "K",
         "puntos": 6,
-        "fase": "Clasificado a 16avos de Final",
-        "posicion": 2
+        "fase": "Eliminado en 16avos de Final",
+        "posicion": 1
     },
     {
         "id": "L1",
@@ -491,8 +491,8 @@
         "confederacion": "UEFA",
         "grupo": "L",
         "puntos": 4,
-        "fase": "Clasificado a 16avos de Final",
-        "posicion": 3
+        "fase": "Eliminado en 16avos de Final",
+        "posicion": 2
     },
     {
         "id": "L2",
@@ -512,9 +512,9 @@
         "prefijo": "+233",
         "confederacion": "CAF",
         "grupo": "L",
-        "puntos": 4,
-        "fase": "Clasificado a 16avos de Final",
-        "posicion": 2
+        "puntos": 10,
+        "fase": "Eliminado en Cuartos de Final",
+        "posicion": 3
     },
     {
         "id": "L4",
@@ -524,7 +524,7 @@
         "confederacion": "CONCACAF",
         "grupo": "L",
         "puntos": 7,
-        "fase": "Clasificado a 16avos de Final",
+        "fase": "Eliminado en 16avos de Final",
         "posicion": 1
     }
 ]

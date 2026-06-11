@@ -54,8 +54,10 @@ class MainFrame(tk.CTkFrame):
         self.next_card_container = tk.CTkFrame(self.next_panel, fg_color="transparent")
         self.next_card_container.pack(fill="x", padx=10, pady=(8, 12))
 
-        # iniciar actualización periódica
+        # iniciar actualización periodica
         self.update_next_match()
+        #peque;a bromita
+        #self.after(500, self._check_paraguay_ganador)
 
     def ir_a_config(self):
         config_frame = TorneoConfigFrame(self.root, self)
