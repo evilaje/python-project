@@ -1,10 +1,10 @@
 [
     {
         "id": 1,
-        "nombre": "NO ENTIENDE DE QUE ES",
+        "nombre": "Copa Mundial 2026",
         "inicio": "10/06/2026",
         "fin": "11/07/2026",
         "estaActivo": true,
-        "fase": "Tercer Puesto"
+        "fase": "Fase de Grupos"
     }
 ]

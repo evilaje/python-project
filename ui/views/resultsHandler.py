@@ -17,7 +17,7 @@ class TorneoResultFrame(tk.CTkFrame):
         self._partido_seleccionado = None
         self._item_activo = None  # tupla (frame, label) del ítem resaltado
 
-        # ── Layout raíz: sidebar | contenido ──────────────────────────────────
+        # ── Layout root: sidebar | contenido ──────────────────────────────────
         self.grid_columnconfigure(0, weight=0)   # sidebar (ancho fijo)
         self.grid_columnconfigure(1, weight=1)   # panel derecho
         self.grid_rowconfigure(0, weight=1)
@@ -487,13 +487,28 @@ class TorneoResultFrame(tk.CTkFrame):
             CTkMessagebox(title="Error", message="Completa ambos campos de penales o deja los dos vacíos", icon="cancel")
             return
 
-        #verificar q en caso d empate los penales no se vayan vacios
+        # En fase de grupos no puede haber penales
+        if self._partido_seleccionado.get("fase") == "Fase de Grupos":
+            if penales_t1 or penales_t2:
+                CTkMessagebox(title="Aviso", message="No hay tanda de penales en Fase de Grupos. No se deben agregar datos en el campo Penales.", icon="warning")
+                self.input_penales_t1.delete(0, "end")
+                self.input_penales_t2.delete(0, "end")
+                return
+
+        # En eliminatorias, si hubo empate los penales son obligatorios y no pueden empatar
         if self._partido_seleccionado.get("fase") != "Fase de Grupos":
             if goles_t1 == goles_t2:
                 if penales_t1 == penales_t2 or (not penales_t1 and not penales_t2):
                     CTkMessagebox(title="Error", message="No se puede empatar en la tanda de penales", icon="cancel")
                     return
 
+        # En eliminatorias, si no hubo empate no puede haber penales
+        if self._partido_seleccionado.get("fase") != "Fase de Grupos":
+            if goles_t1 != goles_t2 and (penales_t1 or penales_t2):
+                CTkMessagebox(title="Aviso", message="El partido no llego a tanda de penales. No debes cargar valores en el campo.", icon="warning")
+                self.input_penales_t1.delete(0, "end")
+                self.input_penales_t2.delete(0, "end")
+                return
 
         if not penales_t1 and not penales_t2:
             penales_t1 = "0"
@@ -524,6 +539,7 @@ class TorneoResultFrame(tk.CTkFrame):
             ])
         else:
             CTkMessagebox(title="Error", message=resultado[1], icon="cancel")
+
 
     def volver(self):
         self._check_paraguay_ganador()
