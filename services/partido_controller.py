@@ -97,7 +97,7 @@ def guardarResultado(id: int, g1: int, g2: int, gp1: int, gp2: int):
         return [True, "Exito"]
 
     return [False, "No se pudo guardar el resultado"]
-    
+
 def getPartidoPorFecha(fecha:str):
     # fecha expected format: "DD/MM/AAAA" (exact match)
     partidos = Partido.getAllPartidos()
@@ -272,7 +272,7 @@ def getSiguientePartido(equipo_nombre: str):
         except Exception:
             continue
 
-        if dt <= ahora:
+        if dt <= ahora or p["jugado"] == True:
             continue
 
         proximos.append((dt, p))
@@ -290,7 +290,7 @@ def getSiguientePartido(equipo_nombre: str):
 
     eq1 = equipo.getEquipo(proximo.get("idEquipo1"))
     eq2 = equipo.getEquipo(proximo.get("idEquipo2"))
-    
+
 
     partido_info = {
         "torneo": torneo_nombre,

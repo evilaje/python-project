@@ -111,6 +111,7 @@ class Equipo:
 
 
     # al abrir la app se cargar todo en un arreglo
+    @staticmethod
     def getAllEquipos(filename:str = None):
         if (filename is None):
             filename = PATH
@@ -255,6 +256,36 @@ def getEquipo(id, filename:str = None):
         if (id == obj["id"]): return obj
     return None
 
+def setEquipoFase(equipo_id: str, fase: str, filename: str = None):
+    """Actualiza el campo 'fase' de un equipo identificado por su id.
+    Retorna True si se actualizó, False si no se encontró o hubo error.
+    """
+    if filename is None:
+        filename = PATH
+
+    if not file_exists(filename):
+        return False
+
+    with open(filename, "r", encoding="utf-8") as f:
+        if is_file_empty(filename):
+            return False
+        equipos = json.load(f)
+
+    updated = False
+    for eq in equipos:
+        if eq.get("id") == equipo_id:
+            eq["fase"] = fase
+            updated = True
+            break
+
+    if not updated:
+        return False
+
+    with open(filename, "w", encoding="utf-8") as f:
+        json.dump(equipos, f, indent=4)
+
+    return True
+
 def ordenar_equipos(equipos):
     """Ordena equipos con prioridad:
     1) más puntos
@@ -387,4 +418,3 @@ def recalcularPuntos(filename: str = None):
         json.dump(equipos, f, indent=4)
 
     return True
-

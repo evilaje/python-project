@@ -30,7 +30,7 @@ def cargarGrupo(pais: str, grupo: str):
         msj = "Este grupo ya esta completo"
         return (saved, msj)
         #print("Ya existen 4 equipos en este grupo")
-        
+
     else:
         setGrupo(pais, grupo)
 
@@ -189,3 +189,9 @@ def guardarGrupo(grupo: str, paises: list):
 
     return True, "Grupo guardado correctamente", None
 
+def isParaguayGanador():
+    eqs = Equipo.getAllEquipos()
+    for e in eqs:
+        if e["pais"] == "Paraguay" and e["fase"] == "Primer Puesto":
+            return True
+    return False
